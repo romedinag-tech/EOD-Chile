@@ -4,3 +4,4 @@ pyarrow>=14
 plotly>=5.20
 streamlit-option-menu>=0.3.12
 numpy>=1.26
+pydeck>=0.9
