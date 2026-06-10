@@ -8,10 +8,15 @@ expandidas con sus factores de expansión corregidos por sesgo.
 
 - **Menú lateral**: selección de región / ciudad / año de la encuesta.
 - **Menú superior** (herramientas):
-  - **Ciudad** — comportamiento de viajes de una ciudad: partición modal, propósito,
-    distribución horaria (segmentable por modo/propósito), tendencias por grupo etario
-    y comportamiento por tipo de usuario. Filtros de segmentación por modo, propósito y edad.
-  - **Comparador** — partición modal / propósito de varias ciudades lado a lado.
+  - **Resumen** — panorama nacional: KPIs país, mapa de ciudades (tamaño ∝ viajes,
+    color ∝ % público), partición modal promedio y tabla comparada por ciudad.
+  - **Ciudad** — comportamiento de viajes de una ciudad, en pestañas:
+    *Resumen · Modos y propósitos · Distancia · Demografía · Ingreso · Mapas*.
+    Incluye partición modal, propósito, distribución horaria, **histograma por distancia**
+    (tramos 0-1…6+ km), tendencias por grupo etario y tipo de usuario, **segmentación por
+    quintil de ingreso**, y mapas de **generación/atracción**, **líneas de deseo** y
+    **matriz O/D interactiva** (zona origen → destinos). Filtros de segmentación globales.
+  - **Comparador** — partición modal/propósito, indicadores y dispersión entre ciudades.
   - **Ranking** — ordena las ciudades por indicador (viajes por persona, % público, etc.).
 
 ## Datos
@@ -48,7 +53,9 @@ data/                 # viajes_analiticos / hogar / persona (Parquet) + índice
 ## Roadmap
 
 - [x] Distancias de viaje + histograma por tramos (0-1, 1-2, … 6+ km), segmentable.
-- [x] Mapas: generación / atracción por zona y **líneas de deseo** (20 ciudades con zonificación).
-- [ ] Matriz O/D interactiva y filtros geográficos (seleccionar zona).
-- [ ] Segmentación por ingreso del hogar.
-- [ ] Más herramientas de comparación entre ciudades.
+- [x] Mapas: generación / atracción por zona y **líneas de deseo** (20 ciudades).
+- [x] Matriz O/D interactiva (seleccionar zona origen → destinos).
+- [x] Segmentación por ingreso del hogar (quintiles, 10 ciudades con dato).
+- [x] Resumen nacional + rediseño profesional (tema, KPIs, pestañas).
+- [ ] Ingreso del hogar para EOD 2010-13 (derivar desde ingreso de personas).
+- [ ] Exportar gráficos/tablas y descargar datos filtrados.
