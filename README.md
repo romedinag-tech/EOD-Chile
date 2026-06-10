@@ -47,7 +47,8 @@ data/                 # viajes_analiticos / hogar / persona (Parquet) + índice
 
 ## Roadmap
 
-- [ ] Distancias de viaje + histograma por tramos (0-1, 1-2, … 6+ km), segmentable.
-- [ ] Mapas: generación/atracción por zona, matriz O/D y **líneas de deseo**.
+- [x] Distancias de viaje + histograma por tramos (0-1, 1-2, … 6+ km), segmentable.
+- [x] Mapas: generación / atracción por zona y **líneas de deseo** (20 ciudades con zonificación).
+- [ ] Matriz O/D interactiva y filtros geográficos (seleccionar zona).
 - [ ] Segmentación por ingreso del hogar.
 - [ ] Más herramientas de comparación entre ciudades.
