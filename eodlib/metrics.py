@@ -8,6 +8,7 @@ ORDEN_PROP = ['Trabajo', 'Estudio', 'Otro']
 ORDEN_ETARIO = ['0-5', '6-14', '15-24', '25-44', '45-64', '65+']
 ORDEN_USUARIO = ['Niño/a', 'Joven', 'Adulto productivo', 'Adulto mayor']
 ORDEN_TRAMO = ['0-1', '1-2', '2-3', '3-4', '4-5', '5-6', '6+']
+ORDEN_QUINTIL = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5']
 
 
 def particion(d, dim, orden=None, dropna=True):

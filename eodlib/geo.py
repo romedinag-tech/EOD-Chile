@@ -58,3 +58,20 @@ def lineas_deseo(d, top_n=150, interzonal=True):
     pares = pares.merge(cen.rename(columns={'zona': 'zd', 'lon': 'lon_d', 'lat': 'lat_d'}), on='zd', how='left')
     pares = pares.dropna(subset=['lon_o', 'lon_d'])
     return pares.sort_values('factor', ascending=False).head(top_n)
+
+
+def destinos_desde(d, zona_origen, top_n=12):
+    """Destinos principales desde una zona origen (tabla + coords)."""
+    cen = centroides()
+    cen = cen[cen['ciudad'] == d['ciudad'].iloc[0]][['zona', 'lon', 'lat']]
+    g = d.assign(zo=_znorm(d['zona_origen']), zd=_znorm(d['zona_destino']))
+    g = g[g['zo'] == str(zona_origen)]
+    dest = g.groupby('zd')['factor'].sum().reset_index().rename(columns={'zd': 'zona', 'factor': 'viajes'})
+    dest = dest.merge(cen, on='zona', how='left').sort_values('viajes', ascending=False)
+    return dest
+
+
+def zonas_con_viajes(d):
+    """Lista de zonas origen ordenadas por volumen (para selector)."""
+    g = d.assign(zo=_znorm(d['zona_origen'])).groupby('zo')['factor'].sum().sort_values(ascending=False)
+    return g.index.tolist()

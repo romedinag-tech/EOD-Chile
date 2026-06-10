@@ -66,3 +66,43 @@ def viajes_ciudad(ciudad, solo_laboral=True, solo_completos=True):
 
 def total_expandido(d):
     return float(pd.to_numeric(d['factor'], errors='coerce').sum())
+
+
+@st.cache_data(show_spinner=False)
+def conteos(ciudad):
+    """(poblacion, hogares) expandidos de la ciudad."""
+    per = cargar_persona(); hog = cargar_hogar()
+    pob = float(per[per['ciudad'] == ciudad]['factor'].sum())
+    h = pd.to_numeric(hog[hog['ciudad'] == ciudad]['factor'], errors='coerce').sum()
+    return pob, float(h)
+
+
+@st.cache_data(show_spinner=False)
+def tabla_resumen():
+    """Tabla de indicadores por ciudad (para Resumen, Ranking y Comparador)."""
+    from eodlib import metrics as M
+    v = cargar_viajes(); per = cargar_persona()
+    rows = []
+    for c, d0 in v.groupby('ciudad'):
+        d = d0[d0['factor'] > 0]
+        if c in MULTIDIA:
+            d = d[d['tipo_dia'].astype('string').isin(['1', '1.0'])]
+        if d.empty:
+            continue
+        pm = M.particion(d, 'modo_pp', M.ORDEN_MODO)
+        pp = M.particion(d, 'proposito_agregado_h', M.ORDEN_PROP)
+        pob = float(per[per['ciudad'] == c]['factor'].sum())
+        dist = pd.to_numeric(d['distancia_km'], errors='coerce')
+        rows.append({
+            'ciudad': c, 'region': d['region'].iloc[0], 'anio': int(d['anio'].iloc[0]),
+            'viajes_dia': float(d['factor'].sum()),
+            'poblacion': pob,
+            'viajes_persona': float(d['factor'].sum()) / pob if pob else None,
+            'dist_mediana': float(dist.median()),
+            'pct_privado': float(pm.get('Privado', 0)),
+            'pct_publico': float(pm.get('Público', 0)),
+            'pct_no_motor': float(pm.get('No motorizado', 0)),
+            'pct_trabajo': float(pp.get('Trabajo', 0)),
+            'pct_estudio': float(pp.get('Estudio', 0)),
+        })
+    return pd.DataFrame(rows).sort_values('ciudad').reset_index(drop=True)
