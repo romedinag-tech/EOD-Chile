@@ -54,3 +54,27 @@ def lineas_deseo(pares, titulo='Líneas de deseo'):
         pares.rename(columns={'lon_o': 'lon', 'lat_o': 'lat'}))),
         height=560, margin=dict(l=0, r=0, t=40, b=0), title=titulo)
     return fig
+
+
+def destinos_map(dest, zona_origen):
+    """Mapa de destinos desde una zona origen: origen marcado + destinos por volumen."""
+    d = dest.dropna(subset=['lon', 'lat']).copy()
+    org = d[d['zona'].astype(str) == str(zona_origen)]
+    dst = d[d['zona'].astype(str) != str(zona_origen)]
+    cen = dict(lat=float(d['lat'].mean()), lon=float(d['lon'].mean()))
+    fig = go.Figure()
+    if not dst.empty:
+        mx = dst['viajes'].max()
+        fig.add_trace(go.Scattermapbox(
+            lon=dst['lon'], lat=dst['lat'], mode='markers',
+            marker=dict(size=(6 + 34 * (dst['viajes'] / mx)), color=dst['viajes'],
+                        colorscale='YlOrRd', showscale=True, colorbar=dict(title='viajes')),
+            hovertext=[f'Zona {z}: {int(v):,}'.replace(',', '.') for z, v in zip(dst['zona'], dst['viajes'])],
+            hoverinfo='text', name='destinos'))
+    if not org.empty:
+        fig.add_trace(go.Scattermapbox(lon=org['lon'], lat=org['lat'], mode='markers',
+                      marker=dict(size=16, color='#1f6feb'), hovertext=f'Origen: zona {zona_origen}',
+                      hoverinfo='text', name='origen'))
+    fig.update_layout(mapbox=dict(style='open-street-map', center=cen, zoom=_zoom(d)),
+                      height=520, margin=dict(l=0, r=0, t=10, b=0), showlegend=False)
+    return fig
