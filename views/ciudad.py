@@ -7,6 +7,25 @@ import streamlit as st
 from eodlib import data as D, metrics as M, viz, geo, geomap, ui
 
 Q_LABEL = {1: 'Q1', 2: 'Q2', 3: 'Q3', 4: 'Q4', 5: 'Q5'}
+# scrollZoom desactivado -> la rueda del mouse hace scroll de la PÁGINA (no zoom del mapa);
+# el usuario hace zoom con doble-clic, pinza o los botones del modebar.
+MAP_CFG = {'scrollZoom': False, 'displaylogo': False,
+           'modeBarButtonsToRemove': ['lasso2d', 'select2d']}
+
+
+def _click_id(ev):
+    """Extrae el id (zona/comuna) del punto clickeado en un mapa Plotly."""
+    try:
+        pts = (ev or {}).get('selection', {}).get('points', [])
+        if not pts:
+            return None
+        p = pts[0]
+        cd = p.get('customdata')
+        if isinstance(cd, (list, tuple)):
+            cd = cd[0] if cd else None
+        return str(p.get('location') if p.get('location') is not None else cd) if (p.get('location') is not None or cd is not None) else None
+    except Exception:
+        return None
 
 
 def _bar(serie, ytit='% de viajes', color='#1f6feb'):
@@ -156,32 +175,63 @@ def render(ciudad, anio):
             st.info('Esta ciudad aún no tiene zonificación geográfica cargada.')
         else:
             gj = geo.geojson(ciudad)
+            hay_comuna = geo.comuna_disponible(ciudad)
+            st.caption('💡 La rueda del mouse hace scroll de la página. Para zoom: doble-clic, '
+                       'pinza o los botones del mapa.')
             modo_mapa = st.radio('Vista', ['Generación', 'Atracción', 'Líneas de deseo', 'Matriz O/D'],
                                  horizontal=True, key='mapa')
+
             if modo_mapa in ('Generación', 'Atracción'):
                 z = geo.generacion_atraccion(d)
                 col = 'generados' if modo_mapa == 'Generación' else 'atraidos'
-                ttl = 'Viajes generados por zona (origen)' if col == 'generados' else 'Viajes atraídos por zona (destino)'
-                st.plotly_chart(geomap.choropleth(gj, z, col, ttl), use_container_width=True, key='c_map_choro')
+                ttl = ('Viajes generados por zona (origen)' if col == 'generados'
+                       else 'Viajes atraídos por zona (destino)')
+                st.plotly_chart(geomap.choropleth(gj, z, col, ttl), use_container_width=True,
+                                key='c_map_choro', config=MAP_CFG)
+
             elif modo_mapa == 'Líneas de deseo':
-                top = st.slider('Pares O-D principales', 50, 400, 150, 50)
-                pares = geo.lineas_deseo(d, top_n=top)
+                cc1, cc2 = st.columns([1, 2])
+                niv = cc1.radio('Nivel', ['Zona'] + (['Comuna'] if hay_comuna else []),
+                                horizontal=True, key='deseo_niv')
+                nivel = 'comuna' if niv == 'Comuna' else 'zona'
+                top = cc2.slider('Pares O-D principales', 30, 400, 120, 30, key='deseo_top')
+                pares = geo.lineas_deseo(d, top_n=top, nivel=nivel)
                 if pares.empty:
                     st.info('Sin pares O-D con coordenadas para esta selección.')
                 else:
-                    st.plotly_chart(geomap.lineas_deseo(pares), use_container_width=True, key='c_map_deseo')
-                    st.caption('Grosor/color ∝ volumen de viajes entre zonas (interzonales).')
-            else:
-                zonas = geo.zonas_con_viajes(d)
-                zsel = st.selectbox('Zona de origen', zonas, format_func=lambda z: f'Zona {z}')
-                dest = geo.destinos_desde(d, zsel)
-                if dest.empty:
-                    st.info('Sin destinos para esta zona.')
+                    st.plotly_chart(geomap.lineas_deseo(pares, f'Líneas de deseo entre {niv.lower()}s'),
+                                    use_container_width=True, key='c_map_deseo', config=MAP_CFG)
+                    st.caption(f'Grosor/color ∝ volumen de viajes entre {niv.lower()}s (interzonales).')
+
+            else:  # Matriz O/D
+                niv = st.radio('Nivel', ['Zona'] + (['Comuna'] if hay_comuna else []),
+                               horizontal=True, key='od_niv')
+                nivel = 'comuna' if niv == 'Comuna' else 'zona'
+                unidades = geo.unidades_con_viajes(d, nivel)
+                if not unidades:
+                    st.info('Sin unidades con viajes.')
                 else:
-                    cmap, ctab = st.columns([3, 2])
-                    cmap.plotly_chart(geomap.destinos_map(dest, zsel), use_container_width=True, key='c_map_od')
-                    tt = dest.head(12)[['zona', 'viajes']].copy()
-                    tt['viajes'] = tt['viajes'].round(0).astype(int)
-                    ctab.markdown('**Principales destinos**')
-                    ctab.dataframe(tt.rename(columns={'zona': 'Zona destino', 'viajes': 'Viajes'}),
-                                   hide_index=True, use_container_width=True)
+                    gen = geo.generacion_atraccion(d, nivel)
+                    fig_sel = (geomap.mapa_zonas_click(gj, gen) if nivel == 'zona'
+                               else geomap.mapa_comunas_click(gen))
+                    ev = st.plotly_chart(fig_sel, use_container_width=True, key=f'odclick_{nivel}',
+                                         on_select='rerun', config=MAP_CFG)
+                    clic = _click_id(ev)
+                    wkey = f'odsel_{ciudad}_{nivel}'
+                    if clic is not None and clic in unidades:
+                        st.session_state[wkey] = clic
+                    label = (lambda z: f'Zona {z}') if nivel == 'zona' else (lambda z: f'Comuna {z}')
+                    origen = st.selectbox(f'{niv} de origen (selecciona o pincha el mapa de arriba)',
+                                          unidades, key=wkey, format_func=label)
+                    dest = geo.destinos_desde(d, origen, nivel)
+                    if dest.empty:
+                        st.info('Sin destinos para esta selección.')
+                    else:
+                        cmap, ctab = st.columns([3, 2])
+                        cmap.plotly_chart(geomap.destinos_map(dest, origen), use_container_width=True,
+                                          key='c_map_od', config=MAP_CFG)
+                        tt = dest.head(15)[['zona', 'viajes']].copy()
+                        tt['viajes'] = tt['viajes'].round(0).astype(int)
+                        ctab.markdown(f'**Destinos desde {label(origen)}**')
+                        ctab.dataframe(tt.rename(columns={'zona': niv + ' destino', 'viajes': 'Viajes'}),
+                                       hide_index=True, use_container_width=True, height=480)
