@@ -4,7 +4,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from eodlib import data as D, metrics as M, viz, geo, geomap, geomap3d, ui
+from eodlib import data as D, metrics as M, viz, geo, geomap, ui
 
 Q_LABEL = {1: 'Q1', 2: 'Q2', 3: 'Q3', 4: 'Q4', 5: 'Q5'}
 # Mapas interactivos: rueda = zoom, arrastrar = mover (pan), doble-clic = reset.
@@ -222,15 +222,15 @@ def render(ciudad, anio):
                     label = (lambda z: f'Zona {z}') if nivel == 'zona' else (lambda z: f'Comuna {z}')
                     dest = geo.destinos_desde(d, origen, nivel)
 
-                    deck = geomap3d.od_3d(gj, origen, dest, nivel, cents)
-                    ev = st.pydeck_chart(deck, use_container_width=True, key=f'od3d_{ciudad}_{nivel}',
-                                         on_select='rerun', selection_mode='single-object')
-                    clic = geomap3d.id_seleccionado(ev)
+                    fig_od = geomap.od_2d(gj, origen, dest, nivel, cents)
+                    ev = st.plotly_chart(fig_od, use_container_width=True, key=f'od2d_{ciudad}_{nivel}',
+                                         on_select='rerun', config=MAP_CFG)
+                    clic = _click_id(ev)
                     if clic is not None and clic in unidades and clic != origen:
                         st.session_state[wkey] = clic
                         st.rerun()
                     st.caption('🖱️ Pincha una zona para fijar el origen (se destaca en azul). '
-                               'Las columnas 3D son los destinos: altura y color proporcional a los viajes.')
+                               'Las burbujas son los destinos: tamaño y color proporcional a los viajes.')
 
                     c1, c2 = st.columns([2, 3])
                     sel2 = c1.selectbox(f'{niv} de origen (o pincha el mapa)', unidades,

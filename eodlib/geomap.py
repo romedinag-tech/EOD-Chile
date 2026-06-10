@@ -85,6 +85,49 @@ def mapa_comunas_click(ccdf, valor='generados', titulo=None):
     return fig
 
 
+def od_2d(geojson, origen, dest_df, nivel, cents):
+    """Mapa O/D 2D en una sola vista: origen destacado + destinos como burbujas.
+    Clickeable (zona = polígono, comuna = punto) para fijar el origen."""
+    cents = cents.dropna(subset=['lon', 'lat'])
+    fig = go.Figure()
+    if nivel == 'zona' and geojson:
+        zonas = [str(f['properties'].get('zona')) for f in geojson['features']]
+        fig.add_trace(go.Choroplethmapbox(
+            geojson=geojson, locations=zonas, z=[1] * len(zonas),
+            colorscale=[[0, 'rgba(190,196,205,0.16)'], [1, 'rgba(190,196,205,0.16)']],
+            showscale=False, marker_line_color='rgba(120,130,145,0.55)', marker_line_width=0.4,
+            customdata=zonas, hovertemplate='Zona %{location}<extra></extra>', name='zonas'))
+        fig.add_trace(go.Choroplethmapbox(
+            geojson=geojson, locations=[str(origen)], z=[1],
+            colorscale=[[0, 'rgba(31,111,235,0.40)'], [1, 'rgba(31,111,235,0.40)']],
+            showscale=False, marker_line_color='#1f6feb', marker_line_width=2.5,
+            hoverinfo='skip', name='orig'))
+    dd = dest_df[dest_df['zona'].astype(str) != str(origen)].dropna(subset=['lon', 'lat'])
+    if len(dd):
+        mx = dd['viajes'].max() or 1
+        fig.add_trace(go.Scattermapbox(
+            lon=dd['lon'], lat=dd['lat'], mode='markers',
+            marker=dict(size=(6 + 36 * (dd['viajes'] / mx)), color=dd['viajes'],
+                        colorscale='YlOrRd', showscale=True, colorbar=dict(title='viajes')),
+            hovertext=[f'{nivel.capitalize()} {z}: {int(v):,}'.replace(',', '.')
+                       for z, v in zip(dd['zona'], dd['viajes'])],
+            hoverinfo='text', name='destinos'))
+    if nivel == 'comuna':
+        fig.add_trace(go.Scattermapbox(
+            lon=cents['lon'], lat=cents['lat'], mode='markers',
+            marker=dict(size=11, color='rgba(120,130,145,0.45)'), customdata=cents['zona'],
+            hovertemplate='Comuna %{customdata}<extra></extra>', name='sel'))
+    co = cents[cents['zona'].astype(str) == str(origen)]
+    if len(co):
+        fig.add_trace(go.Scattermapbox(
+            lon=co['lon'], lat=co['lat'], mode='markers',
+            marker=dict(size=16, color='#1f6feb'), hoverinfo='skip', name='origen'))
+    fig.update_layout(mapbox=dict(style='open-street-map', center=_centro(cents), zoom=_zoom(cents)),
+                      height=560, margin=dict(l=0, r=0, t=0, b=0),
+                      clickmode='event+select', dragmode='pan', showlegend=False)
+    return fig
+
+
 def destinos_map(dest, zona_origen):
     """Mapa de destinos desde una zona origen: origen marcado + destinos por volumen."""
     d = dest.dropna(subset=['lon', 'lat']).copy()
