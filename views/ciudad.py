@@ -7,9 +7,8 @@ import streamlit as st
 from eodlib import data as D, metrics as M, viz, geo, geomap, ui
 
 Q_LABEL = {1: 'Q1', 2: 'Q2', 3: 'Q3', 4: 'Q4', 5: 'Q5'}
-# scrollZoom desactivado -> la rueda del mouse hace scroll de la PÁGINA (no zoom del mapa);
-# el usuario hace zoom con doble-clic, pinza o los botones del modebar.
-MAP_CFG = {'scrollZoom': False, 'displaylogo': False,
+# Mapas interactivos: rueda = zoom, arrastrar = mover (pan), doble-clic = reset.
+MAP_CFG = {'scrollZoom': True, 'displaylogo': False,
            'modeBarButtonsToRemove': ['lasso2d', 'select2d']}
 
 
@@ -176,8 +175,8 @@ def render(ciudad, anio):
         else:
             gj = geo.geojson(ciudad)
             hay_comuna = geo.comuna_disponible(ciudad)
-            st.caption('💡 La rueda del mouse hace scroll de la página. Para zoom: doble-clic, '
-                       'pinza o los botones del mapa.')
+            st.caption('💡 Rueda del mouse = zoom · arrastrar = mover el mapa · '
+                       'doble-clic = restablecer vista.')
             modo_mapa = st.radio('Vista', ['Generación', 'Atracción', 'Líneas de deseo', 'Matriz O/D'],
                                  horizontal=True, key='mapa')
 

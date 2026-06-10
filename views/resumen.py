@@ -23,7 +23,7 @@ def _mapa_ciudades(t):
         hoverinfo='text'))
     fig.update_layout(mapbox=dict(style='open-street-map',
                       center=dict(lat=-37, lon=-71.5), zoom=3.4),
-                      height=620, margin=dict(l=0, r=0, t=0, b=0))
+                      height=620, margin=dict(l=0, r=0, t=0, b=0), dragmode='pan')
     return fig
 
 
@@ -42,7 +42,8 @@ def render():
     a, b = st.columns([3, 2])
     with a:
         ui.section('Mapa de ciudades', 'Tamaño ∝ viajes/día · color ∝ % transporte público.')
-        st.plotly_chart(_mapa_ciudades(t), use_container_width=True, key='res_mapa')
+        st.plotly_chart(_mapa_ciudades(t), use_container_width=True, key='res_mapa',
+                        config={'scrollZoom': True, 'displaylogo': False})
     with b:
         ui.section('Partición modal promedio')
         prom = t[['pct_privado', 'pct_publico', 'pct_no_motor']].mean()
