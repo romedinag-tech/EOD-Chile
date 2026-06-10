@@ -56,6 +56,35 @@ def lineas_deseo(pares, titulo='Líneas de deseo'):
     return fig
 
 
+def mapa_zonas_click(geojson, zdf, valor='generados', titulo=None):
+    """Coroplético de zonas seleccionable (click devuelve la zona en 'location')."""
+    z = zdf.dropna(subset=['lon', 'lat'])
+    fig = go.Figure(go.Choroplethmapbox(
+        geojson=geojson, locations=zdf['zona'], z=zdf[valor],
+        featureidkey='properties.zona', colorscale='YlOrRd', marker_opacity=0.55,
+        marker_line_width=0.4, colorbar=dict(title='viajes'),
+        customdata=zdf['zona'], hovertemplate='Zona %{location}<br>%{z:,.0f} viajes<extra></extra>'))
+    fig.update_layout(mapbox=dict(style='open-street-map', center=_centro(z), zoom=_zoom(z)),
+                      height=520, margin=dict(l=0, r=0, t=30 if titulo else 0, b=0), title=titulo,
+                      clickmode='event+select')
+    return fig
+
+
+def mapa_comunas_click(ccdf, valor='generados', titulo=None):
+    """Puntos de comuna seleccionables (click devuelve la comuna en customdata)."""
+    c = ccdf.dropna(subset=['lon', 'lat']).copy()
+    mx = c[valor].max() if len(c) and c[valor].max() > 0 else 1
+    fig = go.Figure(go.Scattermapbox(
+        lon=c['lon'], lat=c['lat'], mode='markers',
+        marker=dict(size=(12 + 36 * (c[valor] / mx)), color=c[valor], colorscale='YlOrRd',
+                    showscale=True, colorbar=dict(title='viajes')),
+        customdata=c['zona'], hovertemplate='Comuna %{customdata}<br>%{marker.color:,.0f} viajes<extra></extra>'))
+    fig.update_layout(mapbox=dict(style='open-street-map', center=_centro(c), zoom=_zoom(c)),
+                      height=520, margin=dict(l=0, r=0, t=30 if titulo else 0, b=0), title=titulo,
+                      clickmode='event+select')
+    return fig
+
+
 def destinos_map(dest, zona_origen):
     """Mapa de destinos desde una zona origen: origen marcado + destinos por volumen."""
     d = dest.dropna(subset=['lon', 'lat']).copy()
