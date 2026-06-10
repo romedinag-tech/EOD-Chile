@@ -4,7 +4,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from eodlib import data as D, metrics as M, viz, geo, geomap, ui
+from eodlib import data as D, metrics as M, viz, geo, geomap, geomap3d, ui
 
 Q_LABEL = {1: 'Q1', 2: 'Q2', 3: 'Q3', 4: 'Q4', 5: 'Q5'}
 # Mapas interactivos: rueda = zoom, arrastrar = mover (pan), doble-clic = reset.
@@ -202,7 +202,7 @@ def render(ciudad, anio):
                                     use_container_width=True, key='c_map_deseo', config=MAP_CFG)
                     st.caption(f'Grosor/color ∝ volumen de viajes entre {niv.lower()}s (interzonales).')
 
-            else:  # Matriz O/D
+            else:  # Matriz O/D (mapa 3D)
                 niv = st.radio('Nivel', ['Zona'] + (['Comuna'] if hay_comuna else []),
                                horizontal=True, key='od_niv')
                 nivel = 'comuna' if niv == 'Comuna' else 'zona'
@@ -210,27 +210,37 @@ def render(ciudad, anio):
                 if not unidades:
                     st.info('Sin unidades con viajes.')
                 else:
-                    gen = geo.generacion_atraccion(d, nivel)
-                    fig_sel = (geomap.mapa_zonas_click(gj, gen) if nivel == 'zona'
-                               else geomap.mapa_comunas_click(gen))
-                    ev = st.plotly_chart(fig_sel, use_container_width=True, key=f'odclick_{nivel}',
-                                         on_select='rerun', config=MAP_CFG)
-                    clic = _click_id(ev)
-                    wkey = f'odsel_{ciudad}_{nivel}'
-                    if clic is not None and clic in unidades:
-                        st.session_state[wkey] = clic
-                    label = (lambda z: f'Zona {z}') if nivel == 'zona' else (lambda z: f'Comuna {z}')
-                    origen = st.selectbox(f'{niv} de origen (selecciona o pincha el mapa de arriba)',
-                                          unidades, key=wkey, format_func=label)
-                    dest = geo.destinos_desde(d, origen, nivel)
-                    if dest.empty:
-                        st.info('Sin destinos para esta selección.')
+                    if nivel == 'zona':
+                        cents = geo.centroides()
+                        cents = cents[cents['ciudad'] == ciudad][['zona', 'lon', 'lat']]
                     else:
-                        cmap, ctab = st.columns([3, 2])
-                        cmap.plotly_chart(geomap.destinos_map(dest, origen), use_container_width=True,
-                                          key='c_map_od', config=MAP_CFG)
-                        tt = dest.head(15)[['zona', 'viajes']].copy()
-                        tt['viajes'] = tt['viajes'].round(0).astype(int)
-                        ctab.markdown(f'**Destinos desde {label(origen)}**')
-                        ctab.dataframe(tt.rename(columns={'zona': niv + ' destino', 'viajes': 'Viajes'}),
-                                       hide_index=True, use_container_width=True, height=480)
+                        cents = geo.centroides_comuna(ciudad).rename(columns={'comuna': 'zona'})
+                    wkey = f'odsel_{ciudad}_{nivel}'
+                    origen = st.session_state.get(wkey, unidades[0])
+                    if origen not in unidades:
+                        origen = unidades[0]
+                    label = (lambda z: f'Zona {z}') if nivel == 'zona' else (lambda z: f'Comuna {z}')
+                    dest = geo.destinos_desde(d, origen, nivel)
+
+                    deck = geomap3d.od_3d(gj, origen, dest, nivel, cents)
+                    ev = st.pydeck_chart(deck, use_container_width=True, key=f'od3d_{ciudad}_{nivel}',
+                                         on_select='rerun', selection_mode='single-object')
+                    clic = geomap3d.id_seleccionado(ev)
+                    if clic is not None and clic in unidades and clic != origen:
+                        st.session_state[wkey] = clic
+                        st.rerun()
+                    st.caption('🖱️ Pincha una zona para fijar el origen (se destaca en azul). '
+                               'Las columnas 3D son los destinos: altura y color proporcional a los viajes.')
+
+                    c1, c2 = st.columns([2, 3])
+                    sel2 = c1.selectbox(f'{niv} de origen (o pincha el mapa)', unidades,
+                                        index=unidades.index(origen), format_func=label,
+                                        key=f'odbox_{ciudad}_{nivel}')
+                    if sel2 != origen:
+                        st.session_state[wkey] = sel2
+                        st.rerun()
+                    tt = dest[dest['zona'].astype(str) != str(origen)].head(15)[['zona', 'viajes']].copy()
+                    tt['viajes'] = tt['viajes'].round(0).astype(int)
+                    c2.markdown(f'**Principales destinos desde {label(origen)}**')
+                    c2.dataframe(tt.rename(columns={'zona': niv + ' destino', 'viajes': 'Viajes'}),
+                                 hide_index=True, use_container_width=True, height=360)
