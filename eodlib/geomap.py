@@ -23,7 +23,7 @@ def choropleth(geojson, zdf, valor, titulo):
         center=_centro(z), zoom=_zoom(z),
         labels={valor: 'viajes'})
     fig.update_layout(height=520, margin=dict(l=0, r=0, t=40, b=0), title=titulo,
-                      coloraxis_colorbar=dict(title='viajes'))
+                      dragmode='pan', coloraxis_colorbar=dict(title='viajes'))
     return fig
 
 
@@ -52,7 +52,7 @@ def lineas_deseo(pares, titulo='Líneas de deseo'):
                   marker=dict(size=5, color='#333'), hovertext=pts['zo'], showlegend=False))
     fig.update_layout(mapbox=dict(style='open-street-map', center=cen, zoom=_zoom(
         pares.rename(columns={'lon_o': 'lon', 'lat_o': 'lat'}))),
-        height=560, margin=dict(l=0, r=0, t=40, b=0), title=titulo)
+        height=560, margin=dict(l=0, r=0, t=40, b=0), title=titulo, dragmode='pan')
     return fig
 
 
@@ -66,7 +66,7 @@ def mapa_zonas_click(geojson, zdf, valor='generados', titulo=None):
         customdata=zdf['zona'], hovertemplate='Zona %{location}<br>%{z:,.0f} viajes<extra></extra>'))
     fig.update_layout(mapbox=dict(style='open-street-map', center=_centro(z), zoom=_zoom(z)),
                       height=520, margin=dict(l=0, r=0, t=30 if titulo else 0, b=0), title=titulo,
-                      clickmode='event+select')
+                      clickmode='event+select', dragmode='pan')
     return fig
 
 
@@ -81,7 +81,7 @@ def mapa_comunas_click(ccdf, valor='generados', titulo=None):
         customdata=c['zona'], hovertemplate='Comuna %{customdata}<br>%{marker.color:,.0f} viajes<extra></extra>'))
     fig.update_layout(mapbox=dict(style='open-street-map', center=_centro(c), zoom=_zoom(c)),
                       height=520, margin=dict(l=0, r=0, t=30 if titulo else 0, b=0), title=titulo,
-                      clickmode='event+select')
+                      clickmode='event+select', dragmode='pan')
     return fig
 
 
@@ -105,5 +105,5 @@ def destinos_map(dest, zona_origen):
                       marker=dict(size=16, color='#1f6feb'), hovertext=f'Origen: zona {zona_origen}',
                       hoverinfo='text', name='origen'))
     fig.update_layout(mapbox=dict(style='open-street-map', center=cen, zoom=_zoom(d)),
-                      height=520, margin=dict(l=0, r=0, t=10, b=0), showlegend=False)
+                      height=520, margin=dict(l=0, r=0, t=10, b=0), showlegend=False, dragmode='pan')
     return fig
