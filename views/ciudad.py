@@ -27,7 +27,6 @@ def render(ciudad, anio):
         st.info('Esta ciudad solo tiene datos de hogar/persona (sin viajes disponibles).')
         return
 
-    # filtros de segmentación
     with st.expander('🎛️  Segmentar viajes', expanded=False):
         c1, c2, c3, c4 = st.columns(4)
         f_modo = c1.multiselect('Modo', M.ORDEN_MODO)
@@ -40,7 +39,6 @@ def render(ciudad, anio):
     if f_eta: d = d[d['grupo_etario'].isin(f_eta)]
     if f_usu: d = d[d['tipo_usuario'].isin(f_usu)]
 
-    # KPIs
     k = M.kpis(d, n_personas=pob, n_hogares=hog)
     dist = pd.to_numeric(d['distancia_km'], errors='coerce')
     ui.kpis([
@@ -59,13 +57,13 @@ def render(ciudad, anio):
     with tabs[0]:
         a, b = st.columns(2)
         a.plotly_chart(viz.barra_modal(M.particion(d, 'modo_pp', M.ORDEN_MODO), 'Partición modal'),
-                       use_container_width=True)
+                       use_container_width=True, key='c_modal')
         b.plotly_chart(viz.dona(M.particion(d, 'proposito_agregado_h', M.ORDEN_PROP),
-                       'Propósito del viaje', viz.COLOR_PROP), use_container_width=True)
+                       'Propósito del viaje', viz.COLOR_PROP), use_container_width=True, key='c_prop')
         if dist.notna().any():
             ui.section('Distribución por distancia')
             st.plotly_chart(_bar(M.particion(d.dropna(subset=['tramo_dist']), 'tramo_dist', M.ORDEN_TRAMO),
-                            'tramo (km) · % de viajes'), use_container_width=True)
+                            'tramo (km) · % de viajes'), use_container_width=True, key='c_dist_res')
 
     # ---- Modos y propósitos ----
     with tabs[1]:
@@ -74,16 +72,16 @@ def render(ciudad, anio):
         if seg == 'Modo':
             tab = M.distribucion_horaria(d, 'modo_pp')
             tab = tab[[m for m in M.ORDEN_MODO if m in tab.columns]]
-            st.plotly_chart(viz.lineas_horarias(tab, None, viz.COLOR_MODO), use_container_width=True)
+            st.plotly_chart(viz.lineas_horarias(tab, None, viz.COLOR_MODO), use_container_width=True, key='c_hora_m')
         elif seg == 'Propósito':
             st.plotly_chart(viz.lineas_horarias(M.distribucion_horaria(d, 'proposito_agregado_h'),
-                            None, viz.COLOR_PROP), use_container_width=True)
+                            None, viz.COLOR_PROP), use_container_width=True, key='c_hora_p')
         else:
-            st.plotly_chart(viz.lineas_horarias(M.distribucion_horaria(d)), use_container_width=True)
+            st.plotly_chart(viz.lineas_horarias(M.distribucion_horaria(d)), use_container_width=True, key='c_hora_n')
         ui.section('Propósito por modo')
         t = M.tabla_cruzada(d, 'modo_pp', 'proposito_agregado_h', 'fila').reindex(M.ORDEN_MODO).dropna(how='all')
         t = t[[p for p in M.ORDEN_PROP if p in t.columns]]
-        st.plotly_chart(viz.barras_apiladas(t, None, viz.COLOR_PROP), use_container_width=True)
+        st.plotly_chart(viz.barras_apiladas(t, None, viz.COLOR_PROP), use_container_width=True, key='c_prop_modo')
 
     # ---- Distancia ----
     with tabs[2]:
@@ -97,7 +95,7 @@ def render(ciudad, anio):
             dd = d.dropna(subset=['tramo_dist'])
             if seg_d == '(ninguno)':
                 st.plotly_chart(_bar(M.particion(dd, 'tramo_dist', M.ORDEN_TRAMO), 'tramo (km) · % de viajes'),
-                                use_container_width=True)
+                                use_container_width=True, key='c_dist_seg0')
             else:
                 cmap = {'Modo': ('modo_pp', M.ORDEN_MODO, viz.COLOR_MODO),
                         'Propósito': ('proposito_agregado_h', M.ORDEN_PROP, viz.COLOR_PROP),
@@ -110,7 +108,7 @@ def render(ciudad, anio):
                 else:
                     t = M.tabla_cruzada(ddx, 'tramo_dist', col, 'fila').reindex(M.ORDEN_TRAMO).dropna(how='all')
                     t = t[[c for c in orden if c in t.columns]]
-                    st.plotly_chart(viz.barras_apiladas(t, None, colores), use_container_width=True)
+                    st.plotly_chart(viz.barras_apiladas(t, None, colores), use_container_width=True, key='c_dist_seg1')
 
     # ---- Demografía ----
     with tabs[3]:
@@ -118,18 +116,18 @@ def render(ciudad, anio):
         a, b = st.columns(2)
         t = M.tabla_cruzada(d, 'grupo_etario', 'modo_pp', 'fila').reindex(M.ORDEN_ETARIO).dropna(how='all')
         a.plotly_chart(viz.barras_apiladas(t[[m for m in M.ORDEN_MODO if m in t.columns]],
-                       'Partición modal por edad', viz.COLOR_MODO), use_container_width=True)
+                       'Partición modal por edad', viz.COLOR_MODO), use_container_width=True, key='c_eta_modal')
         t = M.tabla_cruzada(d, 'grupo_etario', 'proposito_agregado_h', 'fila').reindex(M.ORDEN_ETARIO).dropna(how='all')
         b.plotly_chart(viz.barras_apiladas(t[[p for p in M.ORDEN_PROP if p in t.columns]],
-                       'Propósito por edad', viz.COLOR_PROP), use_container_width=True)
+                       'Propósito por edad', viz.COLOR_PROP), use_container_width=True, key='c_eta_prop')
         ui.section('Comportamiento por tipo de usuario')
         a, b = st.columns(2)
         t = M.tabla_cruzada(d, 'tipo_usuario', 'modo_pp', 'fila').reindex(M.ORDEN_USUARIO).dropna(how='all')
         a.plotly_chart(viz.barras_apiladas(t[[m for m in M.ORDEN_MODO if m in t.columns]],
-                       'Partición modal por tipo de usuario', viz.COLOR_MODO), use_container_width=True)
+                       'Partición modal por tipo de usuario', viz.COLOR_MODO), use_container_width=True, key='c_usu_modal')
         share = d.dropna(subset=['tipo_usuario']).groupby('tipo_usuario')['factor'].sum()
         share = (share / share.sum() * 100).reindex(M.ORDEN_USUARIO).dropna().round(1)
-        b.plotly_chart(viz.dona(share, '% de viajes por tipo de usuario'), use_container_width=True)
+        b.plotly_chart(viz.dona(share, '% de viajes por tipo de usuario'), use_container_width=True, key='c_usu_dona')
 
     # ---- Ingreso ----
     with tabs[4]:
@@ -142,16 +140,15 @@ def render(ciudad, anio):
             a, b = st.columns(2)
             t = M.tabla_cruzada(dq, 'q', 'modo_pp', 'fila').reindex(M.ORDEN_QUINTIL).dropna(how='all')
             a.plotly_chart(viz.barras_apiladas(t[[m for m in M.ORDEN_MODO if m in t.columns]],
-                           'Partición modal por quintil', viz.COLOR_MODO), use_container_width=True)
-            # viajes por persona por quintil (proxy: viajes/hogar del quintil)
+                           'Partición modal por quintil', viz.COLOR_MODO), use_container_width=True, key='c_ing_modal')
             vpq = dq.groupby('q')['factor'].sum().reindex(M.ORDEN_QUINTIL)
             vpq = (vpq / vpq.sum() * 100).round(1).dropna()
-            b.plotly_chart(_bar(vpq, '% de viajes', '#16a34a'), use_container_width=True)
+            b.plotly_chart(_bar(vpq, '% de viajes', '#16a34a'), use_container_width=True, key='c_ing_vpq')
             if dist.notna().any():
                 ui.section('Distancia por quintil')
                 t = M.tabla_cruzada(dq.dropna(subset=['tramo_dist']), 'q', 'tramo_dist', 'fila').reindex(M.ORDEN_QUINTIL)
                 t = t[[c for c in M.ORDEN_TRAMO if c in t.columns]]
-                st.plotly_chart(viz.barras_apiladas(t, None), use_container_width=True)
+                st.plotly_chart(viz.barras_apiladas(t, None), use_container_width=True, key='c_ing_dist')
 
     # ---- Mapas ----
     with tabs[5]:
@@ -165,14 +162,14 @@ def render(ciudad, anio):
                 z = geo.generacion_atraccion(d)
                 col = 'generados' if modo_mapa == 'Generación' else 'atraidos'
                 ttl = 'Viajes generados por zona (origen)' if col == 'generados' else 'Viajes atraídos por zona (destino)'
-                st.plotly_chart(geomap.choropleth(gj, z, col, ttl), use_container_width=True)
+                st.plotly_chart(geomap.choropleth(gj, z, col, ttl), use_container_width=True, key='c_map_choro')
             elif modo_mapa == 'Líneas de deseo':
                 top = st.slider('Pares O-D principales', 50, 400, 150, 50)
                 pares = geo.lineas_deseo(d, top_n=top)
                 if pares.empty:
                     st.info('Sin pares O-D con coordenadas para esta selección.')
                 else:
-                    st.plotly_chart(geomap.lineas_deseo(pares), use_container_width=True)
+                    st.plotly_chart(geomap.lineas_deseo(pares), use_container_width=True, key='c_map_deseo')
                     st.caption('Grosor/color ∝ volumen de viajes entre zonas (interzonales).')
             else:
                 zonas = geo.zonas_con_viajes(d)
@@ -182,7 +179,7 @@ def render(ciudad, anio):
                     st.info('Sin destinos para esta zona.')
                 else:
                     cmap, ctab = st.columns([3, 2])
-                    cmap.plotly_chart(geomap.destinos_map(dest, zsel), use_container_width=True)
+                    cmap.plotly_chart(geomap.destinos_map(dest, zsel), use_container_width=True, key='c_map_od')
                     tt = dest.head(12)[['zona', 'viajes']].copy()
                     tt['viajes'] = tt['viajes'].round(0).astype(int)
                     ctab.markdown('**Principales destinos**')

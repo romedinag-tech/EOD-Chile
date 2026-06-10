@@ -31,4 +31,4 @@ def render():
     fig.update_layout(height=34 * len(ts) + 60, margin=dict(l=10, r=40, t=10, b=10),
                       yaxis=dict(autorange='reversed'), plot_bgcolor='rgba(0,0,0,0)',
                       xaxis_title=ind)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True, key='rank_bar')
