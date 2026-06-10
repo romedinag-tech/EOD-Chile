@@ -42,13 +42,13 @@ def render():
     a, b = st.columns([3, 2])
     with a:
         ui.section('Mapa de ciudades', 'Tamaño ∝ viajes/día · color ∝ % transporte público.')
-        st.plotly_chart(_mapa_ciudades(t), use_container_width=True)
+        st.plotly_chart(_mapa_ciudades(t), use_container_width=True, key='res_mapa')
     with b:
         ui.section('Partición modal promedio')
         prom = t[['pct_privado', 'pct_publico', 'pct_no_motor']].mean()
         s = pd.Series({'Privado': prom['pct_privado'], 'Público': prom['pct_publico'],
                        'No motorizado': prom['pct_no_motor']})
-        st.plotly_chart(viz.dona(s.round(1), None, viz.COLOR_MODO), use_container_width=True)
+        st.plotly_chart(viz.dona(s.round(1), None, viz.COLOR_MODO), use_container_width=True, key='res_dona')
         st.caption('Promedio simple entre ciudades (no ponderado).')
 
     ui.section('Indicadores por ciudad')
@@ -59,5 +59,5 @@ def render():
     st.dataframe(show.style.format({
         'Viajes/día': '{:,.0f}', 'Viajes/pers.': '{:.2f}', 'Dist. mediana (km)': '{:.1f}',
         '% Privado': '{:.1f}', '% Público': '{:.1f}', '% No motor.': '{:.1f}',
-        '% Trabajo': '{:.1f}', '% Estudio': '{:.1f}'}).background_gradient(
-        subset=['% Público'], cmap='Blues'), hide_index=True, use_container_width=True, height=560)
+        '% Trabajo': '{:.1f}', '% Estudio': '{:.1f}'}),
+        hide_index=True, use_container_width=True, height=560)

@@ -36,7 +36,7 @@ def render():
         orden = M.ORDEN_MODO if dim == 'Partición modal' else M.ORDEN_PROP
         tab = tab[[c for c in orden if c in tab.columns]]
         st.plotly_chart(viz.barras_apiladas(tab, f'{dim} por ciudad', colores, '% de viajes'),
-                        use_container_width=True)
+                        use_container_width=True, key='cmp_modal')
         st.dataframe(tab.style.format('{:.1f}%'), use_container_width=True)
 
     with tab2:
@@ -49,7 +49,7 @@ def render():
             fig.add_bar(name=nombre, x=t.index, y=t[ind[nombre]])
         fig.update_layout(barmode='group', height=420, margin=dict(l=10, r=10, t=10, b=10),
                           legend=dict(orientation='h', y=-0.2), plot_bgcolor='rgba(0,0,0,0)')
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True, key='cmp_ind')
 
     with tab3:
         ui.section('Motorización vs. transporte público',
@@ -63,4 +63,4 @@ def render():
         fig.update_xaxes(title='% Transporte público', ticksuffix='%')
         fig.update_yaxes(title='% Transporte privado', ticksuffix='%')
         fig.update_layout(height=520, margin=dict(l=10, r=10, t=10, b=10), plot_bgcolor='rgba(0,0,0,0)')
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True, key='cmp_disp')
