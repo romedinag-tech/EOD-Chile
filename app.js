@@ -694,6 +694,17 @@ document.getElementById("shareBtn").onclick=doShare;
 const _sbd=document.getElementById("shareBtnD");
 if(_sbd)_sbd.onclick=doShare;
 
+// ── Timestamp de última actualización ────────────────────────────────────────
+(function(){
+  const el=document.getElementById("sidebar-ts");if(!el)return;
+  try{
+    const lm=new Date(document.lastModified);
+    const d=lm.toLocaleDateString("es-CL",{day:"2-digit",month:"2-digit",year:"numeric"});
+    const h=lm.toLocaleTimeString("es-CL",{hour:"2-digit",minute:"2-digit"});
+    el.innerHTML='<b>Actualizado:</b><br>'+d+' '+h;
+  }catch(e){el.textContent="—";}
+})();
+
 // ── Inicialización ───────────────────────────────────────────────────────────
 updateThemeIcon();
 document.getElementById("themeToggle").onclick=()=>setTheme(!isDark());
