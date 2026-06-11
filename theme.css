@@ -66,3 +66,5 @@ html.dark .city-item .cn{color:var(--ink) !important}
 html.dark .city-item.active .cn{color:var(--cyan) !important}
 html.dark .city-item .cm{color:var(--mut) !important}
 html.dark .city-item.active .cm{color:var(--cyan) !important}
+html.dark .sidebar-ts{border-top-color:var(--line) !important;color:#4d6a94 !important}
+html.dark .sidebar-ts b{color:var(--mut) !important}

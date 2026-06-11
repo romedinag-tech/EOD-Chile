@@ -85,6 +85,14 @@ header p{margin:3px 0;opacity:.92;font-size:.95rem}
 .sidebar-hd span{display:flex;align-items:center;gap:7px}
 .sidebar-hd svg{width:14px;height:14px;color:var(--or)}
 
+.sidebar-ts{
+  flex-shrink:0;padding:9px 14px 10px;
+  font-size:.69rem;color:var(--mut-2);
+  border-top:1px solid var(--line);
+  line-height:1.4;
+}
+.sidebar-ts b{color:var(--mut);font-weight:600}
+
 .sidebar-close{
   display:none;width:26px;height:26px;border-radius:6px;
   border:none;background:none;cursor:pointer;
@@ -233,11 +241,18 @@ a{color:var(--navy)}
 .loading{padding:40px;text-align:center;color:var(--mut)}
 :where(button,a,select,input):focus-visible{outline:2px solid var(--or);outline-offset:2px;border-radius:6px}
 
-/* ---- desktop: sidebar handles city selection ---- */
+/* ---- desktop: compact navbar header ---- */
 @media(min-width:769px){
   .selbar{display:none}
   .sidebar-toggle{display:none!important}
-  header{padding:18px 22px 14px}
+  header{padding:0 0 0 0}
+  header>.wrap{display:flex;align-items:center;gap:14px;height:52px;padding:0 20px}
+  header h1{display:none}
+  header>div>p{display:none}
+  .tag{display:none}
+  .brandrow{margin:0;flex:1;min-width:0}
+  .brand{gap:8px;font-size:.88rem}
+  .byline{padding:4px 10px;font-size:.74rem}
 }
 /* hide desktop share icon on mobile */
 @media(max-width:768px){
@@ -326,6 +341,7 @@ a{color:var(--navy)}
       </button>
     </div>
     <div id="city-list" class="city-list"></div>
+    <div class="sidebar-ts" id="sidebar-ts"></div>
   </aside>
 
   <!-- Mobile overlay -->
