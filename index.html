@@ -3,295 +3,464 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>EOD Chile · Movilidad Urbana — By Rodrigo Medina G.</title>
-<meta name="description" content="Encuestas Origen-Destino (EOD) de 18 ciudades chilenas: modal, propósito, horario, etario, quintil y mapas OD. Datos homologados y expandidos. By Rodrigo Medina G."/>
+<title>EOD Chile · Movilidad Urbana</title>
+<meta name="description" content="Encuestas Origen-Destino (EOD) de 18 ciudades chilenas. Datos homologados y expandidos. By Rodrigo Medina G."/>
 <meta name="author" content="Rodrigo Medina González"/>
-<meta name="theme-color" content="#16365a"/>
+<meta name="theme-color" content="#0f2942"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..900;1,14..32,300..900&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <style>
+/* ── Design System v3 ────────────────────────────────────────────── */
 :root{
-  --navy:#1f4e79;--navy2:#2e5e8c;--navy-d:#143150;--or:#d96a1f;
-  --teal:#1f8a86;--green:#1a9850;--red:#d6453a;--amber:#e0a92b;
-  --bg:#f4f7fb;--surface:#ffffff;--surface-2:#eef3f9;--ink:#172430;--mut:#5e6e80;--mut-2:#8696a7;
-  --line:#e4eaf2;--line-2:#d3dde9;
-  --grad:linear-gradient(135deg,#143150 0%,#1f4e79 60%,#2e5e8c 100%);
-  --r:14px;--r-sm:10px;--r-lg:18px;
-  --sh:0 2px 10px rgba(20,40,70,.05),0 10px 28px rgba(20,40,70,.05);
-  --sh-lg:0 16px 44px rgba(20,40,70,.13);
-  --sans:'Inter',-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-  --sb-w:220px;
+  --navy:#0f2942;--navy2:#1a4068;--navy3:#2563a8;
+  --or:#d97706;--or2:#f59e0b;--or-l:rgba(217,119,6,.1);
+  --teal:#0891b2;--green:#16a34a;--red:#dc2626;
+  --bg:#f1f5f9;--surface:#fff;--sf2:#f8fafc;--sf3:#eef2f8;
+  --ink:#0f172a;--ink2:#1e293b;
+  --mut:#64748b;--mut2:#94a3b8;--mut3:#cbd5e1;
+  --line:#e2e8f0;--line2:#cbd5e1;
+  --sh-xs:0 1px 2px rgba(15,41,66,.04);
+  --sh:0 1px 3px rgba(15,41,66,.08),0 2px 6px rgba(15,41,66,.04);
+  --sh-md:0 4px 12px rgba(15,41,66,.09),0 2px 4px rgba(15,41,66,.05);
+  --sh-lg:0 8px 24px rgba(15,41,66,.11),0 3px 8px rgba(15,41,66,.05);
+  --r-xs:4px;--r-sm:6px;--r:10px;--r-lg:14px;--r-xl:20px;
+  --sb-w:240px;--nav-h:52px;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 }
-*{box-sizing:border-box}
-body{margin:0;font-family:var(--sans);color:var(--ink);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-.kpi .v,table,.tag{font-variant-numeric:tabular-nums}
-header{background:var(--grad);color:#fff;padding:30px 22px 24px;position:relative;overflow:hidden}
-header:before{content:"";position:absolute;inset:0;background:radial-gradient(900px 280px at 80% -40%,rgba(120,180,255,.18),transparent 70%);pointer-events:none}
-header>.wrap{position:relative}
-.wrap{max-width:1140px;margin:0 auto;padding:0 20px}
-header h1{margin:0 0 6px;font-size:1.75rem;font-weight:800;letter-spacing:-.5px}
-header p{margin:3px 0;opacity:.92;font-size:.95rem}
-.tag{display:inline-block;background:rgba(255,255,255,.16);padding:4px 12px;border-radius:20px;font-size:.78rem;margin-top:8px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);color:var(--ink);background:var(--bg);
+  line-height:1.6;-webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;
+}
+a{color:var(--navy2)}
+button{cursor:pointer;font-family:var(--sans)}
+.kpi .v,table{font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--or);outline-offset:2px;border-radius:var(--r-sm)}
 
-/* ---- selector bar in header ---- */
-.selbar{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);border-radius:14px;padding:16px 18px;margin-top:18px;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
-.selbar .field{position:relative;flex:1;min-width:280px}
-.selbar label{display:block;font-size:.75rem;color:rgba(255,255,255,.85);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
-.city-select{width:100%;font-size:1.05rem;padding:11px 14px;border:none;border-radius:9px;background:#fff;color:var(--ink);font-weight:600;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235e6e80' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
-.selbar .ctxt{color:rgba(255,255,255,.92);font-size:.84rem;min-width:200px;flex:1.2;align-self:center}
-.selbar .ctxt b{color:#fff}
-.sharebtn{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.26);color:#fff;font:600 .82rem var(--sans);padding:9px 14px;border-radius:10px;cursor:pointer;transition:background .15s;white-space:nowrap;align-self:flex-end}
-.sharebtn:hover{background:rgba(255,255,255,.24)}.sharebtn svg{width:15px;height:15px}
+/* ── Navbar ──────────────────────────────────────────────────────── */
+header{
+  background:var(--navy);
+  border-bottom:1px solid rgba(255,255,255,.07);
+  color:#fff;position:relative;z-index:1200;flex-shrink:0;
+}
+.nav-inner{
+  display:flex;align-items:center;height:var(--nav-h);
+}
+.nav-brand{
+  display:flex;align-items:center;gap:9px;
+  padding:0 18px 0 18px;height:100%;
+  border-right:1px solid rgba(255,255,255,.09);
+  font-weight:700;font-size:.875rem;color:#dce9f5;
+  letter-spacing:.01em;white-space:nowrap;flex-shrink:0;
+  text-decoration:none;
+}
+.nav-brand .mark{
+  width:26px;height:26px;border-radius:7px;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.nav-brand .mark svg{width:13px;height:13px}
+.nav-center{
+  flex:1;display:flex;align-items:center;gap:10px;
+  padding:0 20px;overflow:hidden;
+}
+.nav-city{
+  font-size:.875rem;font-weight:600;color:#c5d9ee;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.nav-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);
+  color:rgba(255,255,255,.72);font-size:.7rem;font-weight:600;
+  padding:3px 9px;border-radius:999px;white-space:nowrap;flex-shrink:0;
+}
+.nav-chip svg{width:10px;height:10px}
+.nav-right{
+  display:flex;align-items:center;gap:4px;
+  padding:0 14px;height:100%;
+  border-left:1px solid rgba(255,255,255,.09);flex-shrink:0;
+}
+.nav-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;border-radius:8px;
+  background:none;border:none;color:rgba(255,255,255,.65);
+  transition:background .15s,color .15s;flex-shrink:0;
+}
+.nav-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.nav-btn svg{width:16px;height:16px}
+.nav-btn.active{background:rgba(255,255,255,.12);color:#fff}
+.nav-author{
+  font-size:.75rem;font-weight:600;color:rgba(255,255,255,.5);
+  padding-left:8px;white-space:nowrap;
+  border-left:1px solid rgba(255,255,255,.1);margin-left:4px;
+}
+/* mobile sidebar open button */
+.sidebar-toggle{
+  display:none;align-items:center;gap:6px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
+  color:#fff;font:.625rem var(--sans);font-weight:600;
+  padding:6px 12px;border-radius:8px;
+  transition:background .15s;
+}
+.sidebar-toggle:hover{background:rgba(255,255,255,.18)}
+.sidebar-toggle svg{width:15px;height:15px}
 
-/* ---- brand / byline ---- */
-.brandrow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
-.brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:.9rem;letter-spacing:.2px;color:#eaf2fb}
-.brand .mark{width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.16);display:inline-flex;align-items:center;justify-content:center}
-.brand .mark svg{width:17px;height:17px;color:#fff}
-.byline{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.24);color:#fff;font-size:.78rem;font-weight:600;padding:5px 11px;border-radius:999px;white-space:nowrap}
-.byline b{font-weight:800}
-.brand-right{display:flex;align-items:center;gap:10px}
-.theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);color:#fff;cursor:pointer;transition:background .15s}
-.theme-toggle:hover{background:rgba(255,255,255,.24)}.theme-toggle svg{width:17px;height:17px}
+/* Hidden city select (kept for JS) */
+#city-sel{position:absolute;opacity:0;pointer-events:none;height:0;overflow:hidden}
 
-/* ---- SIDEBAR LAYOUT ---- */
-.page-body{display:flex;align-items:flex-start;position:relative}
+/* Mobile selbar (kept for mobile only) */
+.selbar{display:none}
+
+/* ── Sidebar ─────────────────────────────────────────────────────── */
+.page-body{display:flex;align-items:stretch;position:relative}
 
 .sidebar{
   width:var(--sb-w);flex-shrink:0;
-  position:sticky;top:0;height:100vh;
-  overflow:hidden;
-  display:flex;flex-direction:column;
   background:var(--surface);
   border-right:1px solid var(--line);
-  z-index:1050;
+  display:flex;flex-direction:column;
+  overflow:hidden;
 }
-.sidebar::-webkit-scrollbar{width:4px}
-.sidebar::-webkit-scrollbar-track{background:transparent}
-.sidebar::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:2px}
-
 .sidebar-hd{
-  flex-shrink:0;
-  padding:13px 14px 11px;
-  font-size:.73rem;font-weight:700;
-  text-transform:uppercase;letter-spacing:.5px;
-  color:var(--mut);
+  flex-shrink:0;padding:12px 14px 10px;
   border-bottom:1px solid var(--line);
+}
+.sidebar-hd-row{
   display:flex;align-items:center;justify-content:space-between;
-  background:var(--surface);
+  margin-bottom:9px;
 }
-.sidebar-hd span{display:flex;align-items:center;gap:7px}
-.sidebar-hd svg{width:14px;height:14px;color:var(--or)}
-
-.sidebar-ts{
-  flex-shrink:0;padding:9px 14px 10px;
-  font-size:.69rem;color:var(--mut-2);
-  border-top:1px solid var(--line);
-  line-height:1.4;
+.sidebar-label{
+  font-size:.7rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.6px;color:var(--mut2);
+  display:flex;align-items:center;gap:6px;
 }
-.sidebar-ts b{color:var(--mut);font-weight:600}
-
+.sidebar-label svg{width:12px;height:12px;color:var(--or)}
 .sidebar-close{
-  display:none;width:26px;height:26px;border-radius:6px;
-  border:none;background:none;cursor:pointer;
-  color:var(--mut);padding:0;
-  align-items:center;justify-content:center;
-  font-size:1rem;line-height:1;
-  transition:background .1s;
+  display:none;width:24px;height:24px;border-radius:5px;
+  border:none;background:none;color:var(--mut);
+  align-items:center;justify-content:center;transition:background .1s;
 }
-.sidebar-close:hover{background:var(--surface-2)}
+.sidebar-close:hover{background:var(--sf3)}
+.sidebar-close svg{width:14px;height:14px}
+.sidebar-search{position:relative}
+.sidebar-search-ic{
+  position:absolute;left:9px;top:50%;transform:translateY(-50%);
+  display:flex;align-items:center;pointer-events:none;color:var(--mut3);
+}
+.sidebar-search-ic svg{width:13px;height:13px}
+#city-search{
+  width:100%;background:var(--sf2);border:1px solid var(--line);
+  border-radius:var(--r-sm);padding:7px 10px 7px 28px;
+  font:500 .8rem var(--sans);color:var(--ink);outline:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+#city-search:focus{border-color:var(--or);box-shadow:0 0 0 3px var(--or-l)}
+#city-search::placeholder{color:var(--mut3)}
 
-.city-list{flex:1;overflow-y:auto;padding:5px 0}
+.city-list{flex:1;overflow-y:auto;padding:4px 0}
 .city-list::-webkit-scrollbar{width:3px}
 .city-list::-webkit-scrollbar-track{background:transparent}
-.city-list::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:2px}
+.city-list::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}
 
 .city-item{
-  display:block;width:100%;
-  padding:8px 14px 8px 17px;
-  text-align:left;border:none;
-  border-left:3px solid transparent;
-  background:none;cursor:pointer;
-  font-family:var(--sans);color:var(--ink);
-  font-size:.86rem;line-height:1.25;
+  display:flex;flex-direction:column;
+  width:100%;padding:8px 14px 8px 13px;
+  text-align:left;border:none;border-left:3px solid transparent;
+  background:none;cursor:pointer;font-family:var(--sans);
   transition:background .1s,border-color .1s;
-  box-sizing:border-box;
+  gap:1px;
 }
-.city-item:hover{background:var(--surface-2)}
+.city-item:hover{background:var(--sf3)}
 .city-item.active{
-  background:var(--surface-2);
+  background:linear-gradient(90deg,rgba(217,119,6,.07),rgba(217,119,6,.02));
   border-left-color:var(--or);
 }
-.city-item .cn{display:block;font-weight:600;font-size:.88rem;color:var(--ink)}
-.city-item.active .cn{color:var(--navy)}
-.city-item .cm{display:block;font-size:.73rem;color:var(--mut-2);margin-top:1px}
-.city-item.active .cm{color:var(--navy2)}
-
-/* Mobile toggle button */
-.sidebar-toggle{
-  display:none;
-  align-items:center;gap:6px;
-  background:rgba(255,255,255,.14);
-  border:1px solid rgba(255,255,255,.26);
-  color:#fff;font:600 .82rem var(--sans);
-  padding:7px 12px;border-radius:9px;cursor:pointer;
-  transition:background .15s;
+.city-item .cn{
+  font-size:.875rem;font-weight:500;color:var(--ink2);line-height:1.25;
 }
-.sidebar-toggle:hover{background:rgba(255,255,255,.24)}
-.sidebar-toggle svg{width:15px;height:15px}
+.city-item.active .cn{font-weight:700;color:var(--navy)}
+.city-item .cm{font-size:.71rem;color:var(--mut2);line-height:1.2;margin-top:1px}
+.city-item.active .cm{color:var(--mut)}
 
-/* Overlay for mobile */
+.sidebar-ts{
+  flex-shrink:0;padding:8px 14px 9px;
+  font-size:.68rem;color:var(--mut3);
+  border-top:1px solid var(--line);line-height:1.5;
+}
+.sidebar-ts b{font-weight:600;color:var(--mut2)}
+
 .sidebar-overlay{
   display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.42);z-index:1990;
+  background:rgba(0,0,0,.45);z-index:1990;
 }
 .sidebar-overlay.active{display:block}
 
-/* ---- page-main (right of sidebar) ---- */
-.page-main{flex:1;min-width:0;overflow:hidden}
+/* ── Page Main ───────────────────────────────────────────────────── */
+.page-main{
+  flex:1;min-width:0;
+  display:flex;flex-direction:column;
+}
 
-/* ---- tabs ---- */
-.tabs{display:flex;gap:0;flex-wrap:nowrap;overflow-x:auto;
-  padding:0 16px;
+/* ── Tabs ────────────────────────────────────────────────────────── */
+.tabs{
+  display:flex;flex-wrap:nowrap;overflow-x:auto;
+  padding:0 24px;
   position:sticky;top:0;
-  background:var(--bg);z-index:1000;border-bottom:1px solid var(--line)}
+  background:var(--surface);
+  z-index:1000;border-bottom:1px solid var(--line);
+  flex-shrink:0;
+}
 .tabs::-webkit-scrollbar{display:none}
-.tabs button{border:none;background:none;padding:14px 16px;cursor:pointer;font-size:.9rem;font-weight:700;color:var(--mut);border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap;flex-shrink:0}
+.tabs button{
+  border:none;background:none;
+  padding:0 2px;margin:0 10px 0 0;
+  cursor:pointer;font-size:.8125rem;font-weight:600;
+  color:var(--mut);
+  border-bottom:2px solid transparent;
+  margin-bottom:-1px;
+  white-space:nowrap;flex-shrink:0;
+  display:inline-flex;align-items:center;gap:6px;
+  height:44px;
+  transition:color .15s,border-color .15s;
+  letter-spacing:.01em;
+}
+.tabs button:hover{color:var(--ink2)}
 .tabs button.on{color:var(--navy);border-bottom-color:var(--or)}
-.tabs button:hover{color:var(--navy)}
-.tabs button .ti{display:inline-flex;align-items:center;margin-right:6px;vertical-align:-3px;color:var(--mut-2)}
-.tabs button .ti svg{width:15px;height:15px}
+.tabs button .ti{display:inline-flex;align-items:center;color:var(--mut3)}
+.tabs button .ti svg{width:13px;height:13px}
 .tabs button.on .ti,.tabs button:hover .ti{color:var(--or)}
 
-main{min-height:60vh}
-.panel{display:none;padding:28px 0}
+/* ── Main Content ────────────────────────────────────────────────── */
+main{padding:22px 24px 0;flex:1}
+.panel{display:none;padding-bottom:36px}
 .panel.on{display:block}
-h2{color:var(--navy);font-size:1.4rem;margin:0 0 6px}
-h2 .bar{display:block;width:54px;height:4px;background:var(--or);border-radius:3px;margin-top:8px}
-h3{color:var(--navy)}
-.lead{color:var(--mut);max-width:880px}
 
-/* ---- KPI cards ---- */
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:14px;margin-top:20px}
-.kpi{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:17px;box-shadow:var(--sh);transition:transform .16s ease,box-shadow .16s ease}
-.kpi:hover{transform:translateY(-2px);box-shadow:var(--sh-lg)}
-.kpi .v{font-size:1.65rem;font-weight:800;color:var(--navy);line-height:1.1}
-.kpi .v.or{color:var(--or)} .kpi .v.green{color:var(--green)} .kpi .v.red{color:var(--red)}
-.kpi .l{color:var(--mut);font-size:.8rem;margin-top:5px}
-.kpi .s{color:var(--or);font-weight:700;font-size:.83rem;margin-top:2px}
-.grp-hd{margin:28px 0 0;font-size:1.02rem;color:var(--navy);font-weight:700;border-left:4px solid var(--or);padding-left:10px}
+/* Headings */
+.panel>h2{
+  font-size:1.0625rem;font-weight:700;color:var(--ink);
+  margin-bottom:3px;padding-left:12px;position:relative;
+}
+.panel>h2::before{
+  content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:4px;height:16px;background:var(--or);border-radius:2px;
+}
+.panel>h2 .bar{display:none}
+h3{font-size:.9375rem;font-weight:600;color:var(--ink2)}
+.lead{
+  color:var(--mut);font-size:.875rem;max-width:860px;
+  margin-top:4px;margin-bottom:20px;line-height:1.6;
+}
 
-/* ---- chart boxes ---- */
-.chartbox{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-top:16px;box-shadow:var(--sh)}
-.chartbox h3{margin:0 0 2px;font-size:1.05rem}
-.chartbox p{margin:0 0 10px;color:var(--mut);font-size:.86rem}
+/* ── KPI Cards ───────────────────────────────────────────────────── */
+.kpis{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(155px,1fr));
+  gap:11px;margin-bottom:22px;
+}
+.kpi{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r);padding:15px 16px 13px;
+  box-shadow:var(--sh-xs);
+  transition:box-shadow .2s,transform .18s;
+  position:relative;overflow:hidden;
+}
+.kpi::after{
+  content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--kpi-c,var(--mut3));
+  border-radius:var(--r) var(--r) 0 0;
+}
+.kpi:hover{box-shadow:var(--sh-md);transform:translateY(-1px)}
+.kpi .v{
+  font-size:1.75rem;font-weight:800;
+  color:var(--ink);line-height:1;
+  letter-spacing:-.03em;margin-bottom:7px;
+}
+/* color variants */
+.kpi .v.or{color:var(--or)}
+.kpi .v.green{color:var(--green)}
+.kpi .v.red{color:var(--red)}
+.kpi .v.c-navy{color:var(--navy)}
+.kpi .v.c-teal{color:var(--teal)}
+.kpi .l{font-size:.78rem;color:var(--mut);font-weight:500;line-height:1.35}
+.kpi .s{font-size:.71rem;color:var(--mut2);font-weight:500;margin-top:2px}
+
+/* ── Section Divider ─────────────────────────────────────────────── */
+.grp-hd{
+  display:flex;align-items:center;gap:10px;
+  font-size:.72rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.55px;color:var(--mut2);
+  margin:24px 0 12px;
+}
+.grp-hd::after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* ── Chart Boxes ─────────────────────────────────────────────────── */
+.chartbox{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r-lg);box-shadow:var(--sh-xs);
+  overflow:hidden;
+}
+.chartbox h3{padding:16px 18px 0;font-size:.9375rem;font-weight:600;color:var(--ink)}
+.chartbox>p{
+  padding:3px 18px 14px;
+  font-size:.78rem;color:var(--mut);margin:0;line-height:1.45;
+  border-bottom:1px solid var(--line);
+}
+.chartbox .cwrap,.chartbox .cwrap-sm,.chartbox .cwrap-md,.chartbox .cwrap-lg{
+  margin:14px 18px 18px;
+}
 .cwrap{position:relative;height:320px}
 .cwrap-sm{position:relative;height:220px}
 .cwrap-md{position:relative;height:260px}
 .cwrap-lg{position:relative;height:380px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:16px}
-.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-top:16px}
-@media(max-width:900px){.three{grid-template-columns:1fr 1fr}}
-@media(max-width:820px){.two,.three{grid-template-columns:1fr}}
 
-/* ---- map controls ---- */
-.panelctrl{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-.panelctrl label{display:block;font-size:.74rem;color:var(--mut);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
-.panelctrl .desc{font-size:.84rem;color:var(--mut);flex:1;min-width:220px}
-.ctrl{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
-.ctrl button{border:1px solid var(--navy);background:#fff;color:var(--navy);padding:8px 16px;border-radius:22px;cursor:pointer;font-weight:600;font-size:.9rem;transition:background .15s,color .15s}
-.ctrl button.on{background:var(--navy);color:#fff}
-.map{height:560px;border-radius:var(--r);border:1px solid var(--line);margin-top:14px;z-index:0}
+/* Grid layouts */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media(max-width:920px){.three{grid-template-columns:1fr 1fr}}
+@media(max-width:800px){.two,.three{grid-template-columns:1fr}}
 
-/* ---- map legend/info ---- */
-.legend{background:#fff;padding:9px 11px;border-radius:8px;box-shadow:0 1px 6px rgba(0,0,0,.2);font-size:.8rem;line-height:1.6}
-.legend b{color:var(--navy);display:block;margin-bottom:4px}
-.info{background:#fff;padding:9px 11px;border-radius:8px;box-shadow:0 1px 6px rgba(0,0,0,.2);font-size:.82rem;min-width:170px}
-.info b{color:var(--navy)}
+/* Spacing between sections */
+.two+.grp-hd,.three+.grp-hd,.chartbox+.grp-hd{margin-top:28px}
+.grp-hd+.two,.grp-hd+.three,.grp-hd+.chartbox{margin-top:0}
+.two+.chartbox,.chartbox+.chartbox,.three+.chartbox,.chartbox+.two,.chartbox+.three{margin-top:14px}
+.two>*,.three>*{margin-top:0}
 
-/* ---- note / empty ---- */
-.note{background:#fff8f0;border:1px solid #f0d9bf;border-left:4px solid var(--or);border-radius:12px;padding:16px 18px;color:#7a4a17;font-size:.88rem;margin-top:16px}
-.empty{background:#fff;border:1px dashed #c7d2de;border-radius:var(--r);padding:40px 22px;text-align:center;color:var(--mut);margin-top:16px}
+/* ── Map Controls ────────────────────────────────────────────────── */
+.panelctrl{
+  display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r-lg);padding:16px 18px;margin-bottom:14px;
+}
+.panelctrl label{
+  display:block;font-size:.7rem;font-weight:700;
+  color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;
+}
+.panelctrl .desc{font-size:.875rem;color:var(--mut);flex:1;min-width:200px}
+.ctrl{display:flex;flex-wrap:wrap;gap:6px}
+.ctrl button{
+  border:1px solid var(--line2);background:var(--surface);color:var(--mut);
+  padding:7px 14px;border-radius:var(--r-xl);
+  font:600 .8rem var(--sans);transition:all .15s;
+}
+.ctrl button:hover{background:var(--sf3);border-color:var(--navy2);color:var(--navy)}
+.ctrl button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.map{
+  height:540px;border-radius:var(--r-lg);
+  border:1px solid var(--line);z-index:0;overflow:hidden;
+}
 
-/* ---- author watermark ---- */
-.author-wm{font:600 11px/1 var(--sans);color:rgba(23,36,48,.62);background:rgba(255,255,255,.72);padding:3px 7px;border-radius:6px}
-.leaflet-control.author-wm{box-shadow:0 1px 4px rgba(0,0,0,.18)}
-.fs-ctrl a{display:flex!important;align-items:center;justify-content:center;width:30px;height:30px;color:#2b3a4a}
-.fs-ctrl svg{width:16px;height:16px}
-.leaflet-control-layers,.leaflet-control-layers-toggle{border-radius:9px!important;box-shadow:0 2px 10px rgba(20,40,70,.18)!important}
-.leaflet-container:fullscreen{height:100%!important;width:100%!important}
-
-/* ---- national table ---- */
-.nac-tbl{width:100%;border-collapse:collapse;font-size:.88rem}
-.nac-tbl th{text-align:left;padding:10px 12px;font-size:.76rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid var(--line)}
-.nac-tbl td{padding:9px 12px;border-bottom:1px solid var(--line);transition:background .1s}
+/* ── National Table ──────────────────────────────────────────────── */
+.nac-tbl{width:100%;border-collapse:collapse;font-size:.875rem}
+.nac-tbl th{
+  padding:10px 14px;font-size:.7rem;font-weight:700;
+  color:var(--mut);text-transform:uppercase;letter-spacing:.5px;
+  border-bottom:2px solid var(--line);background:var(--sf2);
+}
+.nac-tbl th:first-child{padding-left:18px}
+.nac-tbl td{
+  padding:10px 14px;border-bottom:1px solid var(--line);
+  color:var(--ink);transition:background .1s;
+}
+.nac-tbl td:first-child{padding-left:18px}
 .nac-tbl tr{cursor:pointer}
-.nac-tbl tr:hover td{background:var(--surface-2)}
+.nac-tbl tr:hover td{background:var(--sf2)}
 .nac-tbl .num{text-align:right;font-variant-numeric:tabular-nums}
 .nac-tbl .pub-col{color:var(--navy);font-weight:600}
-.nac-sel td{background:var(--surface-2)!important;font-weight:600}
+.nac-sel td{background:rgba(217,119,6,.05)!important}
+.nac-sel td:first-child{border-left:3px solid var(--or);padding-left:15px}
 
-/* ---- footer ---- */
-footer{padding:24px 0;color:var(--mut);font-size:.84rem;text-align:center;border-top:1px solid var(--line);margin-top:20px}
-.foot-credit{color:var(--ink);font-size:.9rem}.foot-credit b{color:var(--navy)}
-.foot-src{margin-top:5px;font-size:.78rem;color:var(--mut-2)}
-a{color:var(--navy)}
-.loading{padding:40px;text-align:center;color:var(--mut)}
-:where(button,a,select,input):focus-visible{outline:2px solid var(--or);outline-offset:2px;border-radius:6px}
+/* ── Map Chrome ──────────────────────────────────────────────────── */
+.legend{
+  background:var(--surface);padding:9px 12px;
+  border-radius:var(--r);box-shadow:var(--sh);
+  font-size:.78rem;line-height:1.7;
+}
+.legend b{
+  color:var(--navy);display:block;margin-bottom:4px;
+  font-size:.7rem;text-transform:uppercase;letter-spacing:.4px;
+}
+.info{
+  background:var(--surface);padding:9px 12px;
+  border-radius:var(--r);box-shadow:var(--sh);
+  font-size:.8rem;min-width:170px;line-height:1.5;
+}
+.info b{color:var(--navy)}
+.author-wm{
+  font:600 10.5px/1 var(--sans);
+  color:rgba(15,23,42,.5);
+  background:rgba(255,255,255,.82);
+  padding:3px 7px;border-radius:5px;
+  backdrop-filter:blur(4px);
+}
+.leaflet-control.author-wm{box-shadow:var(--sh-xs)!important}
+.fs-ctrl a{display:flex!important;align-items:center;justify-content:center;width:30px;height:30px}
+.fs-ctrl svg{width:15px;height:15px;color:var(--ink)}
+.leaflet-control-layers,.leaflet-control-layers-toggle{border-radius:var(--r)!important;box-shadow:var(--sh)!important}
+.leaflet-bar a{color:var(--ink)!important;font-weight:600}
 
-/* ---- desktop: compact navbar + full-height sidebar layout ---- */
+/* ── Callouts ────────────────────────────────────────────────────── */
+.note{
+  background:rgba(217,119,6,.05);
+  border:1px solid rgba(217,119,6,.18);
+  border-left:3px solid var(--or);
+  border-radius:var(--r);padding:11px 16px;
+  color:var(--mut);font-size:.8rem;margin-top:12px;line-height:1.5;
+}
+.empty{
+  background:var(--surface);border:1px dashed var(--line2);
+  border-radius:var(--r);padding:40px 24px;
+  text-align:center;color:var(--mut);
+}
+.loading{padding:60px 24px;text-align:center;color:var(--mut);font-size:.875rem}
+
+/* ── Footer ──────────────────────────────────────────────────────── */
+footer{
+  padding:18px 24px;color:var(--mut2);font-size:.78rem;
+  text-align:center;border-top:1px solid var(--line);
+  flex-shrink:0;
+}
+.foot-credit{color:var(--mut);font-size:.84rem}
+.foot-credit b{color:var(--navy);font-weight:700}
+.foot-src{margin-top:2px;font-size:.73rem;color:var(--mut2)}
+
+/* ── Desktop layout: full-height ────────────────────────────────── */
 @media(min-width:769px){
-  .selbar{display:none}
-  .sidebar-toggle{display:none!important}
-  /* compact navbar */
-  header{padding:0}
-  header>.wrap{display:flex;align-items:center;gap:14px;height:52px;padding:0 20px}
-  header h1{display:none}
-  header>div>p{display:none}
-  .tag{display:none}
-  .brandrow{margin:0;flex:1;min-width:0}
-  .brand{gap:8px;font-size:.88rem}
-  .byline{padding:4px 10px;font-size:.74rem}
-  /* body fills viewport, page-main scrolls — sidebar always fits */
   body{height:100vh;overflow:hidden;display:flex;flex-direction:column}
   .page-body{flex:1;min-height:0}
   .sidebar{position:static!important;height:100%}
   .page-main{overflow-y:auto;height:100%}
 }
-/* hide desktop share icon on mobile */
-@media(max-width:768px){
-  #shareBtnD{display:none!important}
-}
 
-/* ---- mobile layout ---- */
+/* ── Mobile ──────────────────────────────────────────────────────── */
 @media(max-width:768px){
+  :root{--sb-w:270px}
   .sidebar{
-    position:fixed;left:0;top:0;
-    width:260px;height:100vh;
-    z-index:2000;
-    transform:translateX(-100%);
-    transition:transform .26s ease;
-    box-shadow:4px 0 24px rgba(20,40,70,.18);
+    position:fixed!important;left:0;top:0;
+    height:100vh;z-index:2000;
+    transform:translateX(-100%);transition:transform .25s ease;
+    box-shadow:8px 0 32px rgba(0,0,0,.2);
   }
   .sidebar.open{transform:translateX(0)}
   .sidebar-close{display:flex}
-  .sidebar-toggle{display:inline-flex}
-  header{padding:22px 16px 18px}
-  header h1{font-size:1.3rem;letter-spacing:-.3px}
-  .selbar{padding:12px 14px;gap:10px}
-  .selbar .field{min-width:0}
-  .city-select{font-size:1rem;padding:10px 12px}
-  .tabs{padding:0 4px}
-  .tabs button{padding:12px 10px;font-size:.82rem}
-  .panel{padding:20px 0}
-  .kpis{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:14px}
-  .kpi{padding:13px}.kpi .v{font-size:1.4rem}
-  .chartbox,.panelctrl{padding:14px}
+  .sidebar-toggle{display:inline-flex!important}
+  main{padding:16px 16px 0}
+  .tabs{padding:0 10px}
+  .tabs button{height:40px;font-size:.78rem;margin-right:6px}
+  .kpis{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+  .kpi{padding:13px 14px 11px}
+  .kpi .v{font-size:1.5rem}
+  .chartbox h3{padding:13px 14px 0;font-size:.875rem}
+  .chartbox>p{padding:3px 14px 12px}
+  .chartbox .cwrap,.chartbox .cwrap-sm,.chartbox .cwrap-md,.chartbox .cwrap-lg{margin:12px 14px 14px}
   .cwrap{height:260px}.cwrap-md{height:220px}.cwrap-lg{height:300px}.cwrap-sm{height:180px}
-  .map{height:430px}
-  .nac-tbl th,.nac-tbl td{padding:7px 8px}
+  .map{height:420px}
+  .panelctrl{padding:14px}
+  .nac-tbl th,.nac-tbl td{padding:8px 10px;font-size:.8rem}
+  footer{padding:14px 16px}
 }
 </style>
 <link rel="stylesheet" href="theme.css"/>
@@ -299,52 +468,61 @@ a{color:var(--navy)}
 </head>
 <body>
 
-<header><div class="wrap">
-  <div class="brandrow">
-    <div class="brand">
-      <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg></span>
-      EOD Chile · Movilidad Urbana
+<!-- ── Navbar ─────────────────────────────────────────────────────── -->
+<header>
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <span class="mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+      </span>
+      EOD Chile
     </div>
-    <div class="brand-right">
-      <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="Abrir menú de ciudades" title="Seleccionar ciudad">
+    <div class="nav-center">
+      <span class="nav-city" id="nav-city">Movilidad Urbana</span>
+      <span class="nav-chip" id="nav-chip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        18 ciudades EOD
+      </span>
+    </div>
+    <div class="nav-right">
+      <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="Abrir menú" title="Ciudades">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         Ciudades
       </button>
-      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro" title="Tema claro / oscuro"></button>
-      <button id="shareBtnD" class="theme-toggle" type="button" title="Compartir vista" aria-label="Compartir esta vista">
+      <button id="themeToggle" class="nav-btn" type="button" aria-label="Cambiar tema" title="Tema"></button>
+      <button id="shareBtnD" class="nav-btn" type="button" aria-label="Compartir vista" title="Compartir URL">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
       </button>
-      <span class="byline">By <b>Rodrigo Medina G.</b></span>
+      <span class="nav-author">By Rodrigo M.G.</span>
     </div>
   </div>
-  <h1>Movilidad urbana en Chile</h1>
-  <p>Encuestas Origen-Destino (EOD) · 18 ciudades · datos homologados y expandidos</p>
-  <span class="tag" id="htag">Cargando…</span>
-  <div class="selbar">
-    <div class="field">
-      <label for="city-sel">Ciudad</label>
-      <select id="city-sel" class="city-select"></select>
-    </div>
-    <div class="ctxt" id="sel-ctx"></div>
-    <button id="shareBtn" class="sharebtn" type="button" title="Copiar el enlace de esta vista">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-      Compartir vista
-    </button>
-  </div>
-</div></header>
+</header>
+
+<!-- hidden city select for JS -->
+<select id="city-sel" aria-hidden="true" style="position:absolute;opacity:0;pointer-events:none;height:0;overflow:hidden"></select>
+<!-- hidden mobile share button for JS compatibility -->
+<button id="shareBtn" style="display:none" type="button"></button>
 
 <div class="page-body">
 
-  <!-- ======= SIDEBAR ======= -->
+  <!-- ── Sidebar ──────────────────────────────────────────────────── -->
   <aside class="sidebar" id="sidebar" aria-label="Lista de ciudades">
     <div class="sidebar-hd">
-      <span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
-        18 ciudades EOD
-      </span>
-      <button class="sidebar-close" id="sidebarClose" type="button" aria-label="Cerrar menú">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
+      <div class="sidebar-hd-row">
+        <span class="sidebar-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+          Ciudades
+        </span>
+        <button class="sidebar-close" id="sidebarClose" type="button" aria-label="Cerrar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="sidebar-search">
+        <span class="sidebar-search-ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </span>
+        <input type="text" id="city-search" placeholder="Buscar ciudad…" autocomplete="off" spellcheck="false"/>
+      </div>
     </div>
     <div id="city-list" class="city-list"></div>
     <div class="sidebar-ts" id="sidebar-ts"></div>
@@ -353,45 +531,49 @@ a{color:var(--navy)}
   <!-- Mobile overlay -->
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-  <!-- ======= MAIN CONTENT ======= -->
+  <!-- ── Main Content ──────────────────────────────────────────────── -->
   <div class="page-main">
 
     <nav class="tabs" role="tablist" aria-label="Secciones">
       <button data-tab="resumen" class="on" role="tab" aria-controls="p-resumen" aria-selected="true">
-        <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></span>Resumen
+        <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></span>
+        Resumen
       </button>
       <button data-tab="movilidad" role="tab" aria-controls="p-movilidad" aria-selected="false">
-        <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>Modos
+        <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+        Modos
       </button>
       <button data-tab="demografia" role="tab" aria-controls="p-demografia" aria-selected="false">
-        <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>Demografía
+        <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+        Demografía
       </button>
       <button data-tab="ingreso" role="tab" aria-controls="p-ingreso" aria-selected="false">
-        <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>Ingreso
+        <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+        Ingreso
       </button>
       <button data-tab="mapas" role="tab" aria-controls="p-mapas" aria-selected="false">
-        <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg></span>Mapas OD
+        <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg></span>
+        Mapas OD
       </button>
       <button data-tab="nacional" role="tab" aria-controls="p-nacional" aria-selected="false">
-        <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>Nacional
+        <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
+        Nacional
       </button>
     </nav>
 
-    <main class="wrap">
+    <main>
 
-      <!-- ============ RESUMEN ============ -->
+      <!-- RESUMEN -->
       <section class="panel on" id="p-resumen" role="tabpanel" tabindex="0">
         <h2 id="res-title">Resumen<span class="bar"></span></h2>
         <p class="lead" id="res-lead"></p>
         <div id="res-kpis" class="kpis"></div>
-
         <div class="grp-hd">Distribución horaria de viajes</div>
         <div class="chartbox">
           <h3>Viajes por hora del día</h3>
           <p>Porcentaje de viajes según hora de salida del origen. Se marcan las puntas de tráfico.</p>
           <div class="cwrap-sm"><canvas id="c-horario"></canvas></div>
         </div>
-
         <div class="grp-hd">Distancia de los viajes</div>
         <div class="chartbox">
           <h3>Distribución por tramo de distancia</h3>
@@ -400,7 +582,7 @@ a{color:var(--navy)}
         </div>
       </section>
 
-      <!-- ============ MODOS ============ -->
+      <!-- MODOS -->
       <section class="panel" id="p-movilidad" role="tabpanel" tabindex="0">
         <h2>Modos y propósitos<span class="bar"></span></h2>
         <p class="lead">Caracterización de los viajes en día laboral según modo de transporte y propósito del viaje.</p>
@@ -419,7 +601,7 @@ a{color:var(--navy)}
         <div class="grp-hd">Distribución horaria por modo</div>
         <div class="chartbox">
           <h3>Viajes por hora — por modo de transporte</h3>
-          <p>Distribución del total de viajes del día laboral según hora y modo. La suma de todos los modos y horas = 100%.</p>
+          <p>Distribución del total de viajes del día laboral según hora y modo.</p>
           <div class="cwrap"><canvas id="c-horario-modal"></canvas></div>
         </div>
         <div class="grp-hd">Propósito según modo</div>
@@ -443,7 +625,7 @@ a{color:var(--navy)}
         </div>
       </section>
 
-      <!-- ============ DEMOGRAFÍA ============ -->
+      <!-- DEMOGRAFÍA -->
       <section class="panel" id="p-demografia" role="tabpanel" tabindex="0">
         <h2>Demografía<span class="bar"></span></h2>
         <p class="lead">Perfil demográfico de los viajeros: tipo de usuario, modo de transporte según grupo etario y tipo de usuario.</p>
@@ -474,7 +656,7 @@ a{color:var(--navy)}
         </div>
       </section>
 
-      <!-- ============ INGRESO ============ -->
+      <!-- INGRESO -->
       <section class="panel" id="p-ingreso" role="tabpanel" tabindex="0">
         <h2>Ingreso<span class="bar"></span></h2>
         <p class="lead">Movilidad según nivel socioeconómico del hogar. Los quintiles van de Q1 (menor ingreso) a Q5 (mayor ingreso).</p>
@@ -498,7 +680,7 @@ a{color:var(--navy)}
         </div>
       </section>
 
-      <!-- ============ MAPAS ============ -->
+      <!-- MAPAS -->
       <section class="panel" id="p-mapas" role="tabpanel" tabindex="0">
         <h2>Mapas Origen-Destino<span class="bar"></span></h2>
         <p class="lead">Distribución espacial de viajes por zona. Los círculos son proporcionales al volumen de viajes generados o atraídos por cada zona.</p>
@@ -517,7 +699,7 @@ a{color:var(--navy)}
         <div class="note" id="map-note">Fuente: EOD procesada. Flujos OD: top 150 pares por volumen.</div>
       </section>
 
-      <!-- ============ NACIONAL ============ -->
+      <!-- NACIONAL -->
       <section class="panel" id="p-nacional" role="tabpanel" tabindex="0">
         <h2>Resumen Nacional<span class="bar"></span></h2>
         <p class="lead">Comparativa de indicadores de movilidad en las 18 ciudades con Encuesta Origen-Destino (EOD) homologada.</p>
@@ -531,10 +713,10 @@ a{color:var(--navy)}
 
     </main>
 
-    <footer><div class="wrap">
-      <div class="foot-credit">Análisis, homologación y desarrollo · <b>By Rodrigo Medina González</b> · Universidad de Concepción</div>
-      <div class="foot-src">Fuentes: Encuestas Origen-Destino (SECTRA / MOP, múltiples años, 2001–2023) · Expansión y homologación: elaboración propia.</div>
-    </div></footer>
+    <footer>
+      <div class="foot-credit">Análisis, homologación y desarrollo · <b>Rodrigo Medina González</b> · Universidad de Concepción</div>
+      <div class="foot-src">Encuestas Origen-Destino SECTRA / MOP (2001–2023) · Expansión y homologación: elaboración propia.</div>
+    </footer>
 
   </div><!-- /page-main -->
 
@@ -545,19 +727,41 @@ a{color:var(--navy)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 <script>
 if(window.Chart){
-  const F="Inter,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif";
-  Chart.defaults.font.family=F; Chart.defaults.font.size=12; Chart.defaults.color="#5e6e80";
-  Chart.defaults.borderColor="rgba(20,40,70,.07)";
+  const F="Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif";
+  Chart.defaults.font.family=F;
+  Chart.defaults.font.size=12;
+  Chart.defaults.color="#64748b";
+  Chart.defaults.borderColor="rgba(15,23,42,.05)";
   Chart.defaults.plugins.legend.labels.usePointStyle=true;
   Chart.defaults.plugins.legend.labels.boxWidth=8;
   Chart.defaults.plugins.legend.labels.padding=14;
-  Chart.defaults.plugins.tooltip.backgroundColor="rgba(23,36,48,.95)";
-  Chart.defaults.plugins.tooltip.padding=10;
+  Chart.defaults.plugins.tooltip.backgroundColor="rgba(15,23,42,.93)";
+  Chart.defaults.plugins.tooltip.padding={x:12,y:10};
   Chart.defaults.plugins.tooltip.cornerRadius=8;
-  Chart.defaults.plugins.tooltip.titleFont={family:F,weight:"700"};
-  Chart.defaults.plugins.tooltip.bodyFont={family:F};
-  if(window.ChartDataLabels){Chart.register(ChartDataLabels);Chart.defaults.plugins.datalabels.display=false;}
-  Chart.register({id:"authorWM",afterDraw(c){if(c.config.options&&c.config.options.__noWM)return;const a=c.chartArea;if(!a)return;const x=c.ctx;x.save();x.font="600 10px "+F;x.fillStyle="rgba(125,145,170,.55)";x.textAlign="right";x.textBaseline="top";x.fillText("By Rodrigo Medina G.",a.right,a.top+2);x.restore();}});
+  Chart.defaults.plugins.tooltip.caretSize=5;
+  Chart.defaults.plugins.tooltip.displayColors=true;
+  Chart.defaults.plugins.tooltip.boxWidth=8;
+  Chart.defaults.plugins.tooltip.boxHeight=8;
+  Chart.defaults.plugins.tooltip.boxPadding=4;
+  Chart.defaults.plugins.tooltip.titleFont={family:F,weight:"700",size:12};
+  Chart.defaults.plugins.tooltip.bodyFont={family:F,size:12};
+  if(window.ChartDataLabels){
+    Chart.register(ChartDataLabels);
+    Chart.defaults.plugins.datalabels.display=false;
+  }
+  Chart.register({
+    id:"authorWM",
+    afterDraw(c){
+      if(c.config.options&&c.config.options.__noWM)return;
+      const a=c.chartArea;if(!a)return;
+      const x=c.ctx;x.save();
+      x.font="500 10px "+F;
+      x.fillStyle="rgba(100,116,139,.45)";
+      x.textAlign="right";x.textBaseline="top";
+      x.fillText("By Rodrigo Medina G.",a.right,a.top+2);
+      x.restore();
+    }
+  });
 }
 </script>
 <script src="app.js"></script>
