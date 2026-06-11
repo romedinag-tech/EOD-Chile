@@ -1,53 +1,104 @@
 # -*- coding: utf-8 -*-
-"""Componentes y estilos de UI para un look profesional."""
+"""Componentes y estilos de UI — design tokens del sitio ciudades_y_tendencias."""
 import streamlit as st
 
 CSS = """
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
-:root { --eod-primary:#1f6feb; --eod-ink:#1b2430; --eod-muted:#5b6b7c; }
-.block-container { padding-top: 1.4rem; padding-bottom: 2rem; max-width: 1400px; }
-#MainMenu, footer, header [data-testid="stToolbar"] { visibility: hidden; }
+:root{
+  --eod-navy:#1f4e79;--eod-navy2:#2e5e8c;--eod-navy-d:#143150;
+  --eod-or:#d96a1f;--eod-teal:#1f8a86;--eod-green:#1a9850;
+  --eod-red:#d6453a;--eod-amber:#e0a92b;
+  --eod-bg:#f4f7fb;--eod-surface:#ffffff;--eod-surface2:#eef3f9;
+  --eod-ink:#172430;--eod-mut:#5e6e80;--eod-mut2:#8696a7;
+  --eod-line:#e4eaf2;--eod-line2:#d3dde9;
+  --eod-grad:linear-gradient(135deg,#143150 0%,#1f4e79 60%,#2e5e8c 100%);
+  --eod-r:14px;--eod-r-sm:10px;--eod-r-lg:18px;
+  --eod-sh:0 2px 10px rgba(20,40,70,.05),0 10px 28px rgba(20,40,70,.05);
+  --eod-sh-lg:0 16px 44px rgba(20,40,70,.13);
+}
+*{box-sizing:border-box}
+html,body,.stApp,.main,[data-testid="stAppViewContainer"]{background:var(--eod-bg)!important}
+body,[class*="css"],button,input,select,textarea{
+  font-family:'Inter',-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif!important;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.block-container{padding-top:0!important;padding-bottom:2rem;max-width:1400px}
+#MainMenu,footer,header [data-testid="stToolbar"]{visibility:hidden}
 
-/* Encabezado de la app */
-.eod-hero { display:flex; align-items:center; gap:.7rem; padding:.2rem 0 .6rem 0;
-  border-bottom:1px solid #e6eaf0; margin-bottom:.8rem; }
-.eod-hero h1 { font-size:1.5rem; margin:0; color:var(--eod-ink); font-weight:700; }
-.eod-hero .sub { color:var(--eod-muted); font-size:.85rem; }
+/* === HERO HEADER (gradient, como el sitio de referencia) === */
+.eod-hero{
+  background:var(--eod-grad);color:#fff;
+  padding:22px 26px 18px;border-radius:var(--eod-r-lg);
+  margin-bottom:1.1rem;position:relative;overflow:hidden}
+.eod-hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(900px 280px at 80% -40%,rgba(120,180,255,.18),transparent 70%)}
+.eod-hero h1{
+  margin:0 0 5px;font-size:1.6rem;font-weight:800;letter-spacing:-.5px;
+  color:#fff;position:relative}
+.eod-hero .sub{opacity:.88;font-size:.9rem;color:rgba(255,255,255,.9);
+  position:relative;margin:0}
 
-/* Tarjetas KPI */
-.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:.7rem; margin:.2rem 0 1rem 0; }
-.kpi { background:#fff; border:1px solid #e6eaf0; border-radius:12px; padding:.8rem 1rem;
-  box-shadow:0 1px 2px rgba(16,24,40,.04); transition:.15s; }
-.kpi:hover { box-shadow:0 4px 14px rgba(16,24,40,.08); transform:translateY(-1px); }
-.kpi .lab { color:var(--eod-muted); font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; font-weight:600; }
-.kpi .val { color:var(--eod-ink); font-size:1.55rem; font-weight:700; line-height:1.15; margin-top:.15rem; }
-.kpi .sub { color:var(--eod-muted); font-size:.74rem; margin-top:.1rem; }
-.kpi.accent { border-top:3px solid var(--eod-primary); }
+/* === KPI CARDS === */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));
+  gap:14px;margin:.4rem 0 1.2rem 0}
+.kpi{background:var(--eod-surface);border:1px solid var(--eod-line);
+  border-radius:var(--eod-r);padding:18px;box-shadow:var(--eod-sh);
+  transition:transform .16s ease,box-shadow .16s ease}
+.kpi:hover{transform:translateY(-2px);box-shadow:var(--eod-sh-lg)}
+.kpi.accent{border-top:3px solid var(--eod-or)}
+.kpi .lab{color:var(--eod-mut);font-size:.75rem;text-transform:uppercase;
+  letter-spacing:.04em;font-weight:700}
+.kpi .val{color:var(--eod-navy);font-size:1.7rem;font-weight:800;
+  line-height:1.1;margin-top:.2rem;font-variant-numeric:tabular-nums}
+.kpi .sub{color:var(--eod-or);font-weight:700;font-size:.82rem;margin-top:.15rem}
 
-/* Encabezado de sección */
-.sec { margin:.6rem 0 .2rem 0; }
-.sec h3 { font-size:1.05rem; color:var(--eod-ink); margin:0; font-weight:700; }
-.sec p { color:var(--eod-muted); font-size:.82rem; margin:.1rem 0 .3rem 0; }
+/* === SECTION HEADERS (con barra naranja izquierda) === */
+.sec{margin:.9rem 0 .25rem 0}
+.sec h3{font-size:1.05rem;color:var(--eod-navy);margin:0;font-weight:700;
+  border-left:4px solid var(--eod-or);padding-left:10px}
+.sec p{color:var(--eod-mut);font-size:.84rem;margin:.2rem 0 .3rem 0}
 
-/* Chips de contexto */
-.chips { display:flex; gap:.4rem; flex-wrap:wrap; margin:.1rem 0 .6rem 0; }
-.chip { background:#eef3fe; color:#1f6feb; border-radius:999px; padding:.12rem .6rem; font-size:.75rem; font-weight:600; }
+/* === CHIPS === */
+.chips{display:flex;gap:.4rem;flex-wrap:wrap;margin:.2rem 0 .7rem 0}
+.chip{background:var(--eod-navy);color:#fff;border-radius:999px;
+  padding:.24rem .78rem;font-size:.78rem;font-weight:600}
 
-/* Tabs un poco más grandes */
-.stTabs [data-baseweb="tab"] { font-size:.95rem; font-weight:600; }
+/* === STREAMLIT TABS (subrayado naranja, como sitio de referencia) === */
+.stTabs [data-baseweb="tab-list"]{
+  background:transparent!important;border-bottom:1px solid var(--eod-line)!important;gap:0!important}
+.stTabs [data-baseweb="tab"]{
+  font-size:.95rem!important;font-weight:700!important;color:var(--eod-mut)!important;
+  padding:12px 18px!important;background:transparent!important}
+.stTabs [data-baseweb="tab"]:hover{color:var(--eod-navy)!important}
+.stTabs [data-baseweb="tab"][aria-selected="true"]{
+  color:var(--eod-navy)!important;background:transparent!important}
+.stTabs [data-baseweb="tab-highlight"]{background:var(--eod-or)!important;height:3px!important}
 
-/* Botones segmentados: grandes, claros, con aspecto de botón */
-[data-testid="stSegmentedControl"] { margin-top:.1rem; }
-[data-testid="stSegmentedControl"] button {
-  font-size:.9rem !important; font-weight:600 !important; padding:.45rem 1rem !important;
-  border-radius:9px !important; border:1px solid #d7deea !important; }
-[data-testid="stSegmentedControl"] button:hover { background:#eef3fe !important; border-color:#bcd0fb !important; }
+/* === SEGMENTED CONTROL (píldoras navy, activo = fondo navy) === */
+[data-testid="stSegmentedControl"]{margin-top:.1rem}
+[data-testid="stSegmentedControl"] button{
+  font-size:.9rem!important;font-weight:600!important;padding:.45rem 1.1rem!important;
+  border-radius:22px!important;border:1.5px solid var(--eod-navy)!important;
+  color:var(--eod-navy)!important;background:#fff!important}
+[data-testid="stSegmentedControl"] button:hover{
+  background:var(--eod-surface2)!important}
 [data-testid="stSegmentedControl"] button[aria-checked="true"],
-[data-testid="stSegmentedControl"] button[kind="segmented_controlActive"] {
-  background:#1f6feb !important; color:#fff !important; border-color:#1f6feb !important;
-  box-shadow:0 2px 6px rgba(31,111,235,.30) !important; }
-/* etiqueta de los controles, un poco más marcada */
-[data-testid="stWidgetLabel"] label p { font-weight:600; color:#3b4a5c; }
+[data-testid="stSegmentedControl"] button[kind="segmented_controlActive"]{
+  background:var(--eod-navy)!important;color:#fff!important;
+  border-color:var(--eod-navy)!important;
+  box-shadow:0 2px 6px rgba(31,78,121,.28)!important}
+
+/* === WIDGET LABELS === */
+[data-testid="stWidgetLabel"] label p{
+  font-weight:600;color:var(--eod-ink);font-size:.88rem}
+
+/* === SIDEBAR === */
+section[data-testid="stSidebar"]{
+  background:var(--eod-surface)!important;border-right:1px solid var(--eod-line)}
+section[data-testid="stSidebar"] h1,
+section[data-testid="stSidebar"] h2,
+section[data-testid="stSidebar"] h3{color:var(--eod-navy)}
 </style>
 """
 
@@ -58,8 +109,10 @@ def inject_css():
 
 def hero(titulo='EOD Chile', sub='Encuestas Origen-Destino · datos homologados'):
     st.markdown(
-        f'<div class="eod-hero"><span style="font-size:1.7rem">🚍</span>'
-        f'<div><h1>{titulo}</h1><div class="sub">{sub}</div></div></div>',
+        f'<div class="eod-hero">'
+        f'<h1>🚍 {titulo}</h1>'
+        f'<div class="sub">{sub}</div>'
+        f'</div>',
         unsafe_allow_html=True)
 
 

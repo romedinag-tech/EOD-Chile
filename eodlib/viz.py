@@ -1,30 +1,46 @@
 # -*- coding: utf-8 -*-
-"""Gráficos Plotly con estilo consistente para el dashboard EOD."""
+"""Gráficos Plotly con paleta del sitio ciudades_y_tendencias."""
 import plotly.express as px
 import plotly.graph_objects as go
 
-# paleta por modo (consistente en todo el dashboard)
+_FONT = 'Inter,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif'
+
 COLOR_MODO = {
-    'Privado': '#e45756', 'Público': '#4c78a8', 'No motorizado': '#54a24b',
-    'Combinado': '#f58518', 'Otro': '#9d9d9d',
+    'Privado': '#d6453a',
+    'Público': '#1f4e79',
+    'No motorizado': '#1a9850',
+    'Combinado': '#d96a1f',
+    'Otro': '#8696a7',
 }
-COLOR_PROP = {'Trabajo': '#4c78a8', 'Estudio': '#f58518', 'Otro': '#9d9d9d'}
-SECUENCIA = px.colors.qualitative.Safe
+COLOR_PROP = {'Trabajo': '#1f4e79', 'Estudio': '#d96a1f', 'Otro': '#8696a7'}
+SECUENCIA = ['#1f4e79', '#d96a1f', '#1a9850', '#1f8a86', '#d6453a', '#e0a92b', '#8696a7']
 
 
 def _layout(fig, titulo=None, alto=360):
     fig.update_layout(
-        title=titulo, height=alto, margin=dict(l=10, r=10, t=40 if titulo else 10, b=10),
-        legend=dict(orientation='h', yanchor='bottom', y=-0.25, x=0),
-        plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+        title=dict(text=titulo, font=dict(family=_FONT, size=15, color='#1f4e79'), x=0,
+                   pad=dict(l=4)) if titulo else None,
+        height=alto,
+        margin=dict(l=10, r=10, t=44 if titulo else 10, b=10),
+        legend=dict(orientation='h', yanchor='bottom', y=-0.3, x=0,
+                    font=dict(family=_FONT, size=12, color='#5e6e80')),
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(family=_FONT, color='#172430'),
     )
+    fig.update_xaxes(showgrid=False, linecolor='#e4eaf2',
+                     tickfont=dict(size=12, color='#5e6e80'), tickcolor='#e4eaf2')
+    fig.update_yaxes(gridcolor='#eef3f9', linecolor='rgba(0,0,0,0)',
+                     tickfont=dict(size=12, color='#5e6e80'), gridwidth=1)
     return fig
 
 
 def barra_modal(serie, titulo='Partición modal'):
     fig = go.Figure(go.Bar(
-        x=serie.index, y=serie.values, marker_color=[COLOR_MODO.get(i, '#888') for i in serie.index],
-        text=[f'{v:.1f}%' for v in serie.values], textposition='outside'))
+        x=serie.index, y=serie.values,
+        marker_color=[COLOR_MODO.get(i, '#8696a7') for i in serie.index],
+        text=[f'{v:.1f}%' for v in serie.values], textposition='outside',
+        textfont=dict(size=12, family=_FONT)))
     fig.update_yaxes(title='% de viajes', ticksuffix='%')
     return _layout(fig, titulo)
 
@@ -32,7 +48,8 @@ def barra_modal(serie, titulo='Partición modal'):
 def dona(serie, titulo, colores=None):
     cols = [colores.get(i, None) for i in serie.index] if colores else None
     fig = go.Figure(go.Pie(labels=serie.index, values=serie.values, hole=0.55,
-                           marker=dict(colors=cols), textinfo='label+percent', sort=False))
+                           marker=dict(colors=cols), textinfo='label+percent', sort=False,
+                           textfont=dict(size=12, family=_FONT)))
     return _layout(fig, titulo)
 
 
@@ -55,7 +72,7 @@ def lineas_horarias(tabla_o_serie, titulo='Distribución horaria', colores=None)
                             stackgroup='one')
     else:
         fig.add_scatter(x=tabla_o_serie.index, y=tabla_o_serie.values, mode='lines',
-                        fill='tozeroy', line=dict(width=2.5, color='#4c78a8'))
+                        fill='tozeroy', line=dict(width=2.5, color='#1f4e79'))
     fig.update_xaxes(title='Hora del día', dtick=2)
     fig.update_yaxes(title='% de viajes', ticksuffix='%')
     return _layout(fig, titulo, alto=380)

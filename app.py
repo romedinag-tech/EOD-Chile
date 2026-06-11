@@ -35,14 +35,14 @@ seccion = option_menu(
     icons=['globe-americas', 'geo-alt-fill', 'bar-chart-steps', 'trophy-fill'],
     orientation='horizontal', default_index=0,
     styles={
-        'container': {'padding': '6px', 'background-color': '#eef2fb', 'border-radius': '12px',
-                      'margin-bottom': '6px', 'box-shadow': '0 1px 3px rgba(16,24,40,.06)'},
-        'nav-link': {'font-size': '1.02rem', 'font-weight': '700', 'color': '#3b4a5c',
-                     'padding': '10px 18px', 'margin': '0 3px', 'border-radius': '9px',
-                     '--hover-color': '#dde6fb'},
-        'nav-link-selected': {'background-color': '#1f6feb', 'color': 'white',
-                              'box-shadow': '0 2px 6px rgba(31,111,235,.35)'},
-        'icon': {'font-size': '1.05rem'}})
+        'container': {'padding': '0', 'background-color': 'transparent',
+                      'border-bottom': '2px solid #e4eaf2', 'margin-bottom': '18px'},
+        'nav-link': {'font-size': '1rem', 'font-weight': '700', 'color': '#5e6e80',
+                     'padding': '13px 22px', 'margin': '0', 'border-radius': '0',
+                     'border-bottom': '3px solid transparent', '--hover-color': 'transparent'},
+        'nav-link-selected': {'background-color': 'transparent', 'color': '#1f4e79',
+                              'border-bottom': '3px solid #d96a1f', 'box-shadow': 'none'},
+        'icon': {'font-size': '1rem', 'color': 'inherit'}})
 
 if seccion == 'Resumen':
     resumen.render()
