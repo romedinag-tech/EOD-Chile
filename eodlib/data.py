@@ -53,10 +53,12 @@ def catalogo_ciudades():
     return cat
 
 
-def viajes_ciudad(ciudad, solo_laboral=True, solo_completos=True):
-    """Devuelve los viajes de una ciudad, filtrando a día laboral expandible."""
+def viajes_ciudad(ciudad, anio=None, solo_laboral=True, solo_completos=True):
+    """Devuelve los viajes de una ciudad (opcionalmente filtrados por año)."""
     df = cargar_viajes()
     d = df[df['ciudad'] == ciudad].copy()
+    if anio is not None:
+        d = d[d['anio'] == int(anio)]
     if solo_completos:
         d = d[d['factor'] > 0]
     if solo_laboral and ciudad in MULTIDIA:

@@ -96,9 +96,37 @@ body,[class*="css"],button,input,select,textarea{
 /* === SIDEBAR === */
 section[data-testid="stSidebar"]{
   background:var(--eod-surface)!important;border-right:1px solid var(--eod-line)}
-section[data-testid="stSidebar"] h1,
-section[data-testid="stSidebar"] h2,
-section[data-testid="stSidebar"] h3{color:var(--eod-navy)}
+
+/* Título de navegación */
+.nav-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--eod-mut);font-weight:700;padding:6px 4px 10px;margin-bottom:2px}
+
+/* Botones de ciudad (nav list) */
+section[data-testid="stSidebar"] [data-testid="stButton"]{margin:1px 0!important}
+section[data-testid="stSidebar"] button[data-testid="stBaseButton-secondary"]{
+  justify-content:flex-start!important;text-align:left!important;
+  border:none!important;border-radius:8px!important;
+  padding:8px 12px!important;font-size:.87rem!important;font-weight:600!important;
+  background:transparent!important;color:var(--eod-navy)!important;
+  box-shadow:none!important;min-height:unset!important;line-height:1.4!important;
+  transition:background .12s!important}
+section[data-testid="stSidebar"] button[data-testid="stBaseButton-secondary"]:hover{
+  background:var(--eod-surface2)!important}
+section[data-testid="stSidebar"] button[data-testid="stBaseButton-primary"]{
+  justify-content:flex-start!important;text-align:left!important;
+  border:none!important;border-radius:8px!important;
+  padding:8px 12px!important;font-size:.87rem!important;font-weight:700!important;
+  background:var(--eod-navy)!important;color:#fff!important;
+  box-shadow:none!important;min-height:unset!important;line-height:1.4!important}
+
+/* Fila de año (sub-item indentado) */
+.year-row [data-testid="stButton"]{margin:0!important}
+.year-row button[data-testid="stBaseButton-secondary"]{
+  padding:5px 12px 5px 28px!important;font-size:.82rem!important;font-weight:500!important;
+  color:var(--eod-mut)!important}
+.year-row button[data-testid="stBaseButton-secondary"]:hover{color:var(--eod-navy)!important}
+.year-row button[data-testid="stBaseButton-primary"]{
+  padding:5px 12px 5px 28px!important;font-size:.82rem!important;font-weight:600!important}
 </style>
 """
 
