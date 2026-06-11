@@ -36,7 +36,7 @@ def _bar(serie, ytit='% de viajes', color='#1f4e79'):
 
 
 def render(ciudad, anio):
-    d0 = D.viajes_ciudad(ciudad)
+    d0 = D.viajes_ciudad(ciudad, anio=anio)
     pob, hog = D.conteos(ciudad)
     reg = d0['region'].iloc[0] if not d0.empty else ''
     ui.chips([reg, f'EOD {int(anio)}', f'{ui.fmt_miles(pob)} hab.', f'{ui.fmt_miles(hog)} hogares'])
