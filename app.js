@@ -5,8 +5,8 @@
    =================================================================== */
 
 // ── Constantes de color ──────────────────────────────────────────────────────
-const NAVY="#1f4e79", NAVY2="#2e5e8c", OR="#d96a1f", TEAL="#1f8a86",
-      GREEN="#1a9850", RED="#d6453a", GREY="#9aa7b4";
+const NAVY="#0f2942", NAVY2="#1a4068", OR="#d97706", TEAL="#0891b2",
+      GREEN="#16a34a", RED="#dc2626", GREY="#94a3b8";
 
 const MODO_COL={
   "Público":       NAVY,
@@ -65,10 +65,10 @@ function pct(v){
 
 // ── Colores de período horario ───────────────────────────────────────────────
 function horaColor(h){
-  if(h>=7&&h<9)   return "rgba(31,78,121,.90)";
-  if(h>=12&&h<14) return "rgba(217,106,31,.88)";
-  if(h>=17&&h<20) return "rgba(31,138,134,.90)";
-  return "rgba(94,110,128,.45)";
+  if(h>=7&&h<9)   return "rgba(15,41,66,.88)";
+  if(h>=12&&h<14) return "rgba(217,119,6,.85)";
+  if(h>=17&&h<20) return "rgba(8,145,178,.82)";
+  return "rgba(148,163,184,.4)";
 }
 
 // ── Tema claro / oscuro ──────────────────────────────────────────────────────
@@ -84,8 +84,8 @@ function applyMapTheme(){
 
 function applyChartTheme(){
   if(!window.Chart)return;
-  Chart.defaults.color      =isDark()?"#a9c0de":"#5e6e80";
-  Chart.defaults.borderColor=isDark()?"rgba(140,165,200,.14)":"rgba(20,40,70,.07)";
+  Chart.defaults.color      =isDark()?"#8b949e":"#64748b";
+  Chart.defaults.borderColor=isDark()?"rgba(48,54,61,.8)":"rgba(15,23,42,.05)";
 }
 
 function rerenderActive(){
@@ -205,7 +205,6 @@ function buildSelector(){
   const sel=document.getElementById("city-sel");
   sel.innerHTML=S.index.map(c=>`<option value="${c.slug}">${c.ciudad} · EOD ${c.anio}</option>`).join("");
   sel.onchange=()=>loadCity(sel.value);
-  document.getElementById("htag").textContent=S.index.length+" ciudades · datos SECTRA/MOP homologados";
   buildSidebarList();
 }
 
@@ -266,7 +265,10 @@ function render(){
     'Encuesta Origen-Destino <b>'+d.anio+'</b> · '+
     d.kpis.total_viajes.toLocaleString("es-CL")+' viajes expandidos en día laboral · '+
     (d.zonas?d.zonas.length:0)+' zonas georeferenciadas.';
-  document.getElementById("sel-ctx").innerHTML='<b>'+d.ciudad+'</b> · EOD '+d.anio;
+  const nc=document.getElementById("nav-city");
+  if(nc)nc.textContent=d.ciudad;
+  const nch=document.getElementById("nav-chip");
+  if(nch)nch.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> EOD '+d.anio;
   renderResumen(d);
   const t=currentTab();
   if(t==="movilidad")   renderMovilidad(d);
@@ -284,22 +286,22 @@ function renderResumen(d){
   const topProp=d.proposito&&d.proposito.length?[...d.proposito].sort((a,b)=>b.pct-a.pct)[0]:null;
 
   let html=`
-    <div class="kpi"><div class="v">${fmtM(k.total_viajes)}</div><div class="l">Viajes en día laboral</div><div class="s">viajes expandidos</div></div>
-    <div class="kpi"><div class="v">${k.tiempo_medio_min!=null?fmt(k.tiempo_medio_min,0)+" min":"s/d"}</div><div class="l">Tiempo medio de viaje</div><div class="s">minutos por viaje</div></div>
-    <div class="kpi"><div class="v" style="color:${NAVY}">${pct(k.pct_publico)}</div><div class="l">Transporte público</div><div class="s">% del total</div></div>
-    <div class="kpi"><div class="v" style="color:${RED}">${pct(k.pct_privado)}</div><div class="l">Transporte privado</div><div class="s">automóvil y moto</div></div>
-    <div class="kpi"><div class="v" style="color:${GREEN}">${pct(k.pct_no_motorizado)}</div><div class="l">No motorizado</div><div class="s">caminata y bicicleta</div></div>`;
+    <div class="kpi" style="--kpi-c:var(--navy)"><div class="v">${fmtM(k.total_viajes)}</div><div class="l">Viajes en día laboral</div><div class="s">viajes expandidos</div></div>
+    <div class="kpi" style="--kpi-c:var(--mut3)"><div class="v">${k.tiempo_medio_min!=null?fmt(k.tiempo_medio_min,0)+" min":"s/d"}</div><div class="l">Tiempo medio de viaje</div><div class="s">minutos por viaje</div></div>
+    <div class="kpi" style="--kpi-c:var(--navy2)"><div class="v c-navy">${pct(k.pct_publico)}</div><div class="l">Transporte público</div><div class="s">% del total</div></div>
+    <div class="kpi" style="--kpi-c:var(--red)"><div class="v red">${pct(k.pct_privado)}</div><div class="l">Transporte privado</div><div class="s">automóvil y moto</div></div>
+    <div class="kpi" style="--kpi-c:var(--green)"><div class="v green">${pct(k.pct_no_motorizado)}</div><div class="l">No motorizado</div><div class="s">caminata y bicicleta</div></div>`;
 
   if(k.dist_mediana!=null)
-    html+=`<div class="kpi"><div class="v or">${fmt(k.dist_mediana,1)} km</div><div class="l">Distancia mediana</div><div class="s">centroide a centroide</div></div>`;
+    html+=`<div class="kpi" style="--kpi-c:var(--or)"><div class="v or">${fmt(k.dist_mediana,1)} km</div><div class="l">Distancia mediana</div><div class="s">centroide a centroide</div></div>`;
   if(k.viajes_persona!=null)
-    html+=`<div class="kpi"><div class="v">${fmt(k.viajes_persona,2)}</div><div class="l">Viajes por persona</div><div class="s">viajes / habitante día laboral</div></div>`;
+    html+=`<div class="kpi" style="--kpi-c:var(--teal)"><div class="v c-teal">${fmt(k.viajes_persona,2)}</div><div class="l">Viajes por persona</div><div class="s">viajes / habitante día laboral</div></div>`;
   if(k.viajes_hogar!=null)
-    html+=`<div class="kpi"><div class="v">${fmt(k.viajes_hogar,1)}</div><div class="l">Viajes por hogar</div><div class="s">viajes / hogar día laboral</div></div>`;
+    html+=`<div class="kpi" style="--kpi-c:var(--mut3)"><div class="v">${fmt(k.viajes_hogar,1)}</div><div class="l">Viajes por hogar</div><div class="s">viajes / hogar día laboral</div></div>`;
   if(k.pct_trabajo!=null)
-    html+=`<div class="kpi"><div class="v" style="color:${NAVY}">${pct(k.pct_trabajo)}</div><div class="l">Motivo trabajo</div><div class="s">% del total de viajes</div></div>`;
+    html+=`<div class="kpi" style="--kpi-c:var(--navy2)"><div class="v c-navy">${pct(k.pct_trabajo)}</div><div class="l">Motivo trabajo</div><div class="s">% del total de viajes</div></div>`;
   if(k.pct_estudio!=null)
-    html+=`<div class="kpi"><div class="v" style="color:${TEAL}">${pct(k.pct_estudio)}</div><div class="l">Motivo estudio</div><div class="s">% del total de viajes</div></div>`;
+    html+=`<div class="kpi" style="--kpi-c:var(--teal)"><div class="v c-teal">${pct(k.pct_estudio)}</div><div class="l">Motivo estudio</div><div class="s">% del total de viajes</div></div>`;
 
   document.getElementById("res-kpis").innerHTML=html;
 
@@ -353,7 +355,7 @@ function hBarChart(id,labels,data,colors,unit){
         legend:{display:false},
         datalabels:{
           display:true,anchor:"end",align:"end",clamp:true,
-          color:isDark()?"#a9c0de":"#5e6e80",
+          color:isDark()?"#8b949e":"#64748b",
           font:{size:10,weight:"700"},
           formatter:v=>v!=null?fmt(v,1)+unit:""
         },
@@ -428,7 +430,7 @@ function renderDistancia(d){
         legend:{display:false},
         datalabels:{
           display:true,anchor:"end",align:"end",clamp:true,
-          color:isDark()?"#a9c0de":"#5e6e80",
+          color:isDark()?"#8b949e":"#64748b",
           font:{size:10,weight:"700"},
           formatter:v=>v>0.5?fmt(v,1)+"%":""
         },
@@ -643,10 +645,10 @@ function renderNacional(){
     const dmList=S.index.filter(c=>c.dist_mediana!=null);
     const avgDm=dmList.length?dmList.reduce((a,c)=>a+c.dist_mediana,0)/dmList.length:null;
     nacKpis.innerHTML=`
-      <div class="kpi"><div class="v">${S.index.length}</div><div class="l">Ciudades cubiertas</div><div class="s">EOD homologadas</div></div>
-      <div class="kpi"><div class="v">${fmtM(totalV)}</div><div class="l">Viajes expandidos</div><div class="s">suma 18 ciudades día laboral</div></div>
-      <div class="kpi"><div class="v" style="color:${NAVY}">${avgPub!=null?fmt(avgPub,1)+"%":"s/d"}</div><div class="l">% Público promedio</div><div class="s">promedio simple entre ciudades</div></div>
-      <div class="kpi"><div class="v or">${avgDm!=null?fmt(avgDm,1)+" km":"s/d"}</div><div class="l">Dist. mediana promedio</div><div class="s">centroide a centroide</div></div>`;
+      <div class="kpi" style="--kpi-c:var(--navy)"><div class="v">${S.index.length}</div><div class="l">Ciudades cubiertas</div><div class="s">EOD homologadas</div></div>
+      <div class="kpi" style="--kpi-c:var(--teal)"><div class="v c-teal">${fmtM(totalV)}</div><div class="l">Viajes expandidos</div><div class="s">suma 18 ciudades día laboral</div></div>
+      <div class="kpi" style="--kpi-c:var(--navy2)"><div class="v c-navy">${avgPub!=null?fmt(avgPub,1)+"%":"s/d"}</div><div class="l">% Público promedio</div><div class="s">promedio simple entre ciudades</div></div>
+      <div class="kpi" style="--kpi-c:var(--or)"><div class="v or">${avgDm!=null?fmt(avgDm,1)+" km":"s/d"}</div><div class="l">Dist. mediana promedio</div><div class="s">centroide a centroide</div></div>`;
   }
 
   const nacTable=document.getElementById("nac-table");
@@ -703,6 +705,26 @@ if(_sbd)_sbd.onclick=doShare;
     const h=lm.toLocaleTimeString("es-CL",{hour:"2-digit",minute:"2-digit"});
     el.innerHTML='<b>Actualizado:</b><br>'+d+' '+h;
   }catch(e){el.textContent="—";}
+})();
+
+// ── Buscador de ciudades ─────────────────────────────────────────────────────
+(function(){
+  const inp=document.getElementById("city-search");if(!inp)return;
+  inp.addEventListener("input",function(){
+    const raw=this.value.trim();
+    const q=raw.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+    document.querySelectorAll("#city-list .city-item").forEach(btn=>{
+      const name=btn.querySelector(".cn").textContent
+        .toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+      btn.style.display=(!q||name.includes(q))?"":"none";
+    });
+  });
+  inp.addEventListener("keydown",function(e){
+    if(e.key!=="Enter")return;
+    const visible=[...document.querySelectorAll("#city-list .city-item")]
+      .filter(b=>b.style.display!=="none");
+    if(visible.length===1){visible[0].click();this.value="";}
+  });
 })();
 
 // ── Inicialización ───────────────────────────────────────────────────────────
