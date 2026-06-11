@@ -1,0 +1,52 @@
+/* Tema OSCURO (scoped a html.dark) — derivado del look Fluxus. Toggle claro/oscuro. */
+html.dark{--neural:#0D6EFD; --cyan:#18D6FF; --greenfx:#21F2C3;
+  --panel:#0A2348; --panel2:#0e2a55;
+  --grad:linear-gradient(135deg,#0D6EFD 0%,#18D6FF 50%,#21F2C3 100%);
+
+  --navy:#0D6EFD; --navy2:#18D6FF; --or:#18D6FF; --teal:#18D6FF;
+  --green:#21F2C3; --red:#ff6b6b;
+  --bg:#071B35; --ink:#E6EEF8; --mut:#8AA0C7; --line:#16386a;}
+html.dark{scroll-behavior:smooth}
+html.dark body{font-family:'Inter',Segoe UI,system-ui,-apple-system,sans-serif !important;
+  background:#071B35 !important; color:var(--ink) !important;
+  background-image:radial-gradient(rgba(120,180,255,.05) 1px,transparent 1.5px) !important;
+  background-size:30px 30px; background-attachment:fixed;}
+html.dark h1, html.dark h2, html.dark h3, html.dark h4{color:#fff !important; letter-spacing:-.01em}
+html.dark a{color:var(--cyan)}
+html.dark header{background:linear-gradient(135deg,#031B4E 0%,#071B35 100%) !important;border-bottom:1px solid var(--line)}
+html.dark .tabs{background:#071B35 !important;border-bottom:1px solid var(--line)}
+html.dark .tabs button{color:var(--mut)}
+html.dark .tabs button.on{color:var(--cyan) !important;border-bottom-color:var(--cyan) !important}
+html.dark .tabs button:hover{color:#fff}
+html.dark .tag, html.dark .selbar{background:rgba(24,214,255,.08) !important;border:1px solid var(--line) !important}
+html.dark .kpi, html.dark .chartbox, html.dark .panelctrl, html.dark .empty{background:var(--panel) !important;color:var(--ink) !important;border-color:var(--line) !important;box-shadow:none !important;}
+html.dark .kpi, html.dark .chartbox{box-shadow:0 14px 40px rgba(24,214,255,.07) !important}
+html.dark input, html.dark select, html.dark textarea{background:var(--panel) !important;color:var(--ink) !important;border-color:var(--line) !important}
+html.dark ::placeholder{color:#6f87ad !important}
+html.dark .kpi .v{color:var(--cyan) !important}
+html.dark .kpi .v.or{color:var(--greenfx) !important}
+html.dark .kpi .v.green{color:var(--greenfx) !important}
+html.dark .kpi .v.red{color:var(--red) !important}
+html.dark .kpi .l, html.dark .lead, html.dark .panelctrl label, html.dark .chartbox p{color:var(--mut) !important}
+html.dark .kpi .s{color:var(--cyan) !important}
+html.dark h2 .bar, html.dark .grp-hd{border-color:var(--cyan) !important}
+html.dark h2 .bar{background:var(--grad) !important}
+html.dark .grp-hd{color:#fff !important}
+html.dark .ctrl button{background:var(--panel) !important;color:var(--cyan) !important;border:1px solid #1f4f8a !important}
+html.dark .ctrl button.on{background:var(--neural) !important;color:#fff !important}
+html.dark .chip{background:var(--neural) !important;color:#fff !important}
+html.dark .map, html.dark #od-map{border:1px solid var(--line) !important;background:#06224a !important}
+html.dark .leaflet-container{background:#06122a !important}
+html.dark .legend, html.dark .info{background:var(--panel) !important;color:var(--ink) !important;box-shadow:0 10px 30px rgba(0,0,0,.4) !important}
+html.dark .legend b, html.dark .info b{color:var(--cyan) !important}
+html.dark .note{background:var(--panel2) !important;border:1px solid var(--line) !important;border-left:4px solid var(--cyan) !important;color:#cdddf3 !important}
+html.dark footer{color:var(--mut) !important;border-top:1px solid var(--line) !important}
+html.dark .leaflet-bar a,html.dark .leaflet-control-layers,html.dark .leaflet-control-layers-toggle{background:#0e2a55 !important;color:#dbe8fb !important;border-color:#16386a !important}
+html.dark .fs-ctrl a{color:#dbe8fb}
+html.dark .author-wm{background:rgba(10,35,72,.85) !important;color:#bcd0ec !important}
+html.dark .sharebtn{background:rgba(24,214,255,.14) !important;border-color:rgba(24,214,255,.3) !important}
+html.dark .foot-src{color:#7e93b5 !important}
+html.dark .tabs button .ti{color:#6f87ad}
+html.dark .tabs button.on .ti,html.dark .tabs button:hover .ti{color:var(--cyan)}
+html.dark .skel{background:#0e2a55}
+html.dark .city-select{background:var(--panel) !important;color:var(--ink) !important;border-color:var(--line) !important}

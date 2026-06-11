@@ -1,0 +1,112 @@
+{
+  "ciudades": [
+    {
+      "ciudad": "Arica",
+      "slug": "arica",
+      "anio": 2010,
+      "n_zonas": 49
+    },
+    {
+      "ciudad": "Iquique - Alto Hospicio",
+      "slug": "iquique_alto_hospicio",
+      "anio": 2010,
+      "n_zonas": 71
+    },
+    {
+      "ciudad": "Copiapó",
+      "slug": "copiapo",
+      "anio": 2010,
+      "n_zonas": 69
+    },
+    {
+      "ciudad": "Coquimbo - La Serena",
+      "slug": "coquimbo_la_serena",
+      "anio": 2010,
+      "n_zonas": 103
+    },
+    {
+      "ciudad": "Gran Valparaíso",
+      "slug": "gran_valparaiso",
+      "anio": 2014,
+      "n_zonas": 310
+    },
+    {
+      "ciudad": "San Antonio",
+      "slug": "san_antonio",
+      "anio": 2017,
+      "n_zonas": 103
+    },
+    {
+      "ciudad": "Gran Santiago",
+      "slug": "gran_santiago",
+      "anio": 2012,
+      "n_zonas": 850
+    },
+    {
+      "ciudad": "Rancagua - Machalí",
+      "slug": "rancagua_machali",
+      "anio": 2018,
+      "n_zonas": 97
+    },
+    {
+      "ciudad": "Curicó",
+      "slug": "curico",
+      "anio": 2014,
+      "n_zonas": 73
+    },
+    {
+      "ciudad": "Talca",
+      "slug": "talca",
+      "anio": 2022,
+      "n_zonas": 190
+    },
+    {
+      "ciudad": "Linares",
+      "slug": "linares",
+      "anio": 2019,
+      "n_zonas": 112
+    },
+    {
+      "ciudad": "Chillán",
+      "slug": "chillan",
+      "anio": 2023,
+      "n_zonas": 86
+    },
+    {
+      "ciudad": "Gran Concepción",
+      "slug": "gran_concepcion",
+      "anio": 2015,
+      "n_zonas": 359
+    },
+    {
+      "ciudad": "Temuco - Padre las Casas",
+      "slug": "temuco_padre_las_casas",
+      "anio": 2013,
+      "n_zonas": 90
+    },
+    {
+      "ciudad": "Valdivia",
+      "slug": "valdivia",
+      "anio": 2013,
+      "n_zonas": 65
+    },
+    {
+      "ciudad": "Osorno",
+      "slug": "osorno",
+      "anio": 2013,
+      "n_zonas": 54
+    },
+    {
+      "ciudad": "Puerto Montt",
+      "slug": "puerto_montt",
+      "anio": 2014,
+      "n_zonas": 82
+    },
+    {
+      "ciudad": "Punta Arenas",
+      "slug": "punta_arenas",
+      "anio": 2019,
+      "n_zonas": 112
+    }
+  ]
+}
