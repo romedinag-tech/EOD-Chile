@@ -51,9 +51,6 @@ if 'ciudad_sel' not in st.session_state or st.session_state['ciudad_sel'] not in
 elif 'anio_sel' not in st.session_state:
     c = st.session_state['ciudad_sel']
     st.session_state['anio_sel'] = city_years[c][-1]
-if 'ciudad_expand' not in st.session_state:
-    st.session_state['ciudad_expand'] = st.session_state['ciudad_sel']
-
 ciudad_sel = st.session_state['ciudad_sel']
 anio_sel   = st.session_state['anio_sel']
 
@@ -61,36 +58,26 @@ anio_sel   = st.session_state['anio_sel']
 with st.sidebar:
     st.markdown('<div class="nav-title">🧭 Ciudades</div>', unsafe_allow_html=True)
 
-    for ciudad_it in ciudades_disponibles:
-        anios = city_years[ciudad_it]
-        multi  = len(anios) > 1
-        activa = (ciudad_it == ciudad_sel)
-        expandida = (st.session_state.get('ciudad_expand') == ciudad_it)
+    idx_ciudad = ciudades_disponibles.index(ciudad_sel) if ciudad_sel in ciudades_disponibles else 0
+    nueva_ciudad = st.radio('Ciudad', ciudades_disponibles, index=idx_ciudad,
+                            key='_radio_ciudad', label_visibility='collapsed')
+    if nueva_ciudad != ciudad_sel:
+        st.session_state['ciudad_sel'] = nueva_ciudad
+        st.session_state['anio_sel']   = city_years[nueva_ciudad][-1]
+        st.rerun()
 
-        label = (f'{'▾' if expandida else '›'} {ciudad_it}') if multi else ciudad_it
-
-        if st.button(label, key=f'nb_{ciudad_it}', use_container_width=True,
-                     type='primary' if (activa and not multi) else 'secondary'):
-            if multi:
-                st.session_state['ciudad_expand'] = ciudad_it if not expandida else None
-            else:
-                st.session_state['ciudad_sel'] = ciudad_it
-                st.session_state['anio_sel']   = anios[0]
-                st.session_state['ciudad_expand'] = ciudad_it
+    anios_ciudad = city_years.get(ciudad_sel, [])
+    if len(anios_ciudad) > 1:
+        idx_anio = len(anios_ciudad) - 1
+        try:
+            idx_anio = [int(a) for a in anios_ciudad].index(int(anio_sel))
+        except (ValueError, TypeError):
+            pass
+        nuevo_anio = st.selectbox('Año EOD', [int(a) for a in anios_ciudad],
+                                  index=idx_anio, key='_sel_anio_sb')
+        if int(nuevo_anio) != int(anio_sel):
+            st.session_state['anio_sel'] = nuevo_anio
             st.rerun()
-
-        if multi and expandida:
-            for anio in anios:
-                anio_activo = activa and (int(anio) == int(anio_sel))
-                st.markdown('<div class="year-row">', unsafe_allow_html=True)
-                if st.button(f'Encuesta {int(anio)}', key=f'nb_{ciudad_it}_{anio}',
-                             use_container_width=True,
-                             type='primary' if anio_activo else 'secondary'):
-                    st.session_state['ciudad_sel'] = ciudad_it
-                    st.session_state['anio_sel']   = anio
-                    st.session_state['ciudad_expand'] = ciudad_it
-                    st.rerun()
-                st.markdown('</div>', unsafe_allow_html=True)
 
     st.divider()
     nota = D.RATIO_NOTA.get(ciudad_sel)
@@ -117,8 +104,30 @@ seccion = option_menu(
 if seccion == 'Resumen':
     resumen.render()
 elif seccion == 'Ciudad':
-    st.markdown(f'### {ciudad_sel} <span style="font-size:.85rem;color:#5e6e80;font-weight:400">· EOD {int(anio_sel)}</span>',
-                unsafe_allow_html=True)
+    _col_c, _col_a, _col_sp = st.columns([3, 1, 5])
+    with _col_c:
+        _idx_c = ciudades_disponibles.index(ciudad_sel) if ciudad_sel in ciudades_disponibles else 0
+        _sel_c = st.selectbox('Ciudad', ciudades_disponibles, index=_idx_c,
+                              key='_main_ciudad', label_visibility='collapsed')
+        if _sel_c != ciudad_sel:
+            st.session_state['ciudad_sel'] = _sel_c
+            st.session_state['anio_sel']   = city_years[_sel_c][-1]
+            st.rerun()
+    with _col_a:
+        _anios_c = city_years.get(ciudad_sel, [anio_sel])
+        if len(_anios_c) > 1:
+            _idx_a = len(_anios_c) - 1
+            try:
+                _idx_a = [int(a) for a in _anios_c].index(int(anio_sel))
+            except (ValueError, TypeError):
+                pass
+            _sel_a = st.selectbox('Año', [int(a) for a in _anios_c], index=_idx_a,
+                                  key='_main_anio', label_visibility='collapsed')
+            if int(_sel_a) != int(anio_sel):
+                st.session_state['anio_sel'] = _sel_a
+                st.rerun()
+        else:
+            st.caption(f'EOD {int(anio_sel)}')
     ciudad.render(ciudad_sel, anio_sel)
 elif seccion == 'Comparador':
     comparador.render()
