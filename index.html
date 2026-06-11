@@ -241,11 +241,12 @@ a{color:var(--navy)}
 .loading{padding:40px;text-align:center;color:var(--mut)}
 :where(button,a,select,input):focus-visible{outline:2px solid var(--or);outline-offset:2px;border-radius:6px}
 
-/* ---- desktop: compact navbar header ---- */
+/* ---- desktop: compact navbar + full-height sidebar layout ---- */
 @media(min-width:769px){
   .selbar{display:none}
   .sidebar-toggle{display:none!important}
-  header{padding:0 0 0 0}
+  /* compact navbar */
+  header{padding:0}
   header>.wrap{display:flex;align-items:center;gap:14px;height:52px;padding:0 20px}
   header h1{display:none}
   header>div>p{display:none}
@@ -253,6 +254,11 @@ a{color:var(--navy)}
   .brandrow{margin:0;flex:1;min-width:0}
   .brand{gap:8px;font-size:.88rem}
   .byline{padding:4px 10px;font-size:.74rem}
+  /* body fills viewport, page-main scrolls — sidebar always fits */
+  body{height:100vh;overflow:hidden;display:flex;flex-direction:column}
+  .page-body{flex:1;min-height:0}
+  .sidebar{position:static!important;height:100%}
+  .page-main{overflow-y:auto;height:100%}
 }
 /* hide desktop share icon on mobile */
 @media(max-width:768px){
