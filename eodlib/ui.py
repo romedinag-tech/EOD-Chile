@@ -3,8 +3,8 @@
 import streamlit as st
 
 CSS = """
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 :root{
   --eod-navy:#1f4e79;--eod-navy2:#2e5e8c;--eod-navy-d:#143150;
   --eod-or:#d96a1f;--eod-teal:#1f8a86;--eod-green:#1a9850;
