@@ -78,3 +78,71 @@ def lineas_horarias(tabla_o_serie, titulo='Distribución horaria', colores=None)
     fig.update_xaxes(title='Hora del día', dtick=2)
     fig.update_yaxes(title='% de viajes', ticksuffix='%')
     return _layout(fig, titulo, alto=380)
+
+
+_PERIODO_BAND = [
+    (6,  9,  '#1f4e79', 'Punta mañana'),
+    (9,  12, '#8696a7', 'Fuera punta mañana'),
+    (12, 14, '#d96a1f', 'Punta mediodía'),
+    (14, 18, '#8696a7', 'Fuera punta tarde'),
+    (18, 21, '#1f8a86', 'Punta tarde'),
+]
+COLOR_PERIODO = {n: c for _, _, c, n in _PERIODO_BAND}
+
+
+def _hora_to_periodo(h):
+    """Asigna período a una hora entera; coincide con periodo_dia del parquet."""
+    h = int(h)
+    if 6 <= h < 9:    return 'Punta mañana'
+    if 9 <= h < 12:   return 'Fuera punta mañana'
+    if 12 <= h < 14:  return 'Punta mediodía'
+    if 14 <= h < 18:  return 'Fuera punta tarde'
+    if 18 <= h < 21:  return 'Punta tarde'
+    return 'Resto'
+
+
+def histograma_periodos(pct_h, am_h=8, pm_h=18):
+    """Histograma horario con barras coloreadas por período y marcadores de peak.
+
+    pct_h : pd.Series index 0-23, valores = % de viajes.
+    """
+    serie = pct_h.reindex(range(24), fill_value=0)
+    bar_colors = [
+        COLOR_PERIODO.get(_hora_to_periodo(h), '#e4eaf2') for h in range(24)
+    ]
+    fig = go.Figure(go.Bar(
+        x=list(range(24)),
+        y=list(serie.values),
+        marker_color=bar_colors,
+        hovertemplate='%{x}h: %{y:.1f}%<extra></extra>',
+        showlegend=False,
+    ))
+    # Marcadores de peak AM y PM
+    for ph, color in [(am_h, '#1f4e79'), (pm_h, '#1f8a86')]:
+        y_val = float(serie.get(ph, 0))
+        fig.add_annotation(
+            x=ph, y=y_val,
+            text=f'▲{ph}h', showarrow=False,
+            yanchor='bottom', yshift=4,
+            font=dict(size=10, color=color, family=_FONT),
+        )
+    # Mini-leyenda de períodos (anotaciones en la parte inferior)
+    leyenda = [
+        (7.5,  '#1f4e79', 'Punta AM'),
+        (10.5, '#8696a7', 'F. punta'),
+        (13,   '#d96a1f', 'Mediodía'),
+        (16,   '#8696a7', None),
+        (19.5, '#1f8a86', 'Punta tarde'),
+    ]
+    for xpos, col, lbl in leyenda:
+        if lbl:
+            fig.add_annotation(x=xpos, y=-0.55, text=lbl, showarrow=False,
+                               yref='paper', xref='x',
+                               font=dict(size=9, color=col, family=_FONT))
+    fig.update_xaxes(
+        tickmode='array', tickvals=list(range(0, 24, 3)),
+        ticktext=[f'{h}h' for h in range(0, 24, 3)],
+        tickfont=dict(size=11), showgrid=False, linecolor='#e4eaf2',
+    )
+    fig.update_yaxes(ticksuffix='%', tickfont=dict(size=11))
+    return _layout(fig, None, alto=200)
