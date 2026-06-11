@@ -86,7 +86,7 @@ def render(ciudad, anio):
     # ---- Modos y propósitos ----
     with tabs[1]:
         ui.section('Distribución horaria', 'Viajes a lo largo del día, segmentable.')
-        seg = st.radio('Segmentar por', ['(ninguno)', 'Modo', 'Propósito'], horizontal=True, key='seg_hora')
+        seg = ui.seg('Segmentar por', ['(ninguno)', 'Modo', 'Propósito'], key='seg_hora')
         if seg == 'Modo':
             tab = M.distribucion_horaria(d, 'modo_pp')
             tab = tab[[m for m in M.ORDEN_MODO if m in tab.columns]]
@@ -108,8 +108,7 @@ def render(ciudad, anio):
         else:
             ui.section('Distribución por distancia de viaje',
                        'Tramos de 0-1, 1-2, … 6+ km. Segmentable.')
-            seg_d = st.radio('Segmentar por', ['(ninguno)', 'Modo', 'Propósito', 'Tipo usuario', 'Quintil ingreso'],
-                             horizontal=True, key='seg_dist')
+            seg_d = ui.seg('Segmentar por', ['(ninguno)', 'Modo', 'Propósito', 'Tipo usuario', 'Quintil ingreso'], key='seg_dist')
             dd = d.dropna(subset=['tramo_dist'])
             if seg_d == '(ninguno)':
                 st.plotly_chart(_bar(M.particion(dd, 'tramo_dist', M.ORDEN_TRAMO), 'tramo (km) · % de viajes'),
@@ -177,8 +176,7 @@ def render(ciudad, anio):
             hay_comuna = geo.comuna_disponible(ciudad)
             st.caption('💡 Rueda del mouse = zoom · arrastrar = mover el mapa · '
                        'doble-clic = restablecer vista.')
-            modo_mapa = st.radio('Vista', ['Generación', 'Atracción', 'Líneas de deseo', 'Matriz O/D'],
-                                 horizontal=True, key='mapa')
+            modo_mapa = ui.seg('Vista', ['Generación', 'Atracción', 'Líneas de deseo', 'Matriz O/D'], key='mapa')
 
             if modo_mapa in ('Generación', 'Atracción'):
                 z = geo.generacion_atraccion(d)
@@ -190,8 +188,7 @@ def render(ciudad, anio):
 
             elif modo_mapa == 'Líneas de deseo':
                 cc1, cc2 = st.columns([1, 2])
-                niv = cc1.radio('Nivel', ['Zona'] + (['Comuna'] if hay_comuna else []),
-                                horizontal=True, key='deseo_niv')
+                niv = ui.seg('Nivel', ['Zona'] + (['Comuna'] if hay_comuna else []), container=cc1, key='deseo_niv')
                 nivel = 'comuna' if niv == 'Comuna' else 'zona'
                 top = cc2.slider('Pares O-D principales', 30, 400, 120, 30, key='deseo_top')
                 pares = geo.lineas_deseo(d, top_n=top, nivel=nivel)
@@ -203,8 +200,7 @@ def render(ciudad, anio):
                     st.caption(f'Grosor/color ∝ volumen de viajes entre {niv.lower()}s (interzonales).')
 
             else:  # Matriz O/D (mapa 3D)
-                niv = st.radio('Nivel', ['Zona'] + (['Comuna'] if hay_comuna else []),
-                               horizontal=True, key='od_niv')
+                niv = ui.seg('Nivel', ['Zona'] + (['Comuna'] if hay_comuna else []), key='od_niv')
                 nivel = 'comuna' if niv == 'Comuna' else 'zona'
                 unidades = geo.unidades_con_viajes(d, nivel)
                 if not unidades:

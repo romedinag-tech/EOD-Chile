@@ -21,7 +21,7 @@ def render():
     tab1, tab2, tab3 = st.tabs(['Partición modal', 'Indicadores', 'Dispersión'])
 
     with tab1:
-        dim = st.radio('Variable', ['Partición modal', 'Propósito'], horizontal=True)
+        dim = ui.seg('Variable', ['Partición modal', 'Propósito'], key='cmp_dim')
         filas = {}
         for c in sel:
             d = D.viajes_ciudad(c)

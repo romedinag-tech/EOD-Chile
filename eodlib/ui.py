@@ -34,7 +34,20 @@ CSS = """
 .chip { background:#eef3fe; color:#1f6feb; border-radius:999px; padding:.12rem .6rem; font-size:.75rem; font-weight:600; }
 
 /* Tabs un poco más grandes */
-.stTabs [data-baseweb="tab"] { font-size:.9rem; font-weight:600; }
+.stTabs [data-baseweb="tab"] { font-size:.95rem; font-weight:600; }
+
+/* Botones segmentados: grandes, claros, con aspecto de botón */
+[data-testid="stSegmentedControl"] { margin-top:.1rem; }
+[data-testid="stSegmentedControl"] button {
+  font-size:.9rem !important; font-weight:600 !important; padding:.45rem 1rem !important;
+  border-radius:9px !important; border:1px solid #d7deea !important; }
+[data-testid="stSegmentedControl"] button:hover { background:#eef3fe !important; border-color:#bcd0fb !important; }
+[data-testid="stSegmentedControl"] button[aria-checked="true"],
+[data-testid="stSegmentedControl"] button[kind="segmented_controlActive"] {
+  background:#1f6feb !important; color:#fff !important; border-color:#1f6feb !important;
+  box-shadow:0 2px 6px rgba(31,111,235,.30) !important; }
+/* etiqueta de los controles, un poco más marcada */
+[data-testid="stWidgetLabel"] label p { font-weight:600; color:#3b4a5c; }
 </style>
 """
 
@@ -72,6 +85,14 @@ def kpis(items):
 def chips(items):
     c = ''.join(f'<span class="chip">{x}</span>' for x in items if x)
     st.markdown(f'<div class="chips">{c}</div>', unsafe_allow_html=True)
+
+
+def seg(label, options, default=None, key=None, container=None, help=None):
+    """Selector tipo botones segmentados (más visible que un radio). Nunca devuelve None."""
+    c = container if container is not None else st
+    default = default if default is not None else (options[0] if options else None)
+    val = c.segmented_control(label, options, default=default, key=key, help=help)
+    return val if val is not None else default
 
 
 def fmt_miles(n):
