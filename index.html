@@ -427,6 +427,71 @@ footer{
 .foot-credit b{color:var(--navy);font-weight:700}
 .foot-src{margin-top:2px;font-size:.73rem;color:var(--mut2)}
 
+/* ── Sub-tabs (Nacional) ─────────────────────────────────────────── */
+.sub-tabs{
+  display:flex;gap:2px;border:1px solid var(--line);
+  border-radius:var(--r);padding:3px;background:var(--sf2);
+  margin-bottom:22px;width:fit-content;
+}
+.sub-tabs button{
+  padding:7px 20px;border:none;background:none;
+  border-radius:7px;font:.8125rem var(--sans);
+  font-weight:600;color:var(--mut);cursor:pointer;
+  transition:background .15s,color .15s;white-space:nowrap;
+}
+.sub-tabs button.on{background:var(--surface);color:var(--navy);box-shadow:var(--sh-xs)}
+.sub-tabs button:hover:not(.on){color:var(--ink2)}
+.sub-panel{display:none}
+.sub-panel.on{display:block}
+
+/* ── Comparador city checkboxes ──────────────────────────────────── */
+.cmp-city-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(165px,1fr));
+  gap:6px;margin-bottom:4px;
+}
+.cmp-cb{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 12px;border:1px solid var(--line);
+  border-radius:var(--r-sm);cursor:pointer;
+  background:var(--surface);
+  transition:border-color .15s,background .15s;
+  font:.825rem var(--sans);color:var(--ink2);font-weight:500;
+  user-select:none;
+}
+.cmp-cb:hover{border-color:var(--or2);background:var(--sf2)}
+.cmp-cb.on{border-color:var(--or);background:rgba(217,119,6,.05)}
+.cmp-cb input[type=checkbox]{
+  accent-color:var(--or);width:13px;height:13px;
+  flex-shrink:0;pointer-events:none;
+}
+.seg-ctrl{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.seg-ctrl button{
+  padding:7px 16px;border:1px solid var(--line2);
+  background:var(--surface);border-radius:999px;
+  font:.8rem var(--sans);font-weight:600;color:var(--mut);
+  cursor:pointer;transition:all .15s;
+}
+.seg-ctrl button:hover{border-color:var(--navy2);color:var(--navy)}
+.seg-ctrl button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+
+/* ── Ranking controls ────────────────────────────────────────────── */
+.rank-ctrl{
+  display:flex;flex-wrap:wrap;align-items:center;
+  gap:12px;margin-bottom:16px;
+}
+.rank-ctrl select{
+  padding:8px 14px;border:1px solid var(--line);border-radius:var(--r-sm);
+  font:.875rem var(--sans);color:var(--ink);background:var(--surface);
+  font-weight:500;cursor:pointer;outline:none;transition:border-color .15s;
+}
+.rank-ctrl select:focus{border-color:var(--or);box-shadow:0 0 0 3px var(--or-l)}
+.rank-ctrl label{
+  display:flex;align-items:center;gap:6px;
+  font:.875rem var(--sans);font-weight:600;color:var(--mut);cursor:pointer;
+}
+.rank-ctrl input[type=checkbox]{accent-color:var(--or);width:14px;height:14px}
+
 /* ── Desktop layout: full-height ────────────────────────────────── */
 @media(min-width:769px){
   body{height:100vh;overflow:hidden;display:flex;flex-direction:column}
@@ -701,14 +766,82 @@ footer{
 
       <!-- NACIONAL -->
       <section class="panel" id="p-nacional" role="tabpanel" tabindex="0">
-        <h2>Resumen Nacional<span class="bar"></span></h2>
-        <p class="lead">Comparativa de indicadores de movilidad en las 18 ciudades con Encuesta Origen-Destino (EOD) homologada.</p>
-        <div id="nac-kpis" class="kpis"></div>
-        <div class="grp-hd">Indicadores por ciudad</div>
-        <div class="chartbox" style="padding:0;overflow:hidden">
-          <div id="nac-table" style="overflow-x:auto;padding:0"></div>
+        <h2>Análisis Nacional<span class="bar"></span></h2>
+        <nav class="sub-tabs" id="nac-subtabs" aria-label="Secciones nacionales">
+          <button class="on" data-sub="panorama">Panorama</button>
+          <button data-sub="comparador">Comparador</button>
+          <button data-sub="ranking">Ranking</button>
+        </nav>
+
+        <!-- PANORAMA -->
+        <div class="sub-panel on" id="sp-panorama">
+          <div id="nac-kpis" class="kpis"></div>
+          <div class="two">
+            <div class="chartbox" style="overflow:hidden">
+              <h3>Mapa de ciudades EOD</h3>
+              <p>Tamaño ∝ viajes/día · color: baja penetración pública (rojo) → alta (azul)</p>
+              <div id="nac-map" style="height:360px;display:block;margin:0"></div>
+            </div>
+            <div class="chartbox">
+              <h3>Partición modal promedio</h3>
+              <p>Promedio simple de las 18 ciudades EOD homologadas</p>
+              <div class="cwrap-md"><canvas id="c-nac-modal"></canvas></div>
+            </div>
+          </div>
+          <div class="grp-hd">Indicadores por ciudad</div>
+          <div class="chartbox" style="padding:0;overflow:hidden">
+            <div id="nac-table" style="overflow-x:auto;padding:0"></div>
+          </div>
+          <div class="note" style="margin-top:12px">Clic en una fila para explorar esa ciudad. Fuente: EOD SECTRA/MOP (2001–2023).</div>
         </div>
-        <div class="note">Haz clic en una ciudad para explorar sus datos. Fuente: EOD homologadas SECTRA/MOP (2010–2023).</div>
+
+        <!-- COMPARADOR -->
+        <div class="sub-panel" id="sp-comparador">
+          <p class="lead" style="margin-bottom:16px">Compara partición modal, propósito e indicadores entre múltiples ciudades.</p>
+          <div class="grp-hd">Ciudades a comparar</div>
+          <div id="cmp-city-grid" class="cmp-city-grid"></div>
+          <div class="grp-hd" style="margin-top:18px">Variable</div>
+          <div class="seg-ctrl" id="cmp-var-ctrl">
+            <button class="on" data-var="modal">Partición modal</button>
+            <button data-var="proposito">Propósito</button>
+            <button data-var="indicadores">Indicadores</button>
+          </div>
+          <div class="seg-ctrl" id="cmp-ind-row" style="display:none">
+            <button class="on" data-ind="pct_publico">% Público</button>
+            <button data-ind="pct_no_motorizado">% No motor.</button>
+            <button data-ind="viajes_persona">V/persona</button>
+            <button data-ind="dist_mediana">Dist. mediana</button>
+          </div>
+          <div class="chartbox">
+            <h3 id="cmp-title">Partición modal por ciudad</h3>
+            <p id="cmp-lead">Distribución porcentual del modo de transporte principal</p>
+            <div id="cmp-chart-wrap" style="position:relative;height:480px"><canvas id="c-comparador"></canvas></div>
+          </div>
+        </div>
+
+        <!-- RANKING -->
+        <div class="sub-panel" id="sp-ranking">
+          <p class="lead" style="margin-bottom:16px">Ordena las 18 ciudades por cualquier indicador de movilidad.</p>
+          <div class="rank-ctrl">
+            <select id="rank-ind">
+              <option value="pct_publico">% Transporte público</option>
+              <option value="pct_no_motorizado">% No motorizado</option>
+              <option value="pct_privado">% Transporte privado</option>
+              <option value="viajes_persona">Viajes por persona</option>
+              <option value="dist_mediana">Distancia mediana (km)</option>
+              <option value="viajes">Viajes/día (total)</option>
+            </select>
+            <label>
+              <input type="checkbox" id="rank-asc"/> Orden ascendente
+            </label>
+          </div>
+          <div class="chartbox">
+            <h3 id="rank-title">Ranking: % Transporte público</h3>
+            <p id="rank-lead">18 ciudades ordenadas de mayor a menor</p>
+            <div id="rank-cwrap" style="position:relative;height:520px"><canvas id="c-ranking"></canvas></div>
+          </div>
+        </div>
+
       </section>
 
     </main>
