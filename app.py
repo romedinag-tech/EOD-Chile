@@ -48,6 +48,9 @@ if 'ciudad_sel' not in st.session_state or st.session_state['ciudad_sel'] not in
     primera = ciudades_disponibles[0] if ciudades_disponibles else None
     st.session_state['ciudad_sel'] = primera
     st.session_state['anio_sel'] = city_years[primera][-1] if primera else None
+elif 'anio_sel' not in st.session_state:
+    c = st.session_state['ciudad_sel']
+    st.session_state['anio_sel'] = city_years[c][-1]
 if 'ciudad_expand' not in st.session_state:
     st.session_state['ciudad_expand'] = st.session_state['ciudad_sel']
 
