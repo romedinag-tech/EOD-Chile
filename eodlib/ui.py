@@ -22,7 +22,7 @@ html,body,.stApp,.main,[data-testid="stAppViewContainer"]{background:var(--eod-b
 body,[class*="css"],button,input,select,textarea{
   font-family:'Inter',-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif!important;
   -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-.block-container{padding-top:0!important;padding-bottom:2rem;max-width:1400px}
+.block-container{padding-top:.9rem!important;padding-bottom:2rem;max-width:1400px}
 #MainMenu,footer,header [data-testid="stToolbar"]{visibility:hidden}
 
 /* === HERO HEADER (gradient, como el sitio de referencia) === */
