@@ -27,7 +27,7 @@ def _click_id(ev):
         return None
 
 
-def _bar(serie, ytit='% de viajes', color='#1f6feb'):
+def _bar(serie, ytit='% de viajes', color='#1f4e79'):
     fig = go.Figure(go.Bar(x=list(serie.index), y=list(serie.values), marker_color=color,
                     text=[f'{v:.1f}%' for v in serie.values], textposition='outside'))
     fig.update_yaxes(title=ytit, ticksuffix='%'); fig.update_layout(
@@ -160,7 +160,7 @@ def render(ciudad, anio):
                            'Partición modal por quintil', viz.COLOR_MODO), use_container_width=True, key='c_ing_modal')
             vpq = dq.groupby('q')['factor'].sum().reindex(M.ORDEN_QUINTIL)
             vpq = (vpq / vpq.sum() * 100).round(1).dropna()
-            b.plotly_chart(_bar(vpq, '% de viajes', '#16a34a'), use_container_width=True, key='c_ing_vpq')
+            b.plotly_chart(_bar(vpq, '% de viajes', '#1a9850'), use_container_width=True, key='c_ing_vpq')
             if dist.notna().any():
                 ui.section('Distancia por quintil')
                 t = M.tabla_cruzada(dq.dropna(subset=['tramo_dist']), 'q', 'tramo_dist', 'fila').reindex(M.ORDEN_QUINTIL)
