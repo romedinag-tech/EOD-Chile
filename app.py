@@ -7,7 +7,7 @@ from eodlib import data as D, ui
 from views import resumen, ciudad, comparador, ranking
 
 st.set_page_config(page_title='EOD Chile', page_icon='🚍', layout='wide',
-                   initial_sidebar_state='expanded')
+                   initial_sidebar_state='collapsed')
 ui.inject_css()
 ui.hero('EOD Chile', 'Encuestas Origen-Destino · 18 ciudades homologadas y expandidas')
 
@@ -53,38 +53,6 @@ elif 'anio_sel' not in st.session_state:
     st.session_state['anio_sel'] = city_years[c][-1]
 ciudad_sel = st.session_state['ciudad_sel']
 anio_sel   = st.session_state['anio_sel']
-
-# ── Sidebar: lista geográfica de ciudades ──────────────────────────────────
-with st.sidebar:
-    st.markdown('<div class="nav-title">🧭 Ciudades</div>', unsafe_allow_html=True)
-
-    idx_ciudad = ciudades_disponibles.index(ciudad_sel) if ciudad_sel in ciudades_disponibles else 0
-    nueva_ciudad = st.radio('Ciudad', ciudades_disponibles, index=idx_ciudad,
-                            key='_radio_ciudad', label_visibility='collapsed')
-    if nueva_ciudad != ciudad_sel:
-        st.session_state['ciudad_sel'] = nueva_ciudad
-        st.session_state['anio_sel']   = city_years[nueva_ciudad][-1]
-        st.rerun()
-
-    anios_ciudad = city_years.get(ciudad_sel, [])
-    if len(anios_ciudad) > 1:
-        idx_anio = len(anios_ciudad) - 1
-        try:
-            idx_anio = [int(a) for a in anios_ciudad].index(int(anio_sel))
-        except (ValueError, TypeError):
-            pass
-        nuevo_anio = st.selectbox('Año EOD', [int(a) for a in anios_ciudad],
-                                  index=idx_anio, key='_sel_anio_sb')
-        if int(nuevo_anio) != int(anio_sel):
-            st.session_state['anio_sel'] = nuevo_anio
-            st.rerun()
-
-    st.divider()
-    nota = D.RATIO_NOTA.get(ciudad_sel)
-    if nota:
-        st.info(f'ℹ️ {nota}', icon=None)
-    st.caption('Fuente: Biblioteca MTT. Viajes en día laboral, expandidos por '
-               'factor de expansión (corregido por sesgo).')
 
 # ── Menú superior ──────────────────────────────────────────────────────────
 seccion = option_menu(
