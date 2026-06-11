@@ -55,3 +55,14 @@ html.dark .nac-tbl td{border-bottom-color:var(--line) !important;color:var(--ink
 html.dark .nac-tbl tr:hover td{background:var(--panel2) !important}
 html.dark .nac-tbl .pub-col{color:var(--cyan) !important}
 html.dark .nac-sel td{background:var(--panel2) !important}
+html.dark .sidebar{background:var(--panel) !important;border-right-color:var(--line) !important}
+html.dark .sidebar-hd{background:var(--panel) !important;border-bottom-color:var(--line) !important;color:var(--mut) !important}
+html.dark .sidebar-hd svg{color:var(--cyan) !important}
+html.dark .sidebar-close{color:var(--mut)}
+html.dark .city-item{color:var(--ink) !important}
+html.dark .city-item:hover{background:var(--panel2) !important}
+html.dark .city-item.active{background:var(--panel2) !important;border-left-color:var(--cyan) !important}
+html.dark .city-item .cn{color:var(--ink) !important}
+html.dark .city-item.active .cn{color:var(--cyan) !important}
+html.dark .city-item .cm{color:var(--mut) !important}
+html.dark .city-item.active .cm{color:var(--cyan) !important}

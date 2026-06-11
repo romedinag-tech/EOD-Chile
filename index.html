@@ -22,6 +22,7 @@
   --sh:0 2px 10px rgba(20,40,70,.05),0 10px 28px rgba(20,40,70,.05);
   --sh-lg:0 16px 44px rgba(20,40,70,.13);
   --sans:'Inter',-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  --sb-w:220px;
 }
 *{box-sizing:border-box}
 body{margin:0;font-family:var(--sans);color:var(--ink);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
@@ -33,7 +34,8 @@ header>.wrap{position:relative}
 header h1{margin:0 0 6px;font-size:1.75rem;font-weight:800;letter-spacing:-.5px}
 header p{margin:3px 0;opacity:.92;font-size:.95rem}
 .tag{display:inline-block;background:rgba(255,255,255,.16);padding:4px 12px;border-radius:20px;font-size:.78rem;margin-top:8px}
-/* ---- selector de ciudad ---- */
+
+/* ---- selector bar in header ---- */
 .selbar{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);border-radius:14px;padding:16px 18px;margin-top:18px;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
 .selbar .field{position:relative;flex:1;min-width:280px}
 .selbar label{display:block;font-size:.75rem;color:rgba(255,255,255,.85);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
@@ -42,59 +44,7 @@ header p{margin:3px 0;opacity:.92;font-size:.95rem}
 .selbar .ctxt b{color:#fff}
 .sharebtn{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.26);color:#fff;font:600 .82rem var(--sans);padding:9px 14px;border-radius:10px;cursor:pointer;transition:background .15s;white-space:nowrap;align-self:flex-end}
 .sharebtn:hover{background:rgba(255,255,255,.24)}.sharebtn svg{width:15px;height:15px}
-/* ---- tabs ---- */
-.tabs{display:flex;gap:4px;flex-wrap:wrap;margin:0 auto;max-width:1140px;padding:0 20px;position:sticky;top:0;background:var(--bg);z-index:1000;border-bottom:1px solid var(--line)}
-.tabs button{border:none;background:none;padding:15px 16px;cursor:pointer;font-size:.92rem;font-weight:700;color:var(--mut);border-bottom:3px solid transparent;margin-bottom:-1px}
-.tabs button.on{color:var(--navy);border-bottom-color:var(--or)}
-.tabs button:hover{color:var(--navy)}
-.tabs button .ti{display:inline-flex;align-items:center;margin-right:7px;vertical-align:-3px;color:var(--mut-2)}
-.tabs button .ti svg{width:16px;height:16px}
-.tabs button.on .ti,.tabs button:hover .ti{color:var(--or)}
-main{min-height:60vh}
-.panel{display:none;padding:30px 0}
-.panel.on{display:block}
-h2{color:var(--navy);font-size:1.4rem;margin:0 0 6px}
-h2 .bar{display:block;width:54px;height:4px;background:var(--or);border-radius:3px;margin-top:8px}
-h3{color:var(--navy)}
-.lead{color:var(--mut);max-width:880px}
-/* ---- KPI cards ---- */
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:15px;margin-top:22px}
-.kpi{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--sh);transition:transform .16s ease,box-shadow .16s ease}
-.kpi:hover{transform:translateY(-2px);box-shadow:var(--sh-lg)}
-.kpi .v{font-size:1.7rem;font-weight:800;color:var(--navy);line-height:1.1}
-.kpi .v.or{color:var(--or)} .kpi .v.green{color:var(--green)} .kpi .v.red{color:var(--red)}
-.kpi .l{color:var(--mut);font-size:.8rem;margin-top:5px}
-.kpi .s{color:var(--or);font-weight:700;font-size:.85rem;margin-top:2px}
-.grp-hd{margin:30px 0 0;font-size:1.05rem;color:var(--navy);font-weight:700;border-left:4px solid var(--or);padding-left:10px}
-/* ---- chart boxes ---- */
-.chartbox{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-top:18px;box-shadow:var(--sh)}
-.chartbox h3{margin:0 0 2px;font-size:1.05rem}
-.chartbox p{margin:0 0 10px;color:var(--mut);font-size:.86rem}
-.cwrap{position:relative;height:320px}
-.cwrap-sm{position:relative;height:220px}
-.cwrap-md{position:relative;height:260px}
-.cwrap-lg{position:relative;height:380px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
-.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-top:18px}
-@media(max-width:900px){.three{grid-template-columns:1fr 1fr}}
-@media(max-width:820px){.two,.three{grid-template-columns:1fr}}
-/* ---- map controls ---- */
-.panelctrl{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-.panelctrl label{display:block;font-size:.74rem;color:var(--mut);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
-.panelctrl .desc{font-size:.84rem;color:var(--mut);flex:1;min-width:220px}
-.ctrl{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
-.ctrl button{border:1px solid var(--navy);background:#fff;color:var(--navy);padding:8px 16px;border-radius:22px;cursor:pointer;font-weight:600;font-size:.9rem;transition:background .15s,color .15s}
-.ctrl button.on{background:var(--navy);color:#fff}
-.map{height:580px;border-radius:var(--r);border:1px solid var(--line);margin-top:16px;z-index:0}
-/* ---- map legend/info ---- */
-.legend{background:#fff;padding:9px 11px;border-radius:8px;box-shadow:0 1px 6px rgba(0,0,0,.2);font-size:.8rem;line-height:1.6}
-.legend i{display:inline-block;width:13px;height:13px;margin-right:6px;border-radius:50%;vertical-align:-2px}
-.legend b{color:var(--navy);display:block;margin-bottom:4px}
-.info{background:#fff;padding:9px 11px;border-radius:8px;box-shadow:0 1px 6px rgba(0,0,0,.2);font-size:.82rem;min-width:170px}
-.info b{color:var(--navy)}
-/* ---- note / empty ---- */
-.note{background:#fff8f0;border:1px solid #f0d9bf;border-left:4px solid var(--or);border-radius:12px;padding:16px 18px;color:#7a4a17;font-size:.88rem;margin-top:18px}
-.empty{background:#fff;border:1px dashed #c7d2de;border-radius:var(--r);padding:40px 22px;text-align:center;color:var(--mut);margin-top:18px}
+
 /* ---- brand / byline ---- */
 .brandrow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
 .brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:.9rem;letter-spacing:.2px;color:#eaf2fb}
@@ -105,45 +55,215 @@ h3{color:var(--navy)}
 .brand-right{display:flex;align-items:center;gap:10px}
 .theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);color:#fff;cursor:pointer;transition:background .15s}
 .theme-toggle:hover{background:rgba(255,255,255,.24)}.theme-toggle svg{width:17px;height:17px}
+
+/* ---- SIDEBAR LAYOUT ---- */
+.page-body{display:flex;align-items:flex-start;position:relative}
+
+.sidebar{
+  width:var(--sb-w);flex-shrink:0;
+  position:sticky;top:0;height:100vh;
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  background:var(--surface);
+  border-right:1px solid var(--line);
+  z-index:1050;
+}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-track{background:transparent}
+.sidebar::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:2px}
+
+.sidebar-hd{
+  flex-shrink:0;
+  padding:13px 14px 11px;
+  font-size:.73rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;
+  color:var(--mut);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--surface);
+}
+.sidebar-hd span{display:flex;align-items:center;gap:7px}
+.sidebar-hd svg{width:14px;height:14px;color:var(--or)}
+
+.sidebar-close{
+  display:none;width:26px;height:26px;border-radius:6px;
+  border:none;background:none;cursor:pointer;
+  color:var(--mut);padding:0;
+  align-items:center;justify-content:center;
+  font-size:1rem;line-height:1;
+  transition:background .1s;
+}
+.sidebar-close:hover{background:var(--surface-2)}
+
+.city-list{flex:1;overflow-y:auto;padding:5px 0}
+.city-list::-webkit-scrollbar{width:3px}
+.city-list::-webkit-scrollbar-track{background:transparent}
+.city-list::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:2px}
+
+.city-item{
+  display:block;width:100%;
+  padding:8px 14px 8px 17px;
+  text-align:left;border:none;
+  border-left:3px solid transparent;
+  background:none;cursor:pointer;
+  font-family:var(--sans);color:var(--ink);
+  font-size:.86rem;line-height:1.25;
+  transition:background .1s,border-color .1s;
+  box-sizing:border-box;
+}
+.city-item:hover{background:var(--surface-2)}
+.city-item.active{
+  background:var(--surface-2);
+  border-left-color:var(--or);
+}
+.city-item .cn{display:block;font-weight:600;font-size:.88rem;color:var(--ink)}
+.city-item.active .cn{color:var(--navy)}
+.city-item .cm{display:block;font-size:.73rem;color:var(--mut-2);margin-top:1px}
+.city-item.active .cm{color:var(--navy2)}
+
+/* Mobile toggle button */
+.sidebar-toggle{
+  display:none;
+  align-items:center;gap:6px;
+  background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.26);
+  color:#fff;font:600 .82rem var(--sans);
+  padding:7px 12px;border-radius:9px;cursor:pointer;
+  transition:background .15s;
+}
+.sidebar-toggle:hover{background:rgba(255,255,255,.24)}
+.sidebar-toggle svg{width:15px;height:15px}
+
+/* Overlay for mobile */
+.sidebar-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.42);z-index:1990;
+}
+.sidebar-overlay.active{display:block}
+
+/* ---- page-main (right of sidebar) ---- */
+.page-main{flex:1;min-width:0;overflow:hidden}
+
+/* ---- tabs ---- */
+.tabs{display:flex;gap:0;flex-wrap:nowrap;overflow-x:auto;
+  padding:0 16px;
+  position:sticky;top:0;
+  background:var(--bg);z-index:1000;border-bottom:1px solid var(--line)}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{border:none;background:none;padding:14px 16px;cursor:pointer;font-size:.9rem;font-weight:700;color:var(--mut);border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap;flex-shrink:0}
+.tabs button.on{color:var(--navy);border-bottom-color:var(--or)}
+.tabs button:hover{color:var(--navy)}
+.tabs button .ti{display:inline-flex;align-items:center;margin-right:6px;vertical-align:-3px;color:var(--mut-2)}
+.tabs button .ti svg{width:15px;height:15px}
+.tabs button.on .ti,.tabs button:hover .ti{color:var(--or)}
+
+main{min-height:60vh}
+.panel{display:none;padding:28px 0}
+.panel.on{display:block}
+h2{color:var(--navy);font-size:1.4rem;margin:0 0 6px}
+h2 .bar{display:block;width:54px;height:4px;background:var(--or);border-radius:3px;margin-top:8px}
+h3{color:var(--navy)}
+.lead{color:var(--mut);max-width:880px}
+
+/* ---- KPI cards ---- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:14px;margin-top:20px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:17px;box-shadow:var(--sh);transition:transform .16s ease,box-shadow .16s ease}
+.kpi:hover{transform:translateY(-2px);box-shadow:var(--sh-lg)}
+.kpi .v{font-size:1.65rem;font-weight:800;color:var(--navy);line-height:1.1}
+.kpi .v.or{color:var(--or)} .kpi .v.green{color:var(--green)} .kpi .v.red{color:var(--red)}
+.kpi .l{color:var(--mut);font-size:.8rem;margin-top:5px}
+.kpi .s{color:var(--or);font-weight:700;font-size:.83rem;margin-top:2px}
+.grp-hd{margin:28px 0 0;font-size:1.02rem;color:var(--navy);font-weight:700;border-left:4px solid var(--or);padding-left:10px}
+
+/* ---- chart boxes ---- */
+.chartbox{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-top:16px;box-shadow:var(--sh)}
+.chartbox h3{margin:0 0 2px;font-size:1.05rem}
+.chartbox p{margin:0 0 10px;color:var(--mut);font-size:.86rem}
+.cwrap{position:relative;height:320px}
+.cwrap-sm{position:relative;height:220px}
+.cwrap-md{position:relative;height:260px}
+.cwrap-lg{position:relative;height:380px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:16px}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-top:16px}
+@media(max-width:900px){.three{grid-template-columns:1fr 1fr}}
+@media(max-width:820px){.two,.three{grid-template-columns:1fr}}
+
+/* ---- map controls ---- */
+.panelctrl{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.panelctrl label{display:block;font-size:.74rem;color:var(--mut);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.panelctrl .desc{font-size:.84rem;color:var(--mut);flex:1;min-width:220px}
+.ctrl{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.ctrl button{border:1px solid var(--navy);background:#fff;color:var(--navy);padding:8px 16px;border-radius:22px;cursor:pointer;font-weight:600;font-size:.9rem;transition:background .15s,color .15s}
+.ctrl button.on{background:var(--navy);color:#fff}
+.map{height:560px;border-radius:var(--r);border:1px solid var(--line);margin-top:14px;z-index:0}
+
+/* ---- map legend/info ---- */
+.legend{background:#fff;padding:9px 11px;border-radius:8px;box-shadow:0 1px 6px rgba(0,0,0,.2);font-size:.8rem;line-height:1.6}
+.legend b{color:var(--navy);display:block;margin-bottom:4px}
+.info{background:#fff;padding:9px 11px;border-radius:8px;box-shadow:0 1px 6px rgba(0,0,0,.2);font-size:.82rem;min-width:170px}
+.info b{color:var(--navy)}
+
+/* ---- note / empty ---- */
+.note{background:#fff8f0;border:1px solid #f0d9bf;border-left:4px solid var(--or);border-radius:12px;padding:16px 18px;color:#7a4a17;font-size:.88rem;margin-top:16px}
+.empty{background:#fff;border:1px dashed #c7d2de;border-radius:var(--r);padding:40px 22px;text-align:center;color:var(--mut);margin-top:16px}
+
 /* ---- author watermark ---- */
 .author-wm{font:600 11px/1 var(--sans);color:rgba(23,36,48,.62);background:rgba(255,255,255,.72);padding:3px 7px;border-radius:6px}
 .leaflet-control.author-wm{box-shadow:0 1px 4px rgba(0,0,0,.18)}
-/* ---- fullscreen ctrl ---- */
 .fs-ctrl a{display:flex!important;align-items:center;justify-content:center;width:30px;height:30px;color:#2b3a4a}
 .fs-ctrl svg{width:16px;height:16px}
 .leaflet-control-layers,.leaflet-control-layers-toggle{border-radius:9px!important;box-shadow:0 2px 10px rgba(20,40,70,.18)!important}
 .leaflet-container:fullscreen{height:100%!important;width:100%!important}
+
 /* ---- national table ---- */
-.nac-tbl{width:100%;border-collapse:collapse;font-size:.9rem}
-.nac-tbl th{text-align:left;padding:10px 12px;font-size:.78rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid var(--line)}
+.nac-tbl{width:100%;border-collapse:collapse;font-size:.88rem}
+.nac-tbl th{text-align:left;padding:10px 12px;font-size:.76rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid var(--line)}
 .nac-tbl td{padding:9px 12px;border-bottom:1px solid var(--line);transition:background .1s}
+.nac-tbl tr{cursor:pointer}
 .nac-tbl tr:hover td{background:var(--surface-2)}
 .nac-tbl .num{text-align:right;font-variant-numeric:tabular-nums}
 .nac-tbl .pub-col{color:var(--navy);font-weight:600}
 .nac-sel td{background:var(--surface-2)!important;font-weight:600}
+
 /* ---- footer ---- */
-footer{padding:26px 0;color:var(--mut);font-size:.85rem;text-align:center;border-top:1px solid var(--line);margin-top:20px}
-.foot-credit{color:var(--ink);font-size:.92rem}.foot-credit b{color:var(--navy)}
-.foot-src{margin-top:5px;font-size:.8rem;color:var(--mut-2)}
+footer{padding:24px 0;color:var(--mut);font-size:.84rem;text-align:center;border-top:1px solid var(--line);margin-top:20px}
+.foot-credit{color:var(--ink);font-size:.9rem}.foot-credit b{color:var(--navy)}
+.foot-src{margin-top:5px;font-size:.78rem;color:var(--mut-2)}
 a{color:var(--navy)}
 .loading{padding:40px;text-align:center;color:var(--mut)}
-/* ---- focus ---- */
 :where(button,a,select,input):focus-visible{outline:2px solid var(--or);outline-offset:2px;border-radius:6px}
-/* ---- móvil ---- */
-@media(max-width:640px){
+
+/* ---- desktop: hide header select (sidebar handles it) ---- */
+@media(min-width:769px){
+  .selbar .field{display:none}
+  .sidebar-toggle{display:none!important}
+}
+
+/* ---- mobile layout ---- */
+@media(max-width:768px){
+  .sidebar{
+    position:fixed;left:0;top:0;
+    width:260px;height:100vh;
+    z-index:2000;
+    transform:translateX(-100%);
+    transition:transform .26s ease;
+    box-shadow:4px 0 24px rgba(20,40,70,.18);
+  }
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-close{display:flex}
+  .sidebar-toggle{display:inline-flex}
   header{padding:22px 16px 18px}
   header h1{font-size:1.3rem;letter-spacing:-.3px}
   .selbar{padding:12px 14px;gap:10px}
   .selbar .field{min-width:0}
   .city-select{font-size:1rem;padding:10px 12px}
-  .tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:0;padding:0 8px;scrollbar-width:none}
-  .tabs::-webkit-scrollbar{display:none}
-  .tabs button{padding:12px 10px;font-size:.82rem;white-space:nowrap;flex:0 0 auto}
-  .panel{padding:22px 0}
-  .kpis{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:16px}
+  .tabs{padding:0 4px}
+  .tabs button{padding:12px 10px;font-size:.82rem}
+  .panel{padding:20px 0}
+  .kpis{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:14px}
   .kpi{padding:13px}.kpi .v{font-size:1.4rem}
   .chartbox,.panelctrl{padding:14px}
-  .cwrap{height:260px}.cwrap-md{height:220px}.cwrap-lg{height:300px}
+  .cwrap{height:260px}.cwrap-md{height:220px}.cwrap-lg{height:300px}.cwrap-sm{height:180px}
   .map{height:430px}
   .nac-tbl th,.nac-tbl td{padding:7px 8px}
 }
@@ -160,6 +280,10 @@ a{color:var(--navy)}
       EOD Chile · Movilidad Urbana
     </div>
     <div class="brand-right">
+      <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="Abrir menú de ciudades" title="Seleccionar ciudad">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        Ciudades
+      </button>
       <button id="themeToggle" class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro" title="Tema claro / oscuro"></button>
       <span class="byline">By <b>Rodrigo Medina G.</b></span>
     </div>
@@ -180,197 +304,211 @@ a{color:var(--navy)}
   </div>
 </div></header>
 
-<nav class="tabs" role="tablist" aria-label="Secciones">
-  <button data-tab="resumen" class="on" role="tab" aria-controls="p-resumen" aria-selected="true">
-    <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></span>Resumen
-  </button>
-  <button data-tab="movilidad" role="tab" aria-controls="p-movilidad" aria-selected="false">
-    <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>Modos
-  </button>
-  <button data-tab="demografia" role="tab" aria-controls="p-demografia" aria-selected="false">
-    <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>Demografía
-  </button>
-  <button data-tab="ingreso" role="tab" aria-controls="p-ingreso" aria-selected="false">
-    <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>Ingreso
-  </button>
-  <button data-tab="mapas" role="tab" aria-controls="p-mapas" aria-selected="false">
-    <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg></span>Mapas OD
-  </button>
-  <button data-tab="nacional" role="tab" aria-controls="p-nacional" aria-selected="false">
-    <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>Nacional
-  </button>
-</nav>
+<div class="page-body">
 
-<main class="wrap">
-
-  <!-- ============ RESUMEN ============ -->
-  <section class="panel on" id="p-resumen" role="tabpanel" tabindex="0">
-    <h2 id="res-title">Resumen<span class="bar"></span></h2>
-    <p class="lead" id="res-lead"></p>
-    <div id="res-kpis" class="kpis"></div>
-
-    <div class="grp-hd">Distribución horaria de viajes</div>
-    <div class="chartbox">
-      <h3>Viajes por hora del día</h3>
-      <p>Porcentaje de viajes según hora de salida del origen. Se marcan las puntas de tráfico.</p>
-      <div class="cwrap-sm"><canvas id="c-horario"></canvas></div>
+  <!-- ======= SIDEBAR ======= -->
+  <aside class="sidebar" id="sidebar" aria-label="Lista de ciudades">
+    <div class="sidebar-hd">
+      <span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+        18 ciudades EOD
+      </span>
+      <button class="sidebar-close" id="sidebarClose" type="button" aria-label="Cerrar menú">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
+    <div id="city-list" class="city-list"></div>
+  </aside>
 
-    <div class="grp-hd">Distancia de los viajes</div>
-    <div class="chartbox">
-      <h3>Distribución por tramo de distancia</h3>
-      <p>Porcentaje de viajes por tramo kilométrico (distancia entre centroides de zona origen y destino).</p>
-      <div class="cwrap-sm"><canvas id="c-distancia"></canvas></div>
-    </div>
-  </section>
+  <!-- Mobile overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-  <!-- ============ MODOS ============ -->
-  <section class="panel" id="p-movilidad" role="tabpanel" tabindex="0">
-    <h2>Modos y propósitos<span class="bar"></span></h2>
-    <p class="lead">Caracterización de los viajes en día laboral según modo de transporte y propósito del viaje.</p>
+  <!-- ======= MAIN CONTENT ======= -->
+  <div class="page-main">
 
-    <div class="two">
-      <div class="chartbox">
-        <h3>División modal</h3>
-        <p>% de viajes por modo de transporte principal</p>
-        <div class="cwrap-md"><canvas id="c-modal"></canvas></div>
-      </div>
-      <div class="chartbox">
-        <h3>Propósito del viaje</h3>
-        <p>% de viajes por propósito declarado</p>
-        <div class="cwrap-md"><canvas id="c-prop"></canvas></div>
-      </div>
-    </div>
+    <nav class="tabs" role="tablist" aria-label="Secciones">
+      <button data-tab="resumen" class="on" role="tab" aria-controls="p-resumen" aria-selected="true">
+        <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></span>Resumen
+      </button>
+      <button data-tab="movilidad" role="tab" aria-controls="p-movilidad" aria-selected="false">
+        <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>Modos
+      </button>
+      <button data-tab="demografia" role="tab" aria-controls="p-demografia" aria-selected="false">
+        <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>Demografía
+      </button>
+      <button data-tab="ingreso" role="tab" aria-controls="p-ingreso" aria-selected="false">
+        <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>Ingreso
+      </button>
+      <button data-tab="mapas" role="tab" aria-controls="p-mapas" aria-selected="false">
+        <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg></span>Mapas OD
+      </button>
+      <button data-tab="nacional" role="tab" aria-controls="p-nacional" aria-selected="false">
+        <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>Nacional
+      </button>
+    </nav>
 
-    <div class="grp-hd">Distribución horaria por modo</div>
-    <div class="chartbox">
-      <h3>Viajes por hora del día — por modo de transporte</h3>
-      <p>Distribución del total de viajes del día laboral según hora y modo. La suma de todos los modos en todas las horas = 100%.</p>
-      <div class="cwrap"><canvas id="c-horario-modal"></canvas></div>
-    </div>
+    <main class="wrap">
 
-    <div class="grp-hd">Propósito según modo</div>
-    <div class="chartbox">
-      <h3>Propósito del viaje por modo de transporte</h3>
-      <p>Para cada modo de transporte: distribución porcentual del propósito del viaje.</p>
-      <div class="cwrap-md"><canvas id="c-prop-modo"></canvas></div>
-    </div>
+      <!-- ============ RESUMEN ============ -->
+      <section class="panel on" id="p-resumen" role="tabpanel" tabindex="0">
+        <h2 id="res-title">Resumen<span class="bar"></span></h2>
+        <p class="lead" id="res-lead"></p>
+        <div id="res-kpis" class="kpis"></div>
 
-    <div class="grp-hd">Distribución etaria y por quintil</div>
-    <div class="two">
-      <div class="chartbox">
-        <h3>Distribución etaria</h3>
-        <p>% de viajes realizados por grupo de edad</p>
-        <div class="cwrap-md"><canvas id="c-etario"></canvas></div>
-      </div>
-      <div class="chartbox">
-        <h3>Quintil de ingreso del hogar</h3>
-        <p>% de viajes por quintil de ingreso (1 = menor ingreso)</p>
-        <div class="cwrap-md"><canvas id="c-quintil"></canvas></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ DEMOGRAFÍA ============ -->
-  <section class="panel" id="p-demografia" role="tabpanel" tabindex="0">
-    <h2>Demografía<span class="bar"></span></h2>
-    <p class="lead">Perfil demográfico de los viajeros: tipo de usuario, modo de transporte según grupo etario y tipo de usuario.</p>
-
-    <div class="two">
-      <div class="chartbox">
-        <h3>Tipo de usuario</h3>
-        <p>% de viajes por categoría de usuario (edad y rol)</p>
-        <div class="cwrap-md"><canvas id="c-tipo-usuario"></canvas></div>
-      </div>
-      <div class="chartbox">
-        <h3>Modo de transporte según tipo de usuario</h3>
-        <p>Para cada tipo de usuario: distribución porcentual del modo de transporte</p>
-        <div class="cwrap-md"><canvas id="c-modal-usuario"></canvas></div>
-      </div>
-    </div>
-
-    <div class="grp-hd">Análisis por grupo de edad</div>
-    <div class="two">
-      <div class="chartbox">
-        <h3>Modo de transporte según grupo etario</h3>
-        <p>Para cada grupo de edad: distribución porcentual del modo de transporte utilizado</p>
-        <div class="cwrap-lg"><canvas id="c-modal-etario"></canvas></div>
-      </div>
-      <div class="chartbox">
-        <h3>Propósito del viaje según grupo etario</h3>
-        <p>Para cada grupo de edad: distribución porcentual del propósito del viaje</p>
-        <div class="cwrap-lg"><canvas id="c-prop-etario"></canvas></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ INGRESO ============ -->
-  <section class="panel" id="p-ingreso" role="tabpanel" tabindex="0">
-    <h2>Ingreso<span class="bar"></span></h2>
-    <p class="lead">Movilidad según nivel socioeconómico del hogar. Los quintiles van de Q1 (menor ingreso) a Q5 (mayor ingreso).</p>
-
-    <div class="two">
-      <div class="chartbox">
-        <h3>Modo de transporte según quintil</h3>
-        <p>Para cada quintil de ingreso: distribución porcentual del modo de transporte</p>
-        <div class="cwrap"><canvas id="c-modal-quintil"></canvas></div>
-      </div>
-      <div class="chartbox">
-        <h3>Distribución de distancia según quintil</h3>
-        <p>Para cada quintil de ingreso: distribución porcentual de la distancia del viaje</p>
-        <div class="cwrap"><canvas id="c-dist-quintil"></canvas></div>
-      </div>
-    </div>
-
-    <div class="grp-hd">Distancia según modo de transporte</div>
-    <div class="chartbox">
-      <h3>Distribución de distancia según modo de transporte</h3>
-      <p>Para cada modo de transporte: distribución porcentual de los viajes por tramo de distancia.</p>
-      <div class="cwrap-md"><canvas id="c-dist-modo"></canvas></div>
-    </div>
-  </section>
-
-  <!-- ============ MAPAS ============ -->
-  <section class="panel" id="p-mapas" role="tabpanel" tabindex="0">
-    <h2>Mapas Origen-Destino<span class="bar"></span></h2>
-    <p class="lead">Distribución espacial de viajes por zona. Los círculos son proporcionales al volumen de viajes generados o atraídos por cada zona.</p>
-    <div class="panelctrl">
-      <div>
-        <label>Vista</label>
-        <div class="ctrl">
-          <button class="on" data-view="gen" id="mv-gen">Generación</button>
-          <button data-view="atr" id="mv-atr">Atracción</button>
-          <button data-view="od" id="mv-od">Flujos OD</button>
+        <div class="grp-hd">Distribución horaria de viajes</div>
+        <div class="chartbox">
+          <h3>Viajes por hora del día</h3>
+          <p>Porcentaje de viajes según hora de salida del origen. Se marcan las puntas de tráfico.</p>
+          <div class="cwrap-sm"><canvas id="c-horario"></canvas></div>
         </div>
-      </div>
-      <div class="desc" id="map-desc">Viajes generados por zona (salidas del origen).</div>
-    </div>
-    <div id="od-map" class="map"></div>
-    <div class="note" id="map-note">
-      Fuente: EOD procesada. Círculos proporcionales al volumen de viajes expandido. Flujos OD: top 150 pares por volumen.
-    </div>
-  </section>
 
-  <!-- ============ NACIONAL ============ -->
-  <section class="panel" id="p-nacional" role="tabpanel" tabindex="0">
-    <h2>Resumen Nacional<span class="bar"></span></h2>
-    <p class="lead">Comparativa de indicadores de movilidad en las 18 ciudades con Encuesta Origen-Destino (EOD) homologada.</p>
-    <div id="nac-kpis" class="kpis"></div>
-    <div class="grp-hd">Indicadores por ciudad</div>
-    <div class="chartbox" style="padding:0;overflow:hidden">
-      <div id="nac-table" style="overflow-x:auto;padding:0"></div>
-    </div>
-    <div class="note" style="margin-top:18px">
-      Haz clic en cualquier ciudad para explorar sus datos en detalle. Fuente: EOD homologadas SECTRA/MOP (2010–2023).
-    </div>
-  </section>
+        <div class="grp-hd">Distancia de los viajes</div>
+        <div class="chartbox">
+          <h3>Distribución por tramo de distancia</h3>
+          <p>Porcentaje de viajes por tramo kilométrico (distancia entre centroides de zona origen y destino).</p>
+          <div class="cwrap-sm"><canvas id="c-distancia"></canvas></div>
+        </div>
+      </section>
 
-</main>
+      <!-- ============ MODOS ============ -->
+      <section class="panel" id="p-movilidad" role="tabpanel" tabindex="0">
+        <h2>Modos y propósitos<span class="bar"></span></h2>
+        <p class="lead">Caracterización de los viajes en día laboral según modo de transporte y propósito del viaje.</p>
+        <div class="two">
+          <div class="chartbox">
+            <h3>División modal</h3>
+            <p>% de viajes por modo de transporte principal</p>
+            <div class="cwrap-md"><canvas id="c-modal"></canvas></div>
+          </div>
+          <div class="chartbox">
+            <h3>Propósito del viaje</h3>
+            <p>% de viajes por propósito declarado</p>
+            <div class="cwrap-md"><canvas id="c-prop"></canvas></div>
+          </div>
+        </div>
+        <div class="grp-hd">Distribución horaria por modo</div>
+        <div class="chartbox">
+          <h3>Viajes por hora — por modo de transporte</h3>
+          <p>Distribución del total de viajes del día laboral según hora y modo. La suma de todos los modos y horas = 100%.</p>
+          <div class="cwrap"><canvas id="c-horario-modal"></canvas></div>
+        </div>
+        <div class="grp-hd">Propósito según modo</div>
+        <div class="chartbox">
+          <h3>Propósito del viaje por modo de transporte</h3>
+          <p>Para cada modo: distribución porcentual del propósito del viaje.</p>
+          <div class="cwrap-md"><canvas id="c-prop-modo"></canvas></div>
+        </div>
+        <div class="grp-hd">Distribución etaria y por quintil</div>
+        <div class="two">
+          <div class="chartbox">
+            <h3>Distribución etaria</h3>
+            <p>% de viajes realizados por grupo de edad</p>
+            <div class="cwrap-md"><canvas id="c-etario"></canvas></div>
+          </div>
+          <div class="chartbox">
+            <h3>Quintil de ingreso del hogar</h3>
+            <p>% de viajes por quintil de ingreso (1 = menor ingreso)</p>
+            <div class="cwrap-md"><canvas id="c-quintil"></canvas></div>
+          </div>
+        </div>
+      </section>
 
-<footer><div class="wrap">
-  <div class="foot-credit">Análisis, homologación y desarrollo · <b>By Rodrigo Medina González</b> · Universidad de Concepción</div>
-  <div class="foot-src">Fuentes: Encuestas Origen-Destino (SECTRA / MOP, múltiples años, 2001–2023) · Expansión y homologación: elaboración propia.</div>
-</div></footer>
+      <!-- ============ DEMOGRAFÍA ============ -->
+      <section class="panel" id="p-demografia" role="tabpanel" tabindex="0">
+        <h2>Demografía<span class="bar"></span></h2>
+        <p class="lead">Perfil demográfico de los viajeros: tipo de usuario, modo de transporte según grupo etario y tipo de usuario.</p>
+        <div class="two">
+          <div class="chartbox">
+            <h3>Tipo de usuario</h3>
+            <p>% de viajes por categoría de usuario (edad y rol)</p>
+            <div class="cwrap-md"><canvas id="c-tipo-usuario"></canvas></div>
+          </div>
+          <div class="chartbox">
+            <h3>Modo según tipo de usuario</h3>
+            <p>Para cada tipo de usuario: distribución porcentual del modo de transporte</p>
+            <div class="cwrap-md"><canvas id="c-modal-usuario"></canvas></div>
+          </div>
+        </div>
+        <div class="grp-hd">Análisis por grupo de edad</div>
+        <div class="two">
+          <div class="chartbox">
+            <h3>Modo según grupo etario</h3>
+            <p>Para cada grupo de edad: distribución porcentual del modo de transporte</p>
+            <div class="cwrap-lg"><canvas id="c-modal-etario"></canvas></div>
+          </div>
+          <div class="chartbox">
+            <h3>Propósito según grupo etario</h3>
+            <p>Para cada grupo de edad: distribución porcentual del propósito del viaje</p>
+            <div class="cwrap-lg"><canvas id="c-prop-etario"></canvas></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ INGRESO ============ -->
+      <section class="panel" id="p-ingreso" role="tabpanel" tabindex="0">
+        <h2>Ingreso<span class="bar"></span></h2>
+        <p class="lead">Movilidad según nivel socioeconómico del hogar. Los quintiles van de Q1 (menor ingreso) a Q5 (mayor ingreso).</p>
+        <div class="two">
+          <div class="chartbox">
+            <h3>Modo según quintil de ingreso</h3>
+            <p>Para cada quintil: distribución porcentual del modo de transporte</p>
+            <div class="cwrap"><canvas id="c-modal-quintil"></canvas></div>
+          </div>
+          <div class="chartbox">
+            <h3>Distancia según quintil de ingreso</h3>
+            <p>Para cada quintil: distribución porcentual de la distancia del viaje</p>
+            <div class="cwrap"><canvas id="c-dist-quintil"></canvas></div>
+          </div>
+        </div>
+        <div class="grp-hd">Distancia según modo de transporte</div>
+        <div class="chartbox">
+          <h3>Distribución de distancia por modo de transporte</h3>
+          <p>Para cada modo: distribución porcentual de los viajes por tramo de distancia.</p>
+          <div class="cwrap-md"><canvas id="c-dist-modo"></canvas></div>
+        </div>
+      </section>
+
+      <!-- ============ MAPAS ============ -->
+      <section class="panel" id="p-mapas" role="tabpanel" tabindex="0">
+        <h2>Mapas Origen-Destino<span class="bar"></span></h2>
+        <p class="lead">Distribución espacial de viajes por zona. Los círculos son proporcionales al volumen de viajes generados o atraídos por cada zona.</p>
+        <div class="panelctrl">
+          <div>
+            <label>Vista</label>
+            <div class="ctrl">
+              <button class="on" data-view="gen">Generación</button>
+              <button data-view="atr">Atracción</button>
+              <button data-view="od">Flujos OD</button>
+            </div>
+          </div>
+          <div class="desc" id="map-desc">Viajes generados por zona (salidas del origen).</div>
+        </div>
+        <div id="od-map" class="map"></div>
+        <div class="note" id="map-note">Fuente: EOD procesada. Flujos OD: top 150 pares por volumen.</div>
+      </section>
+
+      <!-- ============ NACIONAL ============ -->
+      <section class="panel" id="p-nacional" role="tabpanel" tabindex="0">
+        <h2>Resumen Nacional<span class="bar"></span></h2>
+        <p class="lead">Comparativa de indicadores de movilidad en las 18 ciudades con Encuesta Origen-Destino (EOD) homologada.</p>
+        <div id="nac-kpis" class="kpis"></div>
+        <div class="grp-hd">Indicadores por ciudad</div>
+        <div class="chartbox" style="padding:0;overflow:hidden">
+          <div id="nac-table" style="overflow-x:auto;padding:0"></div>
+        </div>
+        <div class="note">Haz clic en una ciudad para explorar sus datos. Fuente: EOD homologadas SECTRA/MOP (2010–2023).</div>
+      </section>
+
+    </main>
+
+    <footer><div class="wrap">
+      <div class="foot-credit">Análisis, homologación y desarrollo · <b>By Rodrigo Medina González</b> · Universidad de Concepción</div>
+      <div class="foot-src">Fuentes: Encuestas Origen-Destino (SECTRA / MOP, múltiples años, 2001–2023) · Expansión y homologación: elaboración propia.</div>
+    </div></footer>
+
+  </div><!-- /page-main -->
+
+</div><!-- /page-body -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>

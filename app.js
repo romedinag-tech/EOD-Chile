@@ -206,6 +206,39 @@ function buildSelector(){
   sel.innerHTML=S.index.map(c=>`<option value="${c.slug}">${c.ciudad} · EOD ${c.anio}</option>`).join("");
   sel.onchange=()=>loadCity(sel.value);
   document.getElementById("htag").textContent=S.index.length+" ciudades · datos SECTRA/MOP homologados";
+  buildSidebarList();
+}
+
+function buildSidebarList(){
+  const list=document.getElementById("city-list");if(!list)return;
+  list.innerHTML=S.index.map(c=>{
+    const meta=c.pct_publico!=null?`EOD ${c.anio} · ${fmt(c.pct_publico,1)}% púb.`:`EOD ${c.anio}`;
+    return `<button class="city-item" data-slug="${c.slug}" onclick="loadCity('${c.slug}');closeSidebarMobile()">
+      <span class="cn">${c.ciudad}</span>
+      <span class="cm">${meta}</span>
+    </button>`;
+  }).join("");
+}
+
+function updateSidebarActive(slug){
+  document.querySelectorAll("#city-list .city-item").forEach(b=>{
+    b.classList.toggle("active",b.dataset.slug===slug);
+  });
+  // Scroll active item into view
+  const active=document.querySelector("#city-list .city-item.active");
+  if(active)active.scrollIntoView({block:"nearest",behavior:"smooth"});
+}
+
+function openSidebarMobile(){
+  document.getElementById("sidebar").classList.add("open");
+  document.getElementById("sidebarOverlay").classList.add("active");
+  document.body.style.overflow="hidden";
+}
+
+function closeSidebarMobile(){
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("sidebarOverlay").classList.remove("active");
+  document.body.style.overflow="";
 }
 
 // ── Carga de ciudad ──────────────────────────────────────────────────────────
@@ -214,11 +247,13 @@ function loadCity(slug){
   if(S.data[slug]){
     S.sel=S.data[slug];
     document.getElementById("city-sel").value=slug;
+    updateSidebarActive(slug);
     render();return Promise.resolve();
   }
   return getJSON("data/eod/"+slug+".json").then(d=>{
     S.data[slug]=d;S.sel=d;
     document.getElementById("city-sel").value=slug;
+    updateSidebarActive(slug);
     render();
   }).catch(e=>console.error("Error cargando",slug,e));
 }
@@ -654,6 +689,9 @@ document.getElementById("shareBtn").onclick=function(){
 // ── Inicialización ───────────────────────────────────────────────────────────
 updateThemeIcon();
 document.getElementById("themeToggle").onclick=()=>setTheme(!isDark());
+document.getElementById("sidebarToggle").onclick=openSidebarMobile;
+document.getElementById("sidebarClose").onclick=closeSidebarMobile;
+document.getElementById("sidebarOverlay").onclick=closeSidebarMobile;
 
 getJSON("data/eod/index.json").then(idx=>{
   S.index=idx.ciudades;
