@@ -120,5 +120,20 @@ html.dark .foot-credit{color:var(--mut)}
 html.dark .foot-credit b{color:var(--navy2)}
 html.dark .foot-src{color:var(--mut2)}
 
+html.dark .sub-tabs{background:var(--sf2);border-color:var(--line)}
+html.dark .sub-tabs button{color:var(--mut)}
+html.dark .sub-tabs button.on{background:var(--sf3);color:var(--ink);box-shadow:var(--sh-xs)}
+
+html.dark .cmp-cb{background:var(--surface);border-color:var(--line);color:var(--ink2)}
+html.dark .cmp-cb.on{border-color:var(--or);background:rgba(227,179,65,.07)}
+
+html.dark .seg-ctrl button{background:var(--sf2);border-color:var(--line);color:var(--mut)}
+html.dark .seg-ctrl button:hover{background:var(--sf3);color:var(--ink2)}
+html.dark .seg-ctrl button.on{background:var(--navy);border-color:var(--navy);color:#0d1117}
+
+html.dark .rank-ctrl select{background:var(--sf2);border-color:var(--line);color:var(--ink)}
+html.dark .rank-ctrl select:focus{border-color:var(--or)}
+html.dark .rank-ctrl label{color:var(--ink2)}
+
 html.dark a{color:var(--navy)}
 html.dark h1,html.dark h2,html.dark h3,html.dark h4{color:var(--ink)}

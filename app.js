@@ -28,12 +28,37 @@ const TRAMO_PAL={
 };
 const USUARIO_PAL=["#c6dbef","#6baed6","#2171b5","#084594"];
 
+// ── Coordenadas de ciudades (centroides aproximados) ─────────────────────────
+const CITY_COORDS={
+  "arica":[-18.478,-70.313],
+  "iquique_alto_hospicio":[-20.214,-70.151],
+  "copiapo":[-27.366,-70.329],
+  "coquimbo_la_serena":[-29.961,-71.346],
+  "gran_valparaiso":[-33.046,-71.620],
+  "san_antonio":[-33.593,-71.621],
+  "gran_santiago":[-33.456,-70.648],
+  "rancagua_machali":[-34.170,-70.743],
+  "curico":[-34.985,-71.239],
+  "talca":[-35.426,-71.665],
+  "linares":[-35.846,-71.596],
+  "chillan":[-36.608,-72.103],
+  "gran_concepcion":[-36.826,-73.049],
+  "temuco_padre_las_casas":[-38.735,-72.590],
+  "valdivia":[-39.814,-73.246],
+  "osorno":[-40.574,-73.136],
+  "puerto_montt":[-41.473,-72.941],
+  "punta_arenas":[-53.163,-70.907]
+};
+
 // ── Estado global ────────────────────────────────────────────────────────────
 const S={index:[],data:{},sel:null};
 const MAPS=[];
 const CH={};
 let odMap=null, odLyr=null, odInfo=null, odLegend=null;
 let mapView="gen";
+let nacMap=null, nacMapLyr=null;
+let cmpVar="modal", cmpBuilt=false, cmpIndSel="pct_publico";
+let rankInd="pct_publico", rankAsc=false;
 
 // ── Utilidades ───────────────────────────────────────────────────────────────
 function getJSON(url){
@@ -238,6 +263,15 @@ function closeSidebarMobile(){
   document.getElementById("sidebar").classList.remove("open");
   document.getElementById("sidebarOverlay").classList.remove("active");
   document.body.style.overflow="";
+}
+
+// ── Fetch ciudad (sin cambiar ciudad activa) ─────────────────────────────────
+function fetchCityData(slug){
+  if(!slug)return Promise.resolve(null);
+  if(S.data[slug])return Promise.resolve(S.data[slug]);
+  return getJSON("data/eod/"+slug+".json").then(d=>{
+    S.data[slug]=d;return d;
+  }).catch(e=>{console.error("Error fetching",slug,e);return null;});
 }
 
 // ── Carga de ciudad ──────────────────────────────────────────────────────────
@@ -637,44 +671,348 @@ function renderMapas(d){
 
 // ── TAB 6: NACIONAL ──────────────────────────────────────────────────────────
 function renderNacional(){
-  const nacKpis=document.getElementById("nac-kpis");
-  if(nacKpis&&S.index.length){
-    const totalV=S.index.reduce((a,c)=>a+(c.viajes||0),0);
-    const pubList=S.index.filter(c=>c.pct_publico!=null);
-    const avgPub=pubList.length?pubList.reduce((a,c)=>a+c.pct_publico,0)/pubList.length:null;
-    const dmList=S.index.filter(c=>c.dist_mediana!=null);
-    const avgDm=dmList.length?dmList.reduce((a,c)=>a+c.dist_mediana,0)/dmList.length:null;
-    nacKpis.innerHTML=`
-      <div class="kpi" style="--kpi-c:var(--navy)"><div class="v">${S.index.length}</div><div class="l">Ciudades cubiertas</div><div class="s">EOD homologadas</div></div>
-      <div class="kpi" style="--kpi-c:var(--teal)"><div class="v c-teal">${fmtM(totalV)}</div><div class="l">Viajes expandidos</div><div class="s">suma 18 ciudades día laboral</div></div>
-      <div class="kpi" style="--kpi-c:var(--navy2)"><div class="v c-navy">${avgPub!=null?fmt(avgPub,1)+"%":"s/d"}</div><div class="l">% Público promedio</div><div class="s">promedio simple entre ciudades</div></div>
-      <div class="kpi" style="--kpi-c:var(--or)"><div class="v or">${avgDm!=null?fmt(avgDm,1)+" km":"s/d"}</div><div class="l">Dist. mediana promedio</div><div class="s">centroide a centroide</div></div>`;
+  if(!renderNacional._wired){
+    renderNacional._wired=true;
+    document.querySelectorAll("#nac-subtabs button").forEach(b=>{
+      b.onclick=()=>{
+        document.querySelectorAll("#nac-subtabs button").forEach(x=>x.classList.toggle("on",x===b));
+        document.querySelectorAll("#p-nacional .sub-panel").forEach(p=>p.classList.toggle("on",p.id==="sp-"+b.dataset.sub));
+        if(b.dataset.sub==="panorama")  renderPanorama();
+        if(b.dataset.sub==="comparador")renderComparador();
+        if(b.dataset.sub==="ranking")   renderRanking();
+      };
+    });
   }
+  renderPanorama();
+}
 
+function renderPanorama(){
+  if(!S.index.length)return;
+  // KPIs
+  const avg=f=>{const l=S.index.filter(c=>c[f]!=null);return l.length?l.reduce((a,c)=>a+c[f],0)/l.length:null;};
+  const totalV=S.index.reduce((a,c)=>a+(c.viajes||0),0);
+  const avgPub=avg("pct_publico"),avgDm=avg("dist_mediana");
+  const nacKpis=document.getElementById("nac-kpis");
+  if(nacKpis)nacKpis.innerHTML=`
+    <div class="kpi" style="--kpi-c:var(--navy)"><div class="v">${S.index.length}</div><div class="l">Ciudades cubiertas</div><div class="s">EOD homologadas</div></div>
+    <div class="kpi" style="--kpi-c:var(--teal)"><div class="v c-teal">${fmtM(totalV)}</div><div class="l">Viajes expandidos</div><div class="s">suma 18 ciudades día laboral</div></div>
+    <div class="kpi" style="--kpi-c:var(--navy2)"><div class="v c-navy">${avgPub!=null?fmt(avgPub,1)+"%":"s/d"}</div><div class="l">% Público promedio</div><div class="s">promedio simple entre ciudades</div></div>
+    <div class="kpi" style="--kpi-c:var(--or)"><div class="v or">${avgDm!=null?fmt(avgDm,1)+" km":"s/d"}</div><div class="l">Dist. mediana promedio</div><div class="s">centroide a centroide</div></div>`;
+  // Map + donut (delayed so container is laid out)
+  setTimeout(()=>{renderNacMap();renderNacModal();},120);
+  // Table
   const nacTable=document.getElementById("nac-table");
-  if(!nacTable||!S.index.length)return;
+  if(!nacTable)return;
   const rows=S.index.map(c=>{
     const sel=S.sel&&S.sel.slug===c.slug;
-    return `<tr class="${sel?"nac-sel":""}" onclick="loadCity('${c.slug}');activateTab('resumen')" title="Ver ${c.ciudad}">
+    return `<tr class="${sel?"nac-sel":""}" onclick="loadCity('${c.slug}');activateTab('resumen')" title="${c.ciudad}">
       <td>${c.ciudad}</td>
       <td class="num">${c.anio}</td>
       <td class="num">${fmtM(c.viajes)}</td>
       <td class="num pub-col">${c.pct_publico!=null?fmt(c.pct_publico,1)+"%":"—"}</td>
+      <td class="num">${c.pct_privado!=null?fmt(c.pct_privado,1)+"%":"—"}</td>
+      <td class="num">${c.pct_no_motorizado!=null?fmt(c.pct_no_motorizado,1)+"%":"—"}</td>
       <td class="num">${c.dist_mediana!=null?fmt(c.dist_mediana,1)+" km":"—"}</td>
       <td class="num">${c.viajes_persona!=null?fmt(c.viajes_persona,2):"—"}</td>
     </tr>`;
   }).join("");
   nacTable.innerHTML=`<table class="nac-tbl">
     <thead><tr>
-      <th>Ciudad</th>
-      <th class="num">Año EOD</th>
-      <th class="num">Viajes/día</th>
-      <th class="num pub-col">% Público</th>
-      <th class="num">Dist. mediana</th>
-      <th class="num">V/persona</th>
-    </tr></thead>
-    <tbody>${rows}</tbody>
+      <th>Ciudad</th><th class="num">Año</th><th class="num">Viajes/día</th>
+      <th class="num pub-col">% Público</th><th class="num">% Privado</th>
+      <th class="num">% No motor.</th><th class="num">Dist. mediana</th><th class="num">V/pers.</th>
+    </tr></thead><tbody>${rows}</tbody>
   </table>`;
+}
+
+function pctToColor(pct){
+  if(pct==null)return GREY;
+  if(pct<20)return RED;
+  if(pct<30)return OR;
+  if(pct<40)return TEAL;
+  return NAVY;
+}
+
+function renderNacMap(){
+  if(!S.index.length)return;
+  const el=document.getElementById("nac-map");
+  if(!el||el.offsetParent===null)return;
+  if(!nacMap){
+    nacMap=L.map("nac-map",{preferCanvas:true,zoomControl:true}).setView([-37,-71.5],5);
+    const tile=L.tileLayer(isDark()?CARTO_DARK:CARTO_LIGHT,
+      {attribution:'&copy; OpenStreetMap &copy; CARTO',maxZoom:19});
+    tile.addTo(nacMap);MAPS.push({map:nacMap,carto:tile});authorWM(nacMap);
+  }
+  if(nacMapLyr){nacMap.removeLayer(nacMapLyr);nacMapLyr=null;}
+  const maxV=Math.max(...S.index.map(c=>c.viajes||0))||1;
+  const lyr=L.layerGroup();
+  S.index.forEach(c=>{
+    const coords=CITY_COORDS[c.slug];if(!coords)return;
+    const r=7+Math.sqrt((c.viajes||0)/maxV)*26;
+    const isActive=S.sel&&S.sel.slug===c.slug;
+    const m=L.circleMarker(coords,{
+      radius:r,color:isActive?"#fff":"rgba(255,255,255,.55)",
+      weight:isActive?2.5:1.5,
+      fillColor:pctToColor(c.pct_publico),
+      fillOpacity:isActive?0.95:0.78
+    });
+    if(isActive)m.setStyle({color:OR,weight:3});
+    const tip=[
+      `<b>${c.ciudad}</b> · EOD ${c.anio}`,
+      `${fmtM(c.viajes)} viajes/día`,
+      c.pct_publico!=null?`${fmt(c.pct_publico,1)}% público`:"",
+      c.viajes_persona!=null?`${fmt(c.viajes_persona,2)} v/persona`:"",
+    ].filter(Boolean).join("<br>");
+    m.bindTooltip(tip,{sticky:true});
+    m.on("click",()=>{loadCity(c.slug);activateTab("resumen");});
+    lyr.addLayer(m);
+  });
+  lyr.addTo(nacMap);nacMapLyr=lyr;
+  setTimeout(()=>nacMap.invalidateSize(),80);
+}
+
+function renderNacModal(){
+  if(!S.index.length)return;
+  const ctx=document.getElementById("c-nac-modal");if(!ctx)return;
+  const avg=f=>{const l=S.index.filter(c=>c[f]!=null);return l.length?l.reduce((a,c)=>a+c[f],0)/l.length:0;};
+  const pub=avg("pct_publico"),priv=avg("pct_privado"),nom=avg("pct_no_motorizado");
+  if(CH["c-nac-modal"])CH["c-nac-modal"].destroy();
+  CH["c-nac-modal"]=new Chart(ctx,{
+    type:"doughnut",
+    data:{
+      labels:["Público","Privado","No motorizado"],
+      datasets:[{
+        data:[pub,priv,nom].map(v=>Math.round(v*10)/10),
+        backgroundColor:[NAVY,RED,GREEN],
+        borderWidth:0,hoverOffset:8
+      }]
+    },
+    options:{
+      maintainAspectRatio:false,cutout:"60%",
+      plugins:{
+        legend:{display:true,position:"bottom"},
+        datalabels:{display:true,color:"#fff",font:{size:12,weight:"700"},
+          formatter:v=>v>=5?Math.round(v)+"%":""},
+        tooltip:{callbacks:{label:c=>c.label+": "+fmt(c.parsed,1)+"%"}}
+      },
+      __noWM:true
+    }
+  });
+}
+
+// ── Comparador ────────────────────────────────────────────────────────────────
+function buildComparadorUI(){
+  if(cmpBuilt)return;cmpBuilt=true;
+  const grid=document.getElementById("cmp-city-grid");
+  if(grid){
+    grid.innerHTML=S.index.map((c,i)=>`
+      <label class="cmp-cb${i<8?" on":""}" data-slug="${c.slug}">
+        <input type="checkbox"${i<8?" checked":""}/>
+        <span>${c.ciudad}</span>
+      </label>`).join("");
+    grid.querySelectorAll(".cmp-cb").forEach(lbl=>{
+      lbl.onclick=()=>{
+        const cb=lbl.querySelector("input");
+        cb.checked=!cb.checked;lbl.classList.toggle("on",cb.checked);
+        renderComparadorChart();
+      };
+    });
+  }
+  document.querySelectorAll("#cmp-var-ctrl button").forEach(b=>{
+    b.onclick=()=>{
+      document.querySelectorAll("#cmp-var-ctrl button").forEach(x=>x.classList.toggle("on",x===b));
+      cmpVar=b.dataset.var;
+      const ir=document.getElementById("cmp-ind-row");
+      if(ir)ir.style.display=cmpVar==="indicadores"?"flex":"none";
+      renderComparadorChart();
+    };
+  });
+  const indRow=document.getElementById("cmp-ind-row");
+  if(indRow)indRow.querySelectorAll("button").forEach(b=>{
+    b.onclick=()=>{
+      indRow.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));
+      cmpIndSel=b.dataset.ind;renderComparadorChart();
+    };
+  });
+}
+
+function renderComparador(){buildComparadorUI();renderComparadorChart();}
+
+async function renderComparadorChart(){
+  const slugs=[...document.querySelectorAll(".cmp-cb input:checked")]
+    .map(cb=>cb.closest("[data-slug]").dataset.slug);
+  const wrap=document.getElementById("cmp-chart-wrap");if(!wrap)return;
+  if(slugs.length<2){
+    if(CH["c-comparador"]){CH["c-comparador"].destroy();CH["c-comparador"]=null;}
+    wrap.innerHTML='<div class="empty" style="margin:0;height:100%;display:flex;align-items:center;justify-content:center">Selecciona al menos 2 ciudades para comparar.</div>';
+    return;
+  }
+  if(!document.getElementById("c-comparador"))
+    wrap.innerHTML='<canvas id="c-comparador"></canvas>';
+  await Promise.all(slugs.filter(s=>!S.data[s]).map(s=>fetchCityData(s)));
+  const cities=slugs.map(s=>S.data[s]).filter(Boolean);if(!cities.length)return;
+  wrap.style.height=Math.max(260,cities.length*34+80)+"px";
+  document.getElementById("cmp-title").textContent=
+    cmpVar==="modal"?"Partición modal por ciudad":
+    cmpVar==="proposito"?"Propósito del viaje por ciudad":
+    (CMP_IND[cmpIndSel]||{label:cmpIndSel}).label+" por ciudad";
+  document.getElementById("cmp-lead").textContent=
+    cmpVar==="modal"?"Distribución porcentual del modo de transporte principal":
+    cmpVar==="proposito"?"Distribución porcentual del propósito declarado":
+    "Comparativa de "+(CMP_IND[cmpIndSel]||{label:""}).label.toLowerCase()+" entre ciudades";
+  if(cmpVar==="indicadores"){renderComparadorSimple(cities);return;}
+  const isModal=cmpVar==="modal";
+  const keys=isModal?["Público","Privado","No motorizado","Combinado","Otro"]:["Trabajo","Estudio","Otro"];
+  const cols=isModal?MODO_COL:PROP_COL;
+  renderComparadorStacked(
+    cities.map(d=>d.ciudad),
+    keys.map(k=>({label:k,color:cols[k]||GREY,
+      data:cities.map(d=>{
+        const arr=isModal?(d.modal||[]):(d.proposito||[]);
+        const item=isModal?arr.find(x=>x.modo===k):arr.find(x=>x.prop===k);
+        return item?item.pct:0;
+      })
+    }))
+  );
+}
+
+const CMP_IND={
+  pct_publico:{label:"% Público",fmt:v=>fmt(v,1)+"%",color:NAVY},
+  pct_no_motorizado:{label:"% No motorizado",fmt:v=>fmt(v,1)+"%",color:GREEN},
+  viajes_persona:{label:"Viajes por persona",fmt:v=>fmt(v,2),color:TEAL},
+  dist_mediana:{label:"Dist. mediana (km)",fmt:v=>fmt(v,1)+" km",color:OR},
+};
+
+function renderComparadorStacked(cityLabels,datasets){
+  const ctx=document.getElementById("c-comparador");if(!ctx)return;
+  if(CH["c-comparador"])CH["c-comparador"].destroy();
+  CH["c-comparador"]=new Chart(ctx,{
+    type:"bar",
+    data:{labels:cityLabels,datasets:datasets.map(ds=>({
+      label:ds.label,data:ds.data,backgroundColor:ds.color,borderWidth:0
+    }))},
+    options:{
+      indexAxis:"y",maintainAspectRatio:false,
+      plugins:{
+        legend:{display:true,position:"bottom",labels:{usePointStyle:true,boxWidth:8,padding:10,font:{size:11}}},
+        datalabels:{
+          display:c=>{const v=c.dataset.data[c.dataIndex];return v>=7;},
+          anchor:"center",align:"center",color:"#fff",
+          font:{size:10,weight:"700"},formatter:v=>v>=7?Math.round(v)+"%":""
+        },
+        tooltip:{callbacks:{label:c=>c.dataset.label+": "+fmt(c.parsed.x,1)+"%"}}
+      },
+      scales:{
+        x:{stacked:true,display:false,max:100},
+        y:{stacked:true,ticks:{font:{size:11}},grid:{display:false}}
+      }
+    }
+  });
+}
+
+function renderComparadorSimple(cities){
+  const meta=CMP_IND[cmpIndSel];if(!meta)return;
+  const ctx=document.getElementById("c-comparador");if(!ctx)return;
+  if(CH["c-comparador"])CH["c-comparador"].destroy();
+  const vals=cities.map(d=>(d.kpis&&d.kpis[cmpIndSel]!=null)?d.kpis[cmpIndSel]:null);
+  const maxVal=Math.max(...vals.filter(v=>v!=null))||1;
+  const activeSlug=S.sel?S.sel.slug:null;
+  CH["c-comparador"]=new Chart(ctx,{
+    type:"bar",
+    data:{labels:cities.map(d=>d.ciudad),datasets:[{
+      data:vals,borderWidth:0,borderRadius:4,
+      backgroundColor:cities.map(d=>d.slug===activeSlug?OR:meta.color)
+    }]},
+    options:{
+      indexAxis:"y",maintainAspectRatio:false,
+      layout:{padding:{right:70}},
+      plugins:{
+        legend:{display:false},
+        datalabels:{
+          display:true,anchor:"end",align:"end",clamp:true,
+          color:isDark()?"#8b949e":"#64748b",
+          font:{size:10,weight:"700"},formatter:v=>v!=null?meta.fmt(v):""
+        },
+        tooltip:{callbacks:{label:c=>meta.fmt(c.parsed.x)}}
+      },
+      scales:{
+        x:{display:false,max:maxVal*1.22},
+        y:{ticks:{font:{size:11}},grid:{display:false}}
+      }
+    }
+  });
+}
+
+// ── Ranking ───────────────────────────────────────────────────────────────────
+const RANK_IND={
+  pct_publico:{label:"% Transporte público",fmt:v=>fmt(v,1)+"%",color:NAVY},
+  pct_no_motorizado:{label:"% No motorizado",fmt:v=>fmt(v,1)+"%",color:GREEN},
+  pct_privado:{label:"% Transporte privado",fmt:v=>fmt(v,1)+"%",color:RED},
+  viajes_persona:{label:"Viajes por persona",fmt:v=>fmt(v,2),color:TEAL},
+  dist_mediana:{label:"Distancia mediana (km)",fmt:v=>fmt(v,1)+" km",color:OR},
+  viajes:{label:"Viajes/día (total)",fmt:v=>fmtM(v),color:NAVY2},
+};
+
+function renderRanking(){
+  if(!S.index.length)return;
+  const sel=document.getElementById("rank-ind");
+  const asc=document.getElementById("rank-asc");
+  if(sel&&!sel._ri){
+    sel._ri=true;
+    sel.onchange=()=>{rankInd=sel.value;_updateRankTitle();renderRankingChart();};
+    if(asc)asc.onchange=e=>{rankAsc=e.target.checked;_updateRankTitle();renderRankingChart();};
+  }
+  _updateRankTitle();renderRankingChart();
+}
+
+function _updateRankTitle(){
+  const meta=RANK_IND[rankInd]||{};
+  const h3=document.getElementById("rank-title");
+  const p=document.getElementById("rank-lead");
+  if(h3)h3.textContent="Ranking: "+(meta.label||rankInd);
+  if(p)p.textContent="18 ciudades ordenadas de "+(rankAsc?"menor a mayor":"mayor a menor")+".";
+}
+
+function renderRankingChart(){
+  if(!S.index.length)return;
+  const meta=RANK_IND[rankInd];if(!meta)return;
+  const data=S.index.filter(c=>c[rankInd]!=null)
+    .map(c=>({label:c.ciudad,value:c[rankInd],slug:c.slug}))
+    .sort((a,b)=>rankAsc?a.value-b.value:b.value-a.value);
+  if(!data.length)return;
+  const wrap=document.getElementById("rank-cwrap");
+  if(wrap)wrap.style.height=Math.max(400,data.length*34+80)+"px";
+  if(CH["c-ranking"])CH["c-ranking"].destroy();
+  const ctx=document.getElementById("c-ranking");if(!ctx)return;
+  const maxVal=Math.max(...data.map(d=>d.value));
+  const activeSlug=S.sel?S.sel.slug:null;
+  CH["c-ranking"]=new Chart(ctx,{
+    type:"bar",
+    data:{
+      labels:data.map(d=>d.label),
+      datasets:[{
+        data:data.map(d=>d.value),borderWidth:0,borderRadius:4,
+        backgroundColor:data.map(d=>d.slug===activeSlug?OR:meta.color)
+      }]
+    },
+    options:{
+      indexAxis:"y",maintainAspectRatio:false,
+      layout:{padding:{right:72}},
+      plugins:{
+        legend:{display:false},
+        datalabels:{
+          display:true,anchor:"end",align:"end",clamp:true,
+          color:isDark()?"#8b949e":"#64748b",
+          font:{size:11,weight:"700"},formatter:v=>meta.fmt(v)
+        },
+        tooltip:{callbacks:{label:c=>meta.fmt(c.parsed.x)}}
+      },
+      scales:{
+        x:{display:false,max:maxVal*1.2},
+        y:{ticks:{font:{size:12}},grid:{display:false}}
+      }
+    }
+  });
 }
 
 // ── Botón compartir ──────────────────────────────────────────────────────────
