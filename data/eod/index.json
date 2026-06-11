@@ -4,109 +4,181 @@
       "ciudad": "Arica",
       "slug": "arica",
       "anio": 2010,
-      "n_zonas": 49
+      "n_zonas": 49,
+      "viajes": 573594,
+      "pct_publico": 23.1,
+      "dist_mediana": 1.6,
+      "viajes_persona": 2.97
     },
     {
       "ciudad": "Iquique - Alto Hospicio",
       "slug": "iquique_alto_hospicio",
       "anio": 2010,
-      "n_zonas": 71
+      "n_zonas": 71,
+      "viajes": 653181,
+      "pct_publico": 29.7,
+      "dist_mediana": 1.5,
+      "viajes_persona": 2.44
     },
     {
       "ciudad": "Copiapó",
       "slug": "copiapo",
       "anio": 2010,
-      "n_zonas": 69
+      "n_zonas": 69,
+      "viajes": 423191,
+      "pct_publico": 28.6,
+      "dist_mediana": 1.7,
+      "viajes_persona": 2.9
     },
     {
       "ciudad": "Coquimbo - La Serena",
       "slug": "coquimbo_la_serena",
       "anio": 2010,
-      "n_zonas": 103
+      "n_zonas": 103,
+      "viajes": 928209,
+      "pct_publico": 29.8,
+      "dist_mediana": 1.9,
+      "viajes_persona": 2.53
     },
     {
       "ciudad": "Gran Valparaíso",
       "slug": "gran_valparaiso",
       "anio": 2014,
-      "n_zonas": 310
+      "n_zonas": 310,
+      "viajes": 2295100,
+      "pct_publico": 39.1,
+      "dist_mediana": 2.2,
+      "viajes_persona": 2.38
     },
     {
       "ciudad": "San Antonio",
       "slug": "san_antonio",
       "anio": 2017,
-      "n_zonas": 103
+      "n_zonas": 103,
+      "viajes": 211805,
+      "pct_publico": 33.7,
+      "dist_mediana": 1.3,
+      "viajes_persona": 2.4
     },
     {
       "ciudad": "Gran Santiago",
       "slug": "gran_santiago",
       "anio": 2012,
-      "n_zonas": 850
+      "n_zonas": 850,
+      "viajes": 14832175,
+      "pct_publico": 34.3,
+      "dist_mediana": 2.6,
+      "viajes_persona": 2.23
     },
     {
       "ciudad": "Rancagua - Machalí",
       "slug": "rancagua_machali",
       "anio": 2018,
-      "n_zonas": 97
+      "n_zonas": 97,
+      "viajes": 789486,
+      "pct_publico": 23.7,
+      "dist_mediana": 2.0,
+      "viajes_persona": 2.79
     },
     {
       "ciudad": "Curicó",
       "slug": "curico",
       "anio": 2014,
-      "n_zonas": 73
+      "n_zonas": 73,
+      "viajes": 473795,
+      "pct_publico": 25.5,
+      "dist_mediana": 1.8,
+      "viajes_persona": 3.65
     },
     {
       "ciudad": "Talca",
       "slug": "talca",
       "anio": 2022,
-      "n_zonas": 190
+      "n_zonas": 190,
+      "viajes": 557712,
+      "pct_publico": 22.9,
+      "dist_mediana": 2.5,
+      "viajes_persona": 1.96
     },
     {
       "ciudad": "Linares",
       "slug": "linares",
       "anio": 2019,
-      "n_zonas": 112
+      "n_zonas": 112,
+      "viajes": 315695,
+      "pct_publico": 16.1,
+      "dist_mediana": 1.4,
+      "viajes_persona": 2.05
     },
     {
       "ciudad": "Chillán",
       "slug": "chillan",
       "anio": 2023,
-      "n_zonas": 86
+      "n_zonas": 86,
+      "viajes": 539523,
+      "pct_publico": 21.5,
+      "dist_mediana": 1.9,
+      "viajes_persona": 2.36
     },
     {
       "ciudad": "Gran Concepción",
       "slug": "gran_concepcion",
       "anio": 2015,
-      "n_zonas": 359
+      "n_zonas": 359,
+      "viajes": 1789052,
+      "pct_publico": 39.4,
+      "dist_mediana": 2.6,
+      "viajes_persona": 1.96
     },
     {
       "ciudad": "Temuco - Padre las Casas",
       "slug": "temuco_padre_las_casas",
       "anio": 2013,
-      "n_zonas": 90
+      "n_zonas": 90,
+      "viajes": 1018528,
+      "pct_publico": 35.7,
+      "dist_mediana": 2.3,
+      "viajes_persona": 3.27
     },
     {
       "ciudad": "Valdivia",
       "slug": "valdivia",
       "anio": 2013,
-      "n_zonas": 65
+      "n_zonas": 65,
+      "viajes": 561830,
+      "pct_publico": 30.3,
+      "dist_mediana": 2.1,
+      "viajes_persona": 3.48
     },
     {
       "ciudad": "Osorno",
       "slug": "osorno",
       "anio": 2013,
-      "n_zonas": 54
+      "n_zonas": 54,
+      "viajes": 468652,
+      "pct_publico": 30.6,
+      "dist_mediana": 2.0,
+      "viajes_persona": 3.37
     },
     {
       "ciudad": "Puerto Montt",
       "slug": "puerto_montt",
       "anio": 2014,
-      "n_zonas": 82
+      "n_zonas": 82,
+      "viajes": 799391,
+      "pct_publico": 32.5,
+      "dist_mediana": 2.1,
+      "viajes_persona": 3.26
     },
     {
       "ciudad": "Punta Arenas",
       "slug": "punta_arenas",
       "anio": 2019,
-      "n_zonas": 112
+      "n_zonas": 112,
+      "viajes": 419028,
+      "pct_publico": 20.1,
+      "dist_mediana": 4.1,
+      "viajes_persona": 3.14
     }
   ]
 }

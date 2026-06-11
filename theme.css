@@ -50,3 +50,8 @@ html.dark .tabs button .ti{color:#6f87ad}
 html.dark .tabs button.on .ti,html.dark .tabs button:hover .ti{color:var(--cyan)}
 html.dark .skel{background:#0e2a55}
 html.dark .city-select{background:var(--panel) !important;color:var(--ink) !important;border-color:var(--line) !important}
+html.dark .nac-tbl th{color:var(--mut) !important;border-bottom-color:var(--line) !important}
+html.dark .nac-tbl td{border-bottom-color:var(--line) !important;color:var(--ink) !important}
+html.dark .nac-tbl tr:hover td{background:var(--panel2) !important}
+html.dark .nac-tbl .pub-col{color:var(--cyan) !important}
+html.dark .nac-sel td{background:var(--panel2) !important}
