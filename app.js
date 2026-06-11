@@ -676,15 +676,23 @@ function renderNacional(){
 }
 
 // ── Botón compartir ──────────────────────────────────────────────────────────
-document.getElementById("shareBtn").onclick=function(){
+const SHARE_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
+const CHECK_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+function doShare(){
   try{
     navigator.clipboard.writeText(location.href).then(()=>{
-      const btn=document.getElementById("shareBtn");
-      btn.textContent="¡Copiado!";
-      setTimeout(()=>{btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Compartir vista';},1800);
+      const bd=document.getElementById("shareBtnD");
+      const bm=document.getElementById("shareBtn");
+      if(bd){bd.innerHTML=CHECK_SVG;setTimeout(()=>{bd.innerHTML=SHARE_SVG;},1800);}
+      if(bm){bm.innerHTML=SHARE_SVG+' ¡Copiado!';setTimeout(()=>{bm.innerHTML=SHARE_SVG+' Compartir vista';},1800);}
     });
   }catch(e){prompt("Copia este enlace:",location.href);}
-};
+}
+
+document.getElementById("shareBtn").onclick=doShare;
+const _sbd=document.getElementById("shareBtnD");
+if(_sbd)_sbd.onclick=doShare;
 
 // ── Inicialización ───────────────────────────────────────────────────────────
 updateThemeIcon();

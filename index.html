@@ -233,10 +233,15 @@ a{color:var(--navy)}
 .loading{padding:40px;text-align:center;color:var(--mut)}
 :where(button,a,select,input):focus-visible{outline:2px solid var(--or);outline-offset:2px;border-radius:6px}
 
-/* ---- desktop: hide header select (sidebar handles it) ---- */
+/* ---- desktop: sidebar handles city selection ---- */
 @media(min-width:769px){
-  .selbar .field{display:none}
+  .selbar{display:none}
   .sidebar-toggle{display:none!important}
+  header{padding:18px 22px 14px}
+}
+/* hide desktop share icon on mobile */
+@media(max-width:768px){
+  #shareBtnD{display:none!important}
 }
 
 /* ---- mobile layout ---- */
@@ -285,6 +290,9 @@ a{color:var(--navy)}
         Ciudades
       </button>
       <button id="themeToggle" class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro" title="Tema claro / oscuro"></button>
+      <button id="shareBtnD" class="theme-toggle" type="button" title="Compartir vista" aria-label="Compartir esta vista">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      </button>
       <span class="byline">By <b>Rodrigo Medina G.</b></span>
     </div>
   </div>
