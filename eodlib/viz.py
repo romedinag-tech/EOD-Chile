@@ -17,9 +17,7 @@ SECUENCIA = ['#1f4e79', '#d96a1f', '#1a9850', '#1f8a86', '#d6453a', '#e0a92b', '
 
 
 def _layout(fig, titulo=None, alto=360):
-    fig.update_layout(
-        title=dict(text=titulo, font=dict(family=_FONT, size=15, color='#1f4e79'), x=0,
-                   pad=dict(l=4)) if titulo else None,
+    kw = dict(
         height=alto,
         margin=dict(l=10, r=10, t=44 if titulo else 10, b=10),
         legend=dict(orientation='h', yanchor='bottom', y=-0.3, x=0,
@@ -28,6 +26,10 @@ def _layout(fig, titulo=None, alto=360):
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(family=_FONT, color='#172430'),
     )
+    if titulo:
+        kw['title'] = dict(text=titulo, font=dict(family=_FONT, size=15, color='#1f4e79'),
+                           x=0, pad=dict(l=4))
+    fig.update_layout(**kw)
     fig.update_xaxes(showgrid=False, linecolor='#e4eaf2',
                      tickfont=dict(size=12, color='#5e6e80'), tickcolor='#e4eaf2')
     fig.update_yaxes(gridcolor='#eef3f9', linecolor='rgba(0,0,0,0)',
