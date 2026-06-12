@@ -235,7 +235,7 @@ header{
 .tabs button.on .ti,.tabs button:hover .ti{color:var(--or)}
 
 /* ── Main Content ────────────────────────────────────────────────── */
-main{padding:22px 24px 0;flex:1}
+main{padding:22px 24px 0;flex:1;width:100%;max-width:1180px;margin:0 auto}
 .panel{display:none;padding-bottom:36px}
 .panel.on{display:block}
 
@@ -316,6 +316,7 @@ h3{font-size:.9375rem;font-weight:600;color:var(--ink2)}
 .cwrap-sm{position:relative;height:220px}
 .cwrap-md{position:relative;height:260px}
 .cwrap-lg{position:relative;height:380px}
+.cwrap-center{max-width:860px;margin-left:auto!important;margin-right:auto!important}
 
 /* Grid layouts */
 .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -669,7 +670,7 @@ footer{
             <button class="on" data-dseg="total">Total</button>
             <button data-dseg="modo">Por modo</button>
           </div>
-          <div class="cwrap-sm"><canvas id="c-distancia"></canvas></div>
+          <div class="cwrap-sm cwrap-center"><canvas id="c-distancia"></canvas></div>
         </div>
       </section>
 
