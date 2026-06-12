@@ -491,6 +491,9 @@ footer{
   font:.875rem var(--sans);font-weight:600;color:var(--mut);cursor:pointer;
 }
 .rank-ctrl input[type=checkbox]{accent-color:var(--or);width:14px;height:14px}
+.odn-ctrl{display:flex;align-items:center;gap:10px}
+.odn-ctrl input[type=range]{width:150px;accent-color:var(--or);cursor:pointer}
+.odn-ctrl span{font:.8rem var(--sans);font-weight:700;color:var(--navy);min-width:26px;text-align:right}
 
 /* ── Desktop layout: full-height ────────────────────────────────── */
 @media(min-width:769px){
@@ -624,6 +627,10 @@ footer{
         <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
         Nacional
       </button>
+      <button data-tab="comparador" role="tab" aria-controls="p-comparador" aria-selected="false">
+        <span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="6" height="11" rx="1"/><rect x="15" y="3" width="6" height="18" rx="1"/><line x1="9" y1="14" x2="15" y2="14"/></svg></span>
+        Comparador
+      </button>
     </nav>
 
     <main>
@@ -636,13 +643,22 @@ footer{
         <div class="grp-hd">Distribución horaria de viajes</div>
         <div class="chartbox">
           <h3>Viajes por hora del día</h3>
-          <p>Porcentaje de viajes según hora de salida del origen. Se marcan las puntas de tráfico.</p>
+          <p>Histograma de viajes según hora de salida del origen. Segmenta por modo o propósito.</p>
+          <div class="seg-ctrl" id="hor-seg" style="margin-top:14px">
+            <button class="on" data-hseg="total">Total</button>
+            <button data-hseg="modo">Por modo</button>
+            <button data-hseg="proposito">Por propósito</button>
+          </div>
           <div class="cwrap-sm"><canvas id="c-horario"></canvas></div>
         </div>
         <div class="grp-hd">Distancia de los viajes</div>
         <div class="chartbox">
           <h3>Distribución por tramo de distancia</h3>
           <p>Porcentaje de viajes por tramo kilométrico (distancia entre centroides de zona origen y destino).</p>
+          <div class="seg-ctrl" id="dist-seg" style="margin-top:14px">
+            <button class="on" data-dseg="total">Total</button>
+            <button data-dseg="modo">Por modo</button>
+          </div>
           <div class="cwrap-sm"><canvas id="c-distancia"></canvas></div>
         </div>
       </section>
@@ -758,6 +774,23 @@ footer{
               <button data-view="od">Flujos OD</button>
             </div>
           </div>
+          <div>
+            <label>Período</label>
+            <div class="ctrl" id="per-ctrl">
+              <button class="on" data-per="all">Día completo</button>
+              <button data-per="pm">Punta mañana</button>
+              <button data-per="pmd">Punta mediodía</button>
+              <button data-per="pt">Punta tarde</button>
+              <button data-per="fp">Fuera de punta</button>
+            </div>
+          </div>
+          <div id="odn-wrap" style="display:none">
+            <label>Pares OD</label>
+            <div class="odn-ctrl">
+              <input type="range" id="od-n" min="10" max="150" step="10" value="50" aria-label="Cantidad de pares OD"/>
+              <span id="od-n-val">50</span>
+            </div>
+          </div>
           <div class="desc" id="map-desc">Viajes generados por zona (salidas del origen).</div>
         </div>
         <div id="od-map" class="map"></div>
@@ -769,7 +802,6 @@ footer{
         <h2>Análisis Nacional<span class="bar"></span></h2>
         <nav class="sub-tabs" id="nac-subtabs" aria-label="Secciones nacionales">
           <button class="on" data-sub="panorama">Panorama</button>
-          <button data-sub="comparador">Comparador</button>
           <button data-sub="ranking">Ranking</button>
         </nav>
 
@@ -795,31 +827,6 @@ footer{
           <div class="note" style="margin-top:12px">Clic en una fila para explorar esa ciudad. Fuente: EOD SECTRA/MOP (2001–2023).</div>
         </div>
 
-        <!-- COMPARADOR -->
-        <div class="sub-panel" id="sp-comparador">
-          <p class="lead" style="margin-bottom:16px">Compara partición modal, propósito e indicadores entre múltiples ciudades.</p>
-          <div class="grp-hd">Ciudades a comparar</div>
-          <div id="cmp-city-grid" class="cmp-city-grid"></div>
-          <div class="grp-hd" style="margin-top:18px">Variable</div>
-          <div class="seg-ctrl" id="cmp-var-ctrl">
-            <button class="on" data-var="modal">Partición modal</button>
-            <button data-var="proposito">Propósito</button>
-            <button data-var="indicadores">Indicadores</button>
-            <button data-var="multidim">Multidimensional</button>
-          </div>
-          <div class="seg-ctrl" id="cmp-ind-row" style="display:none">
-            <button class="on" data-ind="pct_publico">% Público</button>
-            <button data-ind="pct_no_motorizado">% No motor.</button>
-            <button data-ind="viajes_persona">V/persona</button>
-            <button data-ind="dist_mediana">Dist. mediana</button>
-          </div>
-          <div class="chartbox">
-            <h3 id="cmp-title">Partición modal por ciudad</h3>
-            <p id="cmp-lead">Distribución porcentual del modo de transporte principal</p>
-            <div id="cmp-chart-wrap" style="position:relative;height:480px"><canvas id="c-comparador"></canvas></div>
-          </div>
-        </div>
-
         <!-- RANKING -->
         <div class="sub-panel" id="sp-ranking">
           <p class="lead" style="margin-bottom:16px">Ordena las 18 ciudades por cualquier indicador de movilidad.</p>
@@ -827,6 +834,8 @@ footer{
             <select id="rank-ind">
               <option value="pct_publico">% Transporte público</option>
               <option value="pct_no_motorizado">% No motorizado</option>
+              <option value="pct_caminata">% Caminata</option>
+              <option value="pct_bicicleta">% Bicicleta</option>
               <option value="pct_privado">% Transporte privado</option>
               <option value="viajes_persona">Viajes por persona</option>
               <option value="dist_mediana">Distancia mediana (km)</option>
@@ -843,6 +852,34 @@ footer{
           </div>
         </div>
 
+      </section>
+
+      <!-- COMPARADOR -->
+      <section class="panel" id="p-comparador" role="tabpanel" tabindex="0">
+        <h2>Comparador de Ciudades<span class="bar"></span></h2>
+        <p class="lead">Compara partición modal, propósito, indicadores y el perfil multidimensional entre múltiples ciudades.</p>
+        <div class="grp-hd">Ciudades a comparar</div>
+        <div id="cmp-city-grid" class="cmp-city-grid"></div>
+        <div class="grp-hd" style="margin-top:18px">Variable</div>
+        <div class="seg-ctrl" id="cmp-var-ctrl">
+          <button class="on" data-var="modal">Partición modal</button>
+          <button data-var="proposito">Propósito</button>
+          <button data-var="indicadores">Indicadores</button>
+          <button data-var="multidim">Multidimensional</button>
+        </div>
+        <div class="seg-ctrl" id="cmp-ind-row" style="display:none">
+          <button class="on" data-ind="pct_publico">% Público</button>
+          <button data-ind="pct_caminata">% Caminata</button>
+          <button data-ind="pct_bicicleta">% Bicicleta</button>
+          <button data-ind="pct_no_motorizado">% No motor.</button>
+          <button data-ind="viajes_persona">V/persona</button>
+          <button data-ind="dist_mediana">Dist. mediana</button>
+        </div>
+        <div class="chartbox">
+          <h3 id="cmp-title">Partición modal por ciudad</h3>
+          <p id="cmp-lead">Distribución porcentual del modo de transporte principal</p>
+          <div id="cmp-chart-wrap" style="position:relative;height:480px"><canvas id="c-comparador"></canvas></div>
+        </div>
       </section>
 
     </main>
