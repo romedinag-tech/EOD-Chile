@@ -62,7 +62,7 @@ let nacMap=null, nacMapLyr=null;
 let cmpVar="modal", cmpBuilt=false, cmpIndSel="pct_publico";
 let rankInd="pct_publico", rankAsc=false;
 let horSeg="total", distSeg="total";
-let odPer="all", odTopN=50;
+let odPer="all", odTopN=50, odEsc="auto";
 const PER_LBL={all:"Día completo",pm:"Punta mañana",pmd:"Punta mediodía",pt:"Punta tarde",fp:"Fuera de punta"};
 
 // ── Utilidades ───────────────────────────────────────────────────────────────
@@ -760,6 +760,13 @@ document.querySelectorAll("#per-ctrl button").forEach(b=>
   });
 })();
 
+document.querySelectorAll("#esc-ctrl button").forEach(b=>
+  b.onclick=()=>{
+    odEsc=b.dataset.esc;
+    document.querySelectorAll("#esc-ctrl button").forEach(x=>x.classList.toggle("on",x===b));
+    if(S.sel&&mapView==="od")drawMapView(S.sel);
+  });
+
 function updateMapNote(){
   const note=document.getElementById("map-note");if(!note)return;
   const per=odPer==="all"?"":" · "+PER_LBL[odPer];
@@ -774,6 +781,8 @@ function setMapView(v){
   document.getElementById("map-desc").innerHTML=MAP_DESC[v];
   const nw=document.getElementById("odn-wrap");
   if(nw)nw.style.display=v==="od"?"":"none";
+  const ew=document.getElementById("esc-wrap");
+  if(ew)ew.style.display=v==="od"?"":"none";
   updateMapNote();
   if(S.sel)drawMapView(S.sel);
 }
@@ -852,17 +861,26 @@ function odCurve(a,b,curv){
 }
 
 function drawODLines(d){
-  const flows=odPer==="all"?d.od_top:(d.od_per&&d.od_per[odPer])||[];
+  // Escala efectiva: con zonificación fina los pares zona-zona son ruido →
+  // por defecto se agregan a sectores (macrozonas)
+  const escEff=odEsc==="auto"
+    ?((d.od_macro&&d.zonas&&d.zonas.length>120)?"sectores":"zonas")
+    :(odEsc==="sectores"&&!d.od_macro?"zonas":odEsc);
+  const usaSect=escEff==="sectores";
+  const flows=usaSect
+    ?(d.od_macro&&d.od_macro[odPer])||[]
+    :(odPer==="all"?d.od_top:(d.od_per&&d.od_per[odPer])||[]);
   if(!flows||!flows.length){
     odInfo.update(odPer==="all"?"Sin datos de flujos OD.":"Sin flujos para este período.");
     odLegend._d.innerHTML="";return;
   }
+  const uni=usaSect?"":"Zona ";
   const perTxt=odPer==="all"?"":"<br><small>"+PER_LBL[odPer]+"</small>";
   // Agregar pares bidireccionales: A⇄B con flujo por sentido
   const agg={};
   flows.forEach(f=>{
     const k=f.o<f.d?f.o+"|"+f.d:f.d+"|"+f.o;
-    if(!agg[k])agg[k]={o:f.o,d:f.d,olat:f.olat,olng:f.olng,dlat:f.dlat,dlng:f.dlng,ab:0,ba:0};
+    if(!agg[k])agg[k]={o:f.o,d:f.d,no:f.no,nd:f.nd,olat:f.olat,olng:f.olng,dlat:f.dlat,dlng:f.dlng,ab:0,ba:0};
     const e=agg[k];
     if(f.o===e.o)e.ab+=f.n;else e.ba+=f.n;
   });
@@ -884,7 +902,8 @@ function drawODLines(d){
     const w=1.4+(p.total/maxT)*8;
     const op=0.5+(p.total/maxT)*0.35;
     const line=L.polyline(pts,{color:lineCol,weight:w,opacity:op,lineCap:"round"});
-    const tip=`<b>Zonas ${p.o} ⇄ ${p.d}</b>${perTxt}`+
+    const tip=`<b>${uni}${p.o} ⇄ ${uni}${p.d}</b>${perTxt}`+
+      (usaSect?`<br><small>${p.no||"?"} y ${p.nd||"?"} zonas agrupadas</small>`:"")+
       `<br>${p.o} → ${p.d}: <b>${p.ab.toLocaleString("es-CL")}</b>`+
       `<br>${p.d} → ${p.o}: <b>${p.ba.toLocaleString("es-CL")}</b>`+
       `<br>Total: <b>${p.total.toLocaleString("es-CL")} viajes</b>`;
@@ -906,10 +925,10 @@ function drawODLines(d){
     nodes.set(p.o,[p.olat,p.olng]);
     nodes.set(p.d,[p.dlat,p.dlng]);
   });
-  // Nodos en los centroides de zona
+  // Nodos en los centroides
   nodes.forEach((c,z)=>{
-    lyr.addLayer(L.circleMarker(c,{radius:3.5,color:"#fff",weight:1.5,fillColor:arrowCol,fillOpacity:1})
-      .bindTooltip("Zona "+z));
+    lyr.addLayer(L.circleMarker(c,{radius:usaSect?5:3.5,color:"#fff",weight:1.5,fillColor:arrowCol,fillOpacity:1})
+      .bindTooltip(uni+z));
   });
   lyr.addTo(odMap);odLyr=lyr;
   odLegend._d.innerHTML='<b>Flujos OD</b>'+
@@ -921,7 +940,9 @@ function drawODLines(d){
       <svg viewBox="0 0 10 10" width="12" height="12"><path d="M0 1.2 L10 5 L0 8.8 L2.6 5 Z" fill="${arrowCol}"/></svg>sentido dominante
     </div>`;
   const note=document.getElementById("map-note");
-  if(note)note.textContent="Mostrando "+pairs.length+" de "+totalPairs+" pares · grosor proporcional al flujo total entre zonas, flecha = sentido dominante"
+  if(note)note.textContent="Mostrando "+pairs.length+" de "+totalPairs+" pares entre "
+    +(usaSect?"sectores (zonas agrupadas espacialmente)":"zonas")
+    +" · grosor proporcional al flujo total, flecha = sentido dominante"
     +(odPer==="all"?"":" · "+PER_LBL[odPer])+". Líneas de deseo — no representan rutas reales.";
   const pts=pairs.flatMap(p=>[[p.olat,p.olng],[p.dlat,p.dlng]]);
   if(pts.length)odMap.fitBounds(L.latLngBounds(pts).pad(0.08));
