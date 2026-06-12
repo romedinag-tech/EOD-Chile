@@ -731,7 +731,7 @@ function renderIngreso(d){
 const MAP_DESC={
   gen:"Viajes <b>generados</b> por zona (salidas desde el origen). Círculos anaranjados proporcionales al volumen.",
   atr:"Viajes <b>atraídos</b> por zona (llegadas al destino). Círculos azules proporcionales al volumen.",
-  od :"Pares OD principales por volumen. Líneas de deseo entre origen y destino; grosor proporcional al flujo. Ajusta cuántos pares ver con el control «Pares OD»."
+  od :"Cada arco une dos zonas: el <b>grosor</b> indica cuántos viajes se realizan entre ellas y la <b>flecha</b> marca el <b>sentido dominante</b>. Haz clic en un arco para el detalle por sentido."
 };
 const MAP_NOTE={
   gen:"Fuente: EOD procesada. Círculos proporcionales al volumen de viajes generado (factor de expansión).",
@@ -838,35 +838,92 @@ function drawCircles(d,view){
   if(pts.length)odMap.fitBounds(L.latLngBounds(pts).pad(0.1));
 }
 
+// Arco cuadrático de Bézier entre dos puntos lat/lng (curvatura perpendicular)
+function odCurve(a,b,curv){
+  const mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2;
+  const dx=b[0]-a[0],dy=b[1]-a[1];
+  const cx=mx-dy*curv,cy=my+dx*curv;
+  const pts=[];
+  for(let i=0;i<=24;i++){
+    const t=i/24,u=1-t;
+    pts.push([u*u*a[0]+2*u*t*cx+t*t*b[0],u*u*a[1]+2*u*t*cy+t*t*b[1]]);
+  }
+  return pts;
+}
+
 function drawODLines(d){
-  let flows=odPer==="all"?d.od_top:(d.od_per&&d.od_per[odPer])||[];
+  const flows=odPer==="all"?d.od_top:(d.od_per&&d.od_per[odPer])||[];
   if(!flows||!flows.length){
     odInfo.update(odPer==="all"?"Sin datos de flujos OD.":"Sin flujos para este período.");
     odLegend._d.innerHTML="";return;
   }
-  flows=flows.slice(0,odTopN);
   const perTxt=odPer==="all"?"":"<br><small>"+PER_LBL[odPer]+"</small>";
-  const maxN=Math.max(...flows.map(f=>f.n))||1;
-  const lyr=L.layerGroup();
+  // Agregar pares bidireccionales: A⇄B con flujo por sentido
+  const agg={};
   flows.forEach(f=>{
-    const w=0.7+(f.n/maxN)*7;
-    const op=0.2+(f.n/maxN)*0.65;
-    const line=L.polyline([[f.olat,f.olng],[f.dlat,f.dlng]],{color:NAVY2,weight:w,opacity:op});
-    line.on("mouseover",()=>{
-      line.setStyle({color:OR,opacity:Math.min(op+0.3,1),weight:w+1.5});
-      odInfo.update(`<b>Zona ${f.o} → ${f.d}</b>${perTxt}<br>Flujo: <b>${f.n.toLocaleString("es-CL")} viajes</b>`);
-    });
-    line.on("mouseout",()=>{line.setStyle({color:NAVY2,opacity:op,weight:w});odInfo.update(null);});
-    line.bindPopup(`<b>${f.o} → ${f.d}</b>${perTxt}<br>${f.n.toLocaleString("es-CL")} viajes`);
+    const k=f.o<f.d?f.o+"|"+f.d:f.d+"|"+f.o;
+    if(!agg[k])agg[k]={o:f.o,d:f.d,olat:f.olat,olng:f.olng,dlat:f.dlat,dlng:f.dlng,ab:0,ba:0};
+    const e=agg[k];
+    if(f.o===e.o)e.ab+=f.n;else e.ba+=f.n;
+  });
+  let pairs=Object.values(agg);
+  pairs.forEach(p=>p.total=p.ab+p.ba);
+  pairs.sort((x,y)=>y.total-x.total);
+  const totalPairs=pairs.length;
+  pairs=pairs.slice(0,odTopN);
+  const maxT=pairs[0].total||1;
+  const lineCol=isDark()?"#e3b341":OR;
+  const arrowCol=isDark()?"#79c0ff":NAVY;
+  const lyr=L.layerGroup();
+  const nodes=new Map();
+  pairs.forEach(p=>{
+    const fwd=p.ab>=p.ba;                       // sentido dominante
+    const A=fwd?[p.olat,p.olng]:[p.dlat,p.dlng];
+    const B=fwd?[p.dlat,p.dlng]:[p.olat,p.olng];
+    const pts=odCurve(A,B,0.18);
+    const w=1.4+(p.total/maxT)*8;
+    const op=0.5+(p.total/maxT)*0.35;
+    const line=L.polyline(pts,{color:lineCol,weight:w,opacity:op,lineCap:"round"});
+    const tip=`<b>Zonas ${p.o} ⇄ ${p.d}</b>${perTxt}`+
+      `<br>${p.o} → ${p.d}: <b>${p.ab.toLocaleString("es-CL")}</b>`+
+      `<br>${p.d} → ${p.o}: <b>${p.ba.toLocaleString("es-CL")}</b>`+
+      `<br>Total: <b>${p.total.toLocaleString("es-CL")} viajes</b>`;
+    line.on("mouseover",()=>{line.setStyle({weight:w+2,opacity:1});odInfo.update(tip);});
+    line.on("mouseout",()=>{line.setStyle({weight:w,opacity:op});odInfo.update(null);});
+    line.bindPopup(tip);
     lyr.addLayer(line);
+    // Flecha del sentido dominante a ~55% del arco, rotada según tangente
+    const i1=Math.max(1,Math.floor(pts.length*0.55));
+    const p0=pts[i1-1],p1=pts[i1];
+    const mid=[(p0[0]+p1[0])/2,(p0[1]+p1[1])/2];
+    const sx=(p1[1]-p0[1])*Math.cos(mid[0]*Math.PI/180),sy=-(p1[0]-p0[0]);
+    const deg=Math.round(Math.atan2(sy,sx)*180/Math.PI);
+    const aw=Math.round(Math.max(11,Math.min(20,7+w*1.4)));
+    lyr.addLayer(L.marker(mid,{interactive:false,icon:L.divIcon({
+      className:"od-arrow",iconSize:[aw,aw],iconAnchor:[aw/2,aw/2],
+      html:`<svg viewBox="0 0 10 10" width="${aw}" height="${aw}" style="transform:rotate(${deg}deg);display:block"><path d="M0 1.2 L10 5 L0 8.8 L2.6 5 Z" fill="${arrowCol}"/></svg>`
+    })}));
+    nodes.set(p.o,[p.olat,p.olng]);
+    nodes.set(p.d,[p.dlat,p.dlng]);
+  });
+  // Nodos en los centroides de zona
+  nodes.forEach((c,z)=>{
+    lyr.addLayer(L.circleMarker(c,{radius:3.5,color:"#fff",weight:1.5,fillColor:arrowCol,fillOpacity:1})
+      .bindTooltip("Zona "+z));
   });
   lyr.addTo(odMap);odLyr=lyr;
   odLegend._d.innerHTML='<b>Flujos OD</b>'+
-    [["2","Bajo","0.25"],["5","Medio","0.55"],["8","Alto","0.85"]].map(([h,lab,op])=>
+    [["2","Bajo",".5"],["5","Medio",".7"],["8","Alto",".9"]].map(([h,lab,op])=>
       `<div style="display:flex;align-items:center;gap:7px;margin:3px 0">
-        <span style="display:inline-block;width:26px;height:${h}px;background:${NAVY2};opacity:${op};border-radius:2px"></span>${lab}
-      </div>`).join("");
-  const pts=flows.flatMap(f=>[[f.olat,f.olng],[f.dlat,f.dlng]]);
+        <span style="display:inline-block;width:26px;height:${h}px;background:${lineCol};opacity:${op};border-radius:2px"></span>${lab}
+      </div>`).join("")+
+    `<div style="display:flex;align-items:center;gap:7px;margin:3px 0">
+      <svg viewBox="0 0 10 10" width="12" height="12"><path d="M0 1.2 L10 5 L0 8.8 L2.6 5 Z" fill="${arrowCol}"/></svg>sentido dominante
+    </div>`;
+  const note=document.getElementById("map-note");
+  if(note)note.textContent="Mostrando "+pairs.length+" de "+totalPairs+" pares · grosor proporcional al flujo total entre zonas, flecha = sentido dominante"
+    +(odPer==="all"?"":" · "+PER_LBL[odPer])+". Líneas de deseo — no representan rutas reales.";
+  const pts=pairs.flatMap(p=>[[p.olat,p.olng],[p.dlat,p.dlng]]);
   if(pts.length)odMap.fitBounds(L.latLngBounds(pts).pad(0.08));
 }
 
