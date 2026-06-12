@@ -494,6 +494,10 @@ footer{
 .odn-ctrl{display:flex;align-items:center;gap:10px}
 .odn-ctrl input[type=range]{width:150px;accent-color:var(--or);cursor:pointer}
 .odn-ctrl span{font:.8rem var(--sans);font-weight:700;color:var(--navy);min-width:26px;text-align:right}
+.hleg{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:12px;font:.75rem var(--sans);color:var(--mut)}
+.hleg span{display:inline-flex;align-items:center;gap:6px;font-weight:600}
+.hleg i{display:inline-block;width:10px;height:10px;border-radius:3px}
+.kpi .v.lime{color:#65a30d}
 
 /* ── Desktop layout: full-height ────────────────────────────────── */
 @media(min-width:769px){
@@ -650,6 +654,12 @@ footer{
             <button data-hseg="proposito">Por propósito</button>
           </div>
           <div class="cwrap-sm"><canvas id="c-horario"></canvas></div>
+          <div class="hleg" id="hor-leyenda">
+            <span><i style="background:rgba(15,41,66,.88)"></i>Punta mañana 7–9</span>
+            <span><i style="background:rgba(217,119,6,.85)"></i>Punta mediodía 12–14</span>
+            <span><i style="background:rgba(8,145,178,.82)"></i>Punta tarde 17–20</span>
+            <span><i style="background:rgba(148,163,184,.45)"></i>Fuera de punta</span>
+          </div>
         </div>
         <div class="grp-hd">Distancia de los viajes</div>
         <div class="chartbox">
@@ -679,10 +689,10 @@ footer{
             <div class="cwrap-md"><canvas id="c-prop"></canvas></div>
           </div>
         </div>
-        <div class="grp-hd">Distribución horaria por modo</div>
+        <div class="grp-hd">Composición modal a lo largo del día</div>
         <div class="chartbox">
-          <h3>Viajes por hora — por modo de transporte</h3>
-          <p>Distribución del total de viajes del día laboral según hora y modo.</p>
+          <h3>Participación de cada modo por hora</h3>
+          <p>Dentro de los viajes de cada hora, qué proporción usa cada modo (cada columna suma 100%).</p>
           <div class="cwrap"><canvas id="c-horario-modal"></canvas></div>
         </div>
         <div class="grp-hd">Propósito según modo</div>
