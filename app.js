@@ -237,6 +237,13 @@ function buildSelector(){
   const sel=document.getElementById("city-sel");
   sel.innerHTML=S.index.map(c=>`<option value="${c.slug}">${c.ciudad} · EOD ${c.anio}</option>`).join("");
   sel.onchange=()=>loadCity(sel.value);
+  const hs=document.getElementById("hero-stats");
+  if(hs&&S.index.length){
+    const tv=S.index.reduce((a,c)=>a+(c.viajes||0),0);
+    const tz=S.index.reduce((a,c)=>a+(c.n_zonas||0),0);
+    hs.textContent=S.index.length+" ciudades · "+fmtM(tv)+" viajes/día expandidos · "
+      +tz.toLocaleString("es-CL")+" zonas georeferenciadas";
+  }
   buildSidebarList();
 }
 

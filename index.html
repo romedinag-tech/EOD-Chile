@@ -41,35 +41,75 @@ button{cursor:pointer;font-family:var(--sans)}
 .kpi .v,table{font-variant-numeric:tabular-nums}
 :focus-visible{outline:2px solid var(--or);outline-offset:2px;border-radius:var(--r-sm)}
 
-/* ── Navbar ──────────────────────────────────────────────────────── */
-header{
+/* ── Hero header ─────────────────────────────────────────────────── */
+header.hero{
   background:var(--navy);
   border-bottom:1px solid rgba(255,255,255,.07);
   color:#fff;position:relative;z-index:1200;flex-shrink:0;
+  padding:16px 24px 24px;
 }
-.nav-inner{
-  display:flex;align-items:center;height:var(--nav-h);
+.hero-inner{max-width:1392px;margin:0 auto}
+.hero-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.hero-chip{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);
+  color:#dce9f5;font-size:.78rem;font-weight:700;
+  padding:5px 13px;border-radius:999px;white-space:nowrap;
 }
-.nav-brand{
-  display:flex;align-items:center;gap:9px;
-  padding:0 18px 0 18px;height:100%;
-  border-right:1px solid rgba(255,255,255,.09);
-  font-weight:700;font-size:.875rem;color:#dce9f5;
-  letter-spacing:.01em;white-space:nowrap;flex-shrink:0;
-  text-decoration:none;
+.hero-chip svg{width:12px;height:12px;flex-shrink:0}
+.hero-actions{display:flex;align-items:center;gap:8px}
+.hero-author{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+  color:rgba(255,255,255,.6);font-size:.74rem;font-weight:600;
+  padding:5px 13px;border-radius:999px;white-space:nowrap;
 }
-.nav-brand .mark{
-  width:26px;height:26px;border-radius:7px;
-  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);
-  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+.hero-author b{color:rgba(255,255,255,.85);font-weight:700}
+.hero-title{
+  font-size:1.65rem;font-weight:800;letter-spacing:-.015em;
+  color:#fff;line-height:1.2;margin:0 0 7px;
 }
-.nav-brand .mark svg{width:13px;height:13px}
-.nav-center{
+.hero-desc{
+  max-width:780px;font-size:.875rem;line-height:1.55;
+  color:rgba(255,255,255,.72);margin:0;
+}
+.hero-stats{
+  display:inline-flex;margin-top:11px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.13);
+  color:rgba(255,255,255,.78);font-size:.72rem;font-weight:600;
+  padding:4px 12px;border-radius:999px;
+}
+.hero-sel{
+  margin-top:16px;max-width:900px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
+  border-radius:14px;padding:13px 16px 14px;
+}
+.hero-sel>label{
+  display:block;font-size:.66rem;font-weight:700;
+  letter-spacing:.8px;text-transform:uppercase;
+  color:rgba(255,255,255,.55);margin-bottom:8px;
+}
+.hero-sel-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.hero-search{position:relative;flex:0 1 250px;min-width:190px}
+.hero-search .sidebar-search-ic{
+  position:absolute;left:10px;top:50%;transform:translateY(-50%);
+  display:flex;align-items:center;pointer-events:none;color:#94a3b8;
+}
+.hero-search .sidebar-search-ic svg{width:13px;height:13px}
+#city-search{
+  width:100%;background:#fff;border:1px solid transparent;
+  border-radius:9px;padding:8px 12px 8px 31px;
+  font:500 .82rem var(--sans);color:#0f2942;outline:none;
+  transition:box-shadow .15s;
+}
+#city-search:focus{box-shadow:0 0 0 3px rgba(217,119,6,.35)}
+#city-search::placeholder{color:#94a3b8}
+.hero-sel-info{
   flex:1;display:flex;align-items:center;gap:10px;
-  padding:0 20px;overflow:hidden;
+  min-width:210px;overflow:hidden;
 }
 .nav-city{
-  font-size:.875rem;font-weight:600;color:#c5d9ee;
+  font-size:.92rem;font-weight:700;color:#fff;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .nav-chip{
@@ -79,25 +119,24 @@ header{
   padding:3px 9px;border-radius:999px;white-space:nowrap;flex-shrink:0;
 }
 .nav-chip svg{width:10px;height:10px}
-.nav-right{
-  display:flex;align-items:center;gap:4px;
-  padding:0 14px;height:100%;
-  border-left:1px solid rgba(255,255,255,.09);flex-shrink:0;
+.hero-share{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);
+  color:#fff;font:600 .78rem var(--sans);
+  padding:8px 15px;border-radius:999px;
+  transition:background .15s;white-space:nowrap;
 }
+.hero-share:hover{background:rgba(255,255,255,.18)}
+.hero-share svg{width:13px;height:13px}
 .nav-btn{
   display:inline-flex;align-items:center;justify-content:center;
   width:32px;height:32px;border-radius:8px;
-  background:none;border:none;color:rgba(255,255,255,.65);
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+  color:rgba(255,255,255,.65);
   transition:background .15s,color .15s;flex-shrink:0;
 }
-.nav-btn:hover{background:rgba(255,255,255,.1);color:#fff}
-.nav-btn svg{width:16px;height:16px}
-.nav-btn.active{background:rgba(255,255,255,.12);color:#fff}
-.nav-author{
-  font-size:.75rem;font-weight:600;color:rgba(255,255,255,.5);
-  padding-left:8px;white-space:nowrap;
-  border-left:1px solid rgba(255,255,255,.1);margin-left:4px;
-}
+.nav-btn:hover{background:rgba(255,255,255,.16);color:#fff}
+.nav-btn svg{width:15px;height:15px}
 /* mobile sidebar open button */
 .sidebar-toggle{
   display:none;align-items:center;gap:6px;
@@ -116,12 +155,18 @@ header{
 .selbar{display:none}
 
 /* ── Sidebar ─────────────────────────────────────────────────────── */
-.page-body{display:flex;align-items:stretch;position:relative}
+.page-body{
+  display:flex;align-items:flex-start;position:relative;
+  max-width:1440px;margin:0 auto;width:100%;
+  padding:18px 24px 0;gap:18px;
+}
 
 .sidebar{
   width:var(--sb-w);flex-shrink:0;
   background:var(--surface);
-  border-right:1px solid var(--line);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  box-shadow:var(--sh-xs);
   display:flex;flex-direction:column;
   overflow:hidden;
 }
@@ -500,17 +545,21 @@ footer{
 .hleg i{display:inline-block;width:10px;height:10px;border-radius:3px}
 .kpi .v.lime{color:#65a30d}
 
-/* ── Desktop layout: full-height ────────────────────────────────── */
+/* ── Desktop layout: scroll natural, sidebar sticky ──────────────── */
 @media(min-width:769px){
-  body{height:100vh;overflow:hidden;display:flex;flex-direction:column}
-  .page-body{flex:1;min-height:0}
-  .sidebar{position:static!important;height:100%}
-  .page-main{overflow-y:auto;height:100%}
+  .sidebar{position:sticky;top:14px;max-height:calc(100vh - 28px)}
 }
 
 /* ── Mobile ──────────────────────────────────────────────────────── */
 @media(max-width:768px){
   :root{--sb-w:270px}
+  header.hero{padding:12px 16px 16px}
+  .hero-title{font-size:1.25rem}
+  .hero-desc{font-size:.8rem}
+  .hero-author{display:none}
+  .hero-sel{padding:11px 12px}
+  .hero-search{flex:1 1 100%}
+  .page-body{padding:12px 12px 0;gap:0}
   .sidebar{
     position:fixed!important;left:0;top:0;
     height:100vh;z-index:2000;
@@ -541,32 +590,47 @@ footer{
 </head>
 <body>
 
-<!-- ── Navbar ─────────────────────────────────────────────────────── -->
-<header>
-  <div class="nav-inner">
-    <div class="nav-brand">
-      <span class="mark">
+<!-- ── Hero header ────────────────────────────────────────────────── -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-top">
+      <span class="hero-chip">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+        Encuestas Origen-Destino de Chile
       </span>
-      EOD Chile
+      <div class="hero-actions">
+        <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="Abrir menú" title="Ciudades">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          Ciudades
+        </button>
+        <button id="themeToggle" class="nav-btn" type="button" aria-label="Cambiar tema" title="Tema"></button>
+        <span class="hero-author">By <b>Rodrigo Medina G.</b></span>
+      </div>
     </div>
-    <div class="nav-center">
-      <span class="nav-city" id="nav-city">Movilidad Urbana</span>
-      <span class="nav-chip" id="nav-chip">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-        18 ciudades EOD
-      </span>
-    </div>
-    <div class="nav-right">
-      <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="Abrir menú" title="Ciudades">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-        Ciudades
-      </button>
-      <button id="themeToggle" class="nav-btn" type="button" aria-label="Cambiar tema" title="Tema"></button>
-      <button id="shareBtnD" class="nav-btn" type="button" aria-label="Compartir vista" title="Compartir URL">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-      </button>
-      <span class="nav-author">By Rodrigo M.G.</span>
+    <h1 class="hero-title">Movilidad Urbana en Chile</h1>
+    <p class="hero-desc">Plataforma comparada de las 18 ciudades del país con Encuesta Origen-Destino homologada (SECTRA/MOP 2001–2023): partición modal, propósitos, horarios, distancias y flujos origen-destino en día laboral.</p>
+    <div><span class="hero-stats" id="hero-stats">18 ciudades · EOD 2001–2023</span></div>
+    <div class="hero-sel">
+      <label for="city-search">Ciudad EOD</label>
+      <div class="hero-sel-row">
+        <div class="hero-search">
+          <span class="sidebar-search-ic">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </span>
+          <input type="text" id="city-search" placeholder="Buscar ciudad…" autocomplete="off" spellcheck="false"/>
+        </div>
+        <div class="hero-sel-info">
+          <span class="nav-city" id="nav-city">Movilidad Urbana</span>
+          <span class="nav-chip" id="nav-chip">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            18 ciudades EOD
+          </span>
+        </div>
+        <button id="shareBtnD" class="hero-share" type="button" aria-label="Compartir vista" title="Compartir URL">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          Compartir vista
+        </button>
+      </div>
     </div>
   </div>
 </header>
@@ -581,7 +645,7 @@ footer{
   <!-- ── Sidebar ──────────────────────────────────────────────────── -->
   <aside class="sidebar" id="sidebar" aria-label="Lista de ciudades">
     <div class="sidebar-hd">
-      <div class="sidebar-hd-row">
+      <div class="sidebar-hd-row" style="margin-bottom:0">
         <span class="sidebar-label">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
           Ciudades
@@ -589,12 +653,6 @@ footer{
         <button class="sidebar-close" id="sidebarClose" type="button" aria-label="Cerrar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
-      </div>
-      <div class="sidebar-search">
-        <span class="sidebar-search-ic">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        </span>
-        <input type="text" id="city-search" placeholder="Buscar ciudad…" autocomplete="off" spellcheck="false"/>
       </div>
     </div>
     <div id="city-list" class="city-list"></div>
