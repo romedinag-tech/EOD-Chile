@@ -861,20 +861,29 @@ function odCurve(a,b,curv){
 }
 
 function drawODLines(d){
-  // Escala efectiva: con zonificación fina los pares zona-zona son ruido →
-  // por defecto se agregan a sectores (macrozonas)
-  const escEff=odEsc==="auto"
-    ?((d.od_macro&&d.zonas&&d.zonas.length>120)?"sectores":"zonas")
-    :(odEsc==="sectores"&&!d.od_macro?"zonas":odEsc);
-  const usaSect=escEff==="sectores";
-  const flows=usaSect
-    ?(d.od_macro&&d.od_macro[odPer])||[]
+  // Escala efectiva: comunas en áreas metropolitanas, sectores con
+  // zonificación fina, zonas en el resto
+  const tieneCom=!!(d.od_comuna&&d.od_comuna.all&&d.od_comuna.all.length);
+  const cb=document.querySelector('#esc-ctrl button[data-esc="comunas"]');
+  if(cb)cb.style.display=tieneCom?"":"none";
+  let escEff=odEsc;
+  if(odEsc==="auto"){
+    escEff=(tieneCom&&d.od_comuna.ncom>=4)?"comunas"
+      :((d.od_macro&&d.zonas&&d.zonas.length>120)?"sectores":"zonas");
+  }else if(odEsc==="comunas"&&!tieneCom){
+    escEff=d.od_macro?"sectores":"zonas";
+  }else if(odEsc==="sectores"&&!d.od_macro){
+    escEff="zonas";
+  }
+  const usaAgg=escEff!=="zonas";
+  const flows=escEff==="comunas"?(d.od_comuna[odPer]||[])
+    :escEff==="sectores"?(d.od_macro&&d.od_macro[odPer])||[]
     :(odPer==="all"?d.od_top:(d.od_per&&d.od_per[odPer])||[]);
   if(!flows||!flows.length){
     odInfo.update(odPer==="all"?"Sin datos de flujos OD.":"Sin flujos para este período.");
     odLegend._d.innerHTML="";return;
   }
-  const uni=usaSect?"":"Zona ";
+  const uni=escEff==="zonas"?"Zona ":"";
   const perTxt=odPer==="all"?"":"<br><small>"+PER_LBL[odPer]+"</small>";
   // Agregar pares bidireccionales: A⇄B con flujo por sentido
   const agg={};
@@ -903,7 +912,7 @@ function drawODLines(d){
     const op=0.5+(p.total/maxT)*0.35;
     const line=L.polyline(pts,{color:lineCol,weight:w,opacity:op,lineCap:"round"});
     const tip=`<b>${uni}${p.o} ⇄ ${uni}${p.d}</b>${perTxt}`+
-      (usaSect?`<br><small>${p.no||"?"} y ${p.nd||"?"} zonas agrupadas</small>`:"")+
+      (usaAgg?`<br><small>${p.no||"?"} y ${p.nd||"?"} zonas agrupadas</small>`:"")+
       `<br>${p.o} → ${p.d}: <b>${p.ab.toLocaleString("es-CL")}</b>`+
       `<br>${p.d} → ${p.o}: <b>${p.ba.toLocaleString("es-CL")}</b>`+
       `<br>Total: <b>${p.total.toLocaleString("es-CL")} viajes</b>`;
@@ -925,9 +934,9 @@ function drawODLines(d){
     nodes.set(p.o,[p.olat,p.olng]);
     nodes.set(p.d,[p.dlat,p.dlng]);
   });
-  // Nodos en los centroides
+  // Nodos en los centroides (centro urbano poblacional)
   nodes.forEach((c,z)=>{
-    lyr.addLayer(L.circleMarker(c,{radius:usaSect?5:3.5,color:"#fff",weight:1.5,fillColor:arrowCol,fillOpacity:1})
+    lyr.addLayer(L.circleMarker(c,{radius:usaAgg?5:3.5,color:"#fff",weight:1.5,fillColor:arrowCol,fillOpacity:1})
       .bindTooltip(uni+z));
   });
   lyr.addTo(odMap);odLyr=lyr;
@@ -941,7 +950,8 @@ function drawODLines(d){
     </div>`;
   const note=document.getElementById("map-note");
   if(note)note.textContent="Mostrando "+pairs.length+" de "+totalPairs+" pares entre "
-    +(usaSect?"sectores (zonas agrupadas espacialmente)":"zonas")
+    +(escEff==="comunas"?"comunas (nodos en el centro urbano poblacional)"
+      :escEff==="sectores"?"sectores (zonas agrupadas espacialmente)":"zonas")
     +" · grosor proporcional al flujo total, flecha = sentido dominante"
     +(odPer==="all"?"":" · "+PER_LBL[odPer])+". Líneas de deseo — no representan rutas reales.";
   const pts=pairs.flatMap(p=>[[p.olat,p.olng],[p.dlat,p.dlng]]);
