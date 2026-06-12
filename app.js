@@ -849,6 +849,13 @@ async function renderComparadorChart(){
   }
   if(!document.getElementById("c-comparador"))
     wrap.innerHTML='<canvas id="c-comparador"></canvas>';
+  if(cmpVar==="multidim"){
+    document.getElementById("cmp-title").textContent="Perfil multidimensional por ciudad";
+    document.getElementById("cmp-lead").textContent="6 dimensiones normalizadas — 0 = mínimo, 100 = máximo entre las 18 ciudades";
+    wrap.style.height="460px";
+    renderComparadorRadar(S.index.filter(c=>slugs.includes(c.slug)));
+    return;
+  }
   await Promise.all(slugs.filter(s=>!S.data[s]).map(s=>fetchCityData(s)));
   const cities=slugs.map(s=>S.data[s]).filter(Boolean);if(!cities.length)return;
   wrap.style.height=Math.max(260,cities.length*34+80)+"px";
@@ -938,6 +945,71 @@ function renderComparadorSimple(cities){
       scales:{
         x:{display:false,max:maxVal*1.22},
         y:{ticks:{font:{size:11}},grid:{display:false}}
+      }
+    }
+  });
+}
+
+const RADAR_DIMS=[
+  {key:"pct_publico",      label:"% Público",    hi:true,  fmt:v=>fmt(v,1)+"%"},
+  {key:"pct_no_motorizado",label:"% No motor.",  hi:true,  fmt:v=>fmt(v,1)+"%"},
+  {key:"viajes_persona",   label:"V/persona",    hi:true,  fmt:v=>fmt(v,2)},
+  {key:"dist_mediana",     label:"Compacidad",   hi:false, fmt:v=>fmt(v,1)+" km"},
+  {key:"tiempo_medio_min", label:"Rapidez",      hi:false, fmt:v=>fmt(v,0)+" min"},
+  {key:"pct_trabajo",      label:"% Trabajo",    hi:true,  fmt:v=>fmt(v,1)+"%"},
+];
+
+function renderComparadorRadar(cities){
+  const ctx=document.getElementById("c-comparador");if(!ctx)return;
+  if(CH["c-comparador"])CH["c-comparador"].destroy();
+  const dimStats=RADAR_DIMS.map(d=>{
+    const vals=S.index.map(c=>c[d.key]).filter(v=>v!=null);
+    return {mn:Math.min(...vals),mx:Math.max(...vals)};
+  });
+  const PALETTE=[NAVY,OR,GREEN,TEAL,RED,"#8b5cf6","#ec4899"];
+  const dk=isDark();
+  const gridClr=dk?"rgba(48,54,61,.8)":"rgba(0,0,0,.1)";
+  const lblClr=dk?"#c9d1d9":"#334155";
+  CH["c-comparador"]=new Chart(ctx,{
+    type:"radar",
+    data:{
+      labels:RADAR_DIMS.map(d=>d.label),
+      datasets:cities.map((city,i)=>({
+        label:city.ciudad,
+        data:RADAR_DIMS.map((d,j)=>{
+          const v=city[d.key];if(v==null)return null;
+          const {mn,mx}=dimStats[j];
+          const pct=mx===mn?50:(v-mn)/(mx-mn)*100;
+          return Math.round(d.hi?pct:100-pct);
+        }),
+        backgroundColor:PALETTE[i%PALETTE.length]+"28",
+        borderColor:PALETTE[i%PALETTE.length],
+        borderWidth:2,pointRadius:4,pointHoverRadius:7,
+      }))
+    },
+    options:{
+      maintainAspectRatio:false,
+      scales:{r:{
+        min:0,max:100,
+        ticks:{display:false,stepSize:25},
+        pointLabels:{font:{size:12,weight:"700"},color:lblClr},
+        grid:{color:gridClr},
+        angleLines:{color:gridClr},
+      }},
+      plugins:{
+        legend:{display:true,position:"bottom",
+          labels:{usePointStyle:true,boxWidth:8,padding:10,font:{size:11}}},
+        datalabels:{display:false},
+        tooltip:{callbacks:{
+          title:items=>"Dimensión: "+items[0].label,
+          label:c=>{
+            const d=RADAR_DIMS[c.dataIndex];
+            const raw=cities[c.datasetIndex]?.[d.key];
+            const hint=d.hi?"↑ mejor":"↓ mejor";
+            return " "+c.dataset.label+": "+(raw!=null?d.fmt(raw):"s/d")
+              +" (score "+c.parsed.r+" · "+hint+")";
+          }
+        }}
       }
     }
   });
