@@ -333,7 +333,7 @@ function renderResumen(d){
     <div class="kpi" style="--kpi-c:var(--navy2)"><div class="v c-navy">${pct(k.pct_publico)}</div><div class="l">Transporte público</div><div class="s">% del total</div></div>
     <div class="kpi" style="--kpi-c:var(--red)"><div class="v red">${pct(k.pct_privado)}</div><div class="l">Transporte privado</div><div class="s">automóvil y moto</div></div>
     <div class="kpi" style="--kpi-c:var(--green)"><div class="v green">${pct(k.pct_caminata)}</div><div class="l">Caminata</div><div class="s">viajes a pie</div></div>
-    <div class="kpi" style="--kpi-c:var(--green)"><div class="v" style="color:${LIME}">${pct(k.pct_bicicleta)}</div><div class="l">Bicicleta</div><div class="s">y otros ciclos</div></div>`;
+    <div class="kpi" style="--kpi-c:var(--green)"><div class="v lime">${pct(k.pct_bicicleta)}</div><div class="l">Bicicleta</div><div class="s">y otros ciclos</div></div>`;
 
   if(k.dist_mediana!=null)
     html+=`<div class="kpi" style="--kpi-c:var(--or)"><div class="v or">${fmt(k.dist_mediana,1)} km</div><div class="l">Distancia mediana</div><div class="s">centroide a centroide</div></div>`;
@@ -360,14 +360,32 @@ document.querySelectorAll("#hor-seg button").forEach(b=>
     if(S.sel)renderHorario(S.sel);
   });
 
+// Ticks de hora: mostrar solo horas pares para no saturar el eje
+function hourTicks(){
+  return {
+    font:{size:10},autoSkip:false,maxRotation:0,
+    callback:function(v,i){return i%2===0?this.getLabelForValue(v):"";}
+  };
+}
+// Título de tooltip con rango horario real
+function hourTooltipTitle(items){
+  const h=parseInt(items[0].label);
+  if(isNaN(h))return items[0].label;
+  const p=String(h).padStart(2,"0");
+  return p+":00 – "+p+":59";
+}
+
 function renderHorario(d){
   const ctx=document.getElementById("c-horario");if(!ctx)return;
   if(CH.horario){CH.horario.destroy();CH.horario=null;}
   const sep=isDark()?"#161b22":"#ffffff";
   const segData=horSeg==="modo"?d.horario_modal:
                 horSeg==="proposito"?d.horario_proposito:null;
+  const showTotal=horSeg==="total"||!segData;
+  const leg=document.getElementById("hor-leyenda");
+  if(leg)leg.style.display=showTotal?"":"none";
 
-  if(horSeg!=="total"&&segData){
+  if(!showTotal){
     CH.horario=new Chart(ctx,{
       type:"bar",
       data:{
@@ -383,10 +401,13 @@ function renderHorario(d){
         plugins:{
           legend:{display:true,position:"bottom",labels:{usePointStyle:true,boxWidth:8,padding:10,font:{size:11}}},
           datalabels:{display:false},
-          tooltip:{callbacks:{label:c=>c.dataset.label+": "+c.parsed.y.toFixed(2)+"% del día"}}
+          tooltip:{callbacks:{
+            title:hourTooltipTitle,
+            label:c=>c.dataset.label+": "+c.parsed.y.toFixed(2)+"% del día"
+          }}
         },
         scales:{
-          x:{stacked:true,ticks:{font:{size:10}},grid:{display:false}},
+          x:{stacked:true,ticks:hourTicks(),grid:{display:false}},
           y:{stacked:true,ticks:{callback:v=>v+"%",font:{size:10}},grid:{color:"rgba(20,40,70,.05)"}}
         }
       }
@@ -411,10 +432,13 @@ function renderHorario(d){
       plugins:{
         legend:{display:false},
         datalabels:{display:false},
-        tooltip:{callbacks:{label:c=>c.parsed.y.toFixed(2)+"% de los viajes"}}
+        tooltip:{callbacks:{
+          title:hourTooltipTitle,
+          label:c=>c.parsed.y.toFixed(2)+"% de los viajes"
+        }}
       },
       scales:{
-        x:{ticks:{font:{size:11}},grid:{display:false}},
+        x:{ticks:hourTicks(),grid:{display:false}},
         y:{ticks:{callback:v=>v+"%"},grid:{color:"rgba(20,40,70,.05)"}}
       }
     }
@@ -550,32 +574,53 @@ function renderDistancia(d){
 
   if(!d.distancia||!d.distancia.length)return;
   const maxV=Math.max(...d.distancia.map(t=>t.pct||0));
+  // % acumulado: qué proporción de los viajes recorre hasta ese tramo
+  let acc=0;
+  const cum=d.distancia.map(t=>{acc+=t.pct||0;return Math.round(acc*10)/10;});
+  const lineColor=isDark()?"#79c0ff":NAVY2;
   CH["c-distancia"]=new Chart(ctx,{
     type:"bar",
     data:{
       labels:d.distancia.map(t=>t.tramo+" km"),
-      datasets:[{
-        data:d.distancia.map(t=>t.pct),
-        backgroundColor:d.distancia.map(t=>TRAMO_PAL[t.tramo]||"#41ab5d"),
-        borderColor:sep,borderWidth:1,borderSkipped:false,
-        barPercentage:1,categoryPercentage:1
-      }]
+      datasets:[
+        {
+          data:d.distancia.map(t=>t.pct),
+          backgroundColor:d.distancia.map(t=>TRAMO_PAL[t.tramo]||"#41ab5d"),
+          borderColor:sep,borderWidth:1,borderSkipped:false,
+          barPercentage:1,categoryPercentage:1,order:2,
+          datalabels:{
+            display:true,anchor:"end",align:"end",clamp:true,
+            color:lblColor,font:{size:10,weight:"700"},
+            formatter:v=>v>0.5?fmt(v,1)+"%":""
+          }
+        },
+        {
+          type:"line",label:"% acumulado",data:cum,
+          borderColor:lineColor,borderWidth:2,borderDash:[5,4],
+          pointRadius:3,pointBackgroundColor:lineColor,
+          tension:0.35,yAxisID:"y1",order:1,
+          datalabels:{display:false}
+        }
+      ]
     },
     options:{
       maintainAspectRatio:false,
       plugins:{
-        legend:{display:false},
-        datalabels:{
-          display:true,anchor:"end",align:"end",clamp:true,
-          color:lblColor,
-          font:{size:10,weight:"700"},
-          formatter:v=>v>0.5?fmt(v,1)+"%":""
+        legend:{
+          display:true,position:"bottom",
+          labels:{usePointStyle:true,boxWidth:8,padding:8,font:{size:11},
+            filter:item=>item.text==="% acumulado"}
         },
-        tooltip:{callbacks:{label:c=>c.parsed.y.toFixed(1)+"% de los viajes"}}
+        tooltip:{callbacks:{
+          label:c=>c.dataset.label==="% acumulado"
+            ?"Acumulado: "+fmt(c.parsed.y,1)+"% de los viajes hasta este tramo"
+            :fmt(c.parsed.y,1)+"% de los viajes"
+        }}
       },
       scales:{
         x:{ticks:{font:{size:11}},grid:{display:false}},
-        y:{display:false,max:maxV*1.3}
+        y:{display:false,max:maxV*1.3},
+        y1:{display:false,min:0,max:108}
       }
     }
   });
@@ -614,13 +659,22 @@ function renderHorarioModal(d){
   if(CH["c-horario-modal"])CH["c-horario-modal"].destroy();
   const ctx=document.getElementById("c-horario-modal");if(!ctx)return;
   const{labels,datasets}=d.horario_modal;
+  // Composición modal: normalizar cada hora a 100% (la magnitud horaria ya
+  // está en el histograma del Resumen; aquí interesa el mix de modos)
+  const totals=labels.map((_,i)=>datasets.reduce((a,ds)=>a+(ds.data[i]||0),0));
+  const norm=datasets.map(ds=>({
+    label:ds.label,color:ds.color,
+    data:ds.data.map((v,i)=>totals[i]>0.05?Math.round((v||0)/totals[i]*1000)/10:null)
+  }));
+  const sep=isDark()?"#161b22":"#ffffff";
   CH["c-horario-modal"]=new Chart(ctx,{
     type:"bar",
     data:{
       labels,
-      datasets:datasets.map(ds=>({
-        label:ds.label,data:ds.data,
-        backgroundColor:ds.color,borderWidth:0,
+      datasets:norm.map(ds=>({
+        label:ds.label,data:ds.data,backgroundColor:ds.color,
+        borderColor:sep,borderWidth:1,borderSkipped:false,
+        barPercentage:1,categoryPercentage:1
       }))
     },
     options:{
@@ -628,11 +682,14 @@ function renderHorarioModal(d){
       plugins:{
         legend:{display:true,position:"bottom",labels:{usePointStyle:true,boxWidth:8,padding:12,font:{size:11}}},
         datalabels:{display:false},
-        tooltip:{callbacks:{label:c=>c.dataset.label+": "+c.parsed.y.toFixed(2)+"% del día"}}
+        tooltip:{callbacks:{
+          title:hourTooltipTitle,
+          label:c=>c.dataset.label+": "+fmt(c.parsed.y,1)+"% de los viajes de esa hora"
+        }}
       },
       scales:{
-        x:{stacked:true,ticks:{font:{size:10}},grid:{display:false}},
-        y:{stacked:true,ticks:{callback:v=>v+"%",font:{size:10}},grid:{color:"rgba(20,40,70,.05)"}}
+        x:{stacked:true,ticks:hourTicks(),grid:{display:false}},
+        y:{stacked:true,min:0,max:100,ticks:{callback:v=>v+"%",font:{size:10},stepSize:25},grid:{color:"rgba(20,40,70,.05)"}}
       }
     }
   });
@@ -918,14 +975,15 @@ function renderNacModal(){
   const avg=f=>{const l=S.index.filter(c=>c[f]!=null);return l.length?l.reduce((a,c)=>a+c[f],0)/l.length:0;};
   const pub=avg("pct_publico"),priv=avg("pct_privado"),
         cam=avg("pct_caminata"),bic=avg("pct_bicicleta");
+  const resto=Math.max(0,100-(pub+priv+cam+bic));
   if(CH["c-nac-modal"])CH["c-nac-modal"].destroy();
   CH["c-nac-modal"]=new Chart(ctx,{
     type:"doughnut",
     data:{
-      labels:["Público","Privado","Caminata","Bicicleta"],
+      labels:["Público","Privado","Caminata","Bicicleta","Combinado y otros"],
       datasets:[{
-        data:[pub,priv,cam,bic].map(v=>Math.round(v*10)/10),
-        backgroundColor:[NAVY,RED,GREEN,LIME],
+        data:[pub,priv,cam,bic,resto].map(v=>Math.round(v*10)/10),
+        backgroundColor:[NAVY,RED,GREEN,LIME,GREY],
         borderWidth:0,hoverOffset:8
       }]
     },
@@ -1188,7 +1246,12 @@ function _updateRankTitle(){
   const h3=document.getElementById("rank-title");
   const p=document.getElementById("rank-lead");
   if(h3)h3.textContent="Ranking: "+(meta.label||rankInd);
-  if(p)p.textContent="18 ciudades ordenadas de "+(rankAsc?"menor a mayor":"mayor a menor")+".";
+  if(p){
+    const vals=S.index.map(c=>c[rankInd]).filter(v=>v!=null);
+    const prom=vals.length?vals.reduce((a,v)=>a+v,0)/vals.length:null;
+    p.textContent="18 ciudades ordenadas de "+(rankAsc?"menor a mayor":"mayor a menor")
+      +(prom!=null&&meta.fmt?" · promedio nacional: "+meta.fmt(prom):"")+".";
+  }
 }
 
 function renderRankingChart(){
