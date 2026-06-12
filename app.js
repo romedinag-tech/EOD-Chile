@@ -6,11 +6,13 @@
 
 // ── Constantes de color ──────────────────────────────────────────────────────
 const NAVY="#0f2942", NAVY2="#1a4068", OR="#d97706", TEAL="#0891b2",
-      GREEN="#16a34a", RED="#dc2626", GREY="#94a3b8";
+      GREEN="#16a34a", RED="#dc2626", GREY="#94a3b8", LIME="#65a30d";
 
 const MODO_COL={
   "Público":       NAVY,
   "Privado":       RED,
+  "Caminata":      GREEN,
+  "Bicicleta":     LIME,
   "No motorizado": GREEN,
   "Combinado":     OR,
   "Otro":          GREY
@@ -59,6 +61,9 @@ let mapView="gen";
 let nacMap=null, nacMapLyr=null;
 let cmpVar="modal", cmpBuilt=false, cmpIndSel="pct_publico";
 let rankInd="pct_publico", rankAsc=false;
+let horSeg="total", distSeg="total";
+let odPer="all", odTopN=50;
+const PER_LBL={all:"Día completo",pm:"Punta mañana",pmd:"Punta mediodía",pt:"Punta tarde",fp:"Fuera de punta"};
 
 // ── Utilidades ───────────────────────────────────────────────────────────────
 function getJSON(url){
@@ -122,7 +127,8 @@ function rerenderActive(){
     if(t==="ingreso")    renderIngreso(S.sel);
     if(t==="mapas")      drawMapView(S.sel);
   }
-  if(t==="nacional") renderNacional();
+  if(t==="nacional")   renderNacional();
+  if(t==="comparador") renderComparador();
 }
 
 function setTheme(dark){
@@ -189,6 +195,7 @@ function activateTab(t){
   if(t==="ingreso"&&S.sel)    renderIngreso(S.sel);
   if(t==="mapas"&&S.sel)      renderMapas(S.sel);
   if(t==="nacional")          renderNacional();
+  if(t==="comparador")        renderComparador();
   writeURL();
 }
 
@@ -310,6 +317,7 @@ function render(){
   else if(t==="ingreso")    renderIngreso(d);
   else if(t==="mapas")      renderMapas(d);
   else if(t==="nacional")   renderNacional();
+  else if(t==="comparador") renderComparador();
   writeURL();
 }
 
@@ -324,7 +332,8 @@ function renderResumen(d){
     <div class="kpi" style="--kpi-c:var(--mut3)"><div class="v">${k.tiempo_medio_min!=null?fmt(k.tiempo_medio_min,0)+" min":"s/d"}</div><div class="l">Tiempo medio de viaje</div><div class="s">minutos por viaje</div></div>
     <div class="kpi" style="--kpi-c:var(--navy2)"><div class="v c-navy">${pct(k.pct_publico)}</div><div class="l">Transporte público</div><div class="s">% del total</div></div>
     <div class="kpi" style="--kpi-c:var(--red)"><div class="v red">${pct(k.pct_privado)}</div><div class="l">Transporte privado</div><div class="s">automóvil y moto</div></div>
-    <div class="kpi" style="--kpi-c:var(--green)"><div class="v green">${pct(k.pct_no_motorizado)}</div><div class="l">No motorizado</div><div class="s">caminata y bicicleta</div></div>`;
+    <div class="kpi" style="--kpi-c:var(--green)"><div class="v green">${pct(k.pct_caminata)}</div><div class="l">Caminata</div><div class="s">viajes a pie</div></div>
+    <div class="kpi" style="--kpi-c:var(--green)"><div class="v" style="color:${LIME}">${pct(k.pct_bicicleta)}</div><div class="l">Bicicleta</div><div class="s">y otros ciclos</div></div>`;
 
   if(k.dist_mediana!=null)
     html+=`<div class="kpi" style="--kpi-c:var(--or)"><div class="v or">${fmt(k.dist_mediana,1)} km</div><div class="l">Distancia mediana</div><div class="s">centroide a centroide</div></div>`;
@@ -339,38 +348,77 @@ function renderResumen(d){
 
   document.getElementById("res-kpis").innerHTML=html;
 
-  // horario total
-  if(d.horario&&d.horario.length){
-    if(CH.horario)CH.horario.destroy();
-    const ctx=document.getElementById("c-horario");if(ctx){
-      CH.horario=new Chart(ctx,{
-        type:"bar",
-        data:{
-          labels:d.horario.map(h=>h.h+"h"),
-          datasets:[{
-            data:d.horario.map(h=>h.pct),
-            backgroundColor:d.horario.map(h=>horaColor(h.h)),
-            borderWidth:0,borderRadius:3
-          }]
+  renderHorario(d);
+  renderDistancia(d);
+}
+
+// ── Histograma horario (total / por modo / por propósito) ────────────────────
+document.querySelectorAll("#hor-seg button").forEach(b=>
+  b.onclick=()=>{
+    horSeg=b.dataset.hseg;
+    document.querySelectorAll("#hor-seg button").forEach(x=>x.classList.toggle("on",x===b));
+    if(S.sel)renderHorario(S.sel);
+  });
+
+function renderHorario(d){
+  const ctx=document.getElementById("c-horario");if(!ctx)return;
+  if(CH.horario){CH.horario.destroy();CH.horario=null;}
+  const sep=isDark()?"#161b22":"#ffffff";
+  const segData=horSeg==="modo"?d.horario_modal:
+                horSeg==="proposito"?d.horario_proposito:null;
+
+  if(horSeg!=="total"&&segData){
+    CH.horario=new Chart(ctx,{
+      type:"bar",
+      data:{
+        labels:segData.labels,
+        datasets:segData.datasets.map(ds=>({
+          label:ds.label,data:ds.data,backgroundColor:ds.color,
+          borderColor:sep,borderWidth:1,borderSkipped:false,
+          barPercentage:1,categoryPercentage:1
+        }))
+      },
+      options:{
+        maintainAspectRatio:false,
+        plugins:{
+          legend:{display:true,position:"bottom",labels:{usePointStyle:true,boxWidth:8,padding:10,font:{size:11}}},
+          datalabels:{display:false},
+          tooltip:{callbacks:{label:c=>c.dataset.label+": "+c.parsed.y.toFixed(2)+"% del día"}}
         },
-        options:{
-          maintainAspectRatio:false,
-          plugins:{
-            legend:{display:false},
-            datalabels:{display:false},
-            tooltip:{callbacks:{label:c=>c.parsed.y.toFixed(2)+"% de los viajes"}}
-          },
-          scales:{
-            x:{ticks:{font:{size:11}},grid:{display:false}},
-            y:{ticks:{callback:v=>v+"%"},grid:{color:"rgba(20,40,70,.05)"}}
-          }
+        scales:{
+          x:{stacked:true,ticks:{font:{size:10}},grid:{display:false}},
+          y:{stacked:true,ticks:{callback:v=>v+"%",font:{size:10}},grid:{color:"rgba(20,40,70,.05)"}}
         }
-      });
-    }
+      }
+    });
+    return;
   }
 
-  // distancia
-  renderDistancia(d);
+  if(!d.horario||!d.horario.length)return;
+  CH.horario=new Chart(ctx,{
+    type:"bar",
+    data:{
+      labels:d.horario.map(h=>h.h+"h"),
+      datasets:[{
+        data:d.horario.map(h=>h.pct),
+        backgroundColor:d.horario.map(h=>horaColor(h.h)),
+        borderColor:sep,borderWidth:1,borderSkipped:false,
+        barPercentage:1,categoryPercentage:1
+      }]
+    },
+    options:{
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        datalabels:{display:false},
+        tooltip:{callbacks:{label:c=>c.parsed.y.toFixed(2)+"% de los viajes"}}
+      },
+      scales:{
+        x:{ticks:{font:{size:11}},grid:{display:false}},
+        y:{ticks:{callback:v=>v+"%"},grid:{color:"rgba(20,40,70,.05)"}}
+      }
+    }
+  });
 }
 
 // ── Barras horizontales simples (hBarChart) ──────────────────────────────────
@@ -442,11 +490,65 @@ function stackedBar(id,chartData){
   });
 }
 
-// ── Distribución por distancia ────────────────────────────────────────────────
+// ── Distribución por distancia (total / desglose modal) ──────────────────────
+document.querySelectorAll("#dist-seg button").forEach(b=>
+  b.onclick=()=>{
+    distSeg=b.dataset.dseg;
+    document.querySelectorAll("#dist-seg button").forEach(x=>x.classList.toggle("on",x===b));
+    if(S.sel)renderDistancia(S.sel);
+  });
+
 function renderDistancia(d){
-  if(!d.distancia||!d.distancia.length)return;
-  if(CH["c-distancia"])CH["c-distancia"].destroy();
   const ctx=document.getElementById("c-distancia");if(!ctx)return;
+  if(CH["c-distancia"]){CH["c-distancia"].destroy();CH["c-distancia"]=null;}
+  const sep=isDark()?"#161b22":"#ffffff";
+  const lblColor=isDark()?"#8b949e":"#64748b";
+
+  if(distSeg==="modo"&&d.dist_modal){
+    const dm=d.dist_modal;
+    const totals=dm.labels.map((_,i)=>dm.datasets.reduce((a,ds)=>a+(ds.data[i]||0),0));
+    const maxT=Math.max(...totals);
+    CH["c-distancia"]=new Chart(ctx,{
+      type:"bar",
+      data:{
+        labels:dm.labels.map(t=>t+" km"),
+        datasets:dm.datasets.map(ds=>({
+          label:ds.label,data:ds.data,backgroundColor:ds.color,
+          borderColor:sep,borderWidth:1,borderSkipped:false,
+          barPercentage:1,categoryPercentage:1
+        }))
+      },
+      options:{
+        maintainAspectRatio:false,
+        plugins:{
+          legend:{display:true,position:"bottom",labels:{usePointStyle:true,boxWidth:8,padding:10,font:{size:11}}},
+          datalabels:{
+            display:c=>c.datasetIndex===c.chart.data.datasets.length-1,
+            anchor:"end",align:"end",clamp:true,
+            color:lblColor,font:{size:10,weight:"700"},
+            formatter:(v,c)=>{
+              const t=c.chart.data.datasets.reduce((a,ds)=>a+(ds.data[c.dataIndex]||0),0);
+              return t>0.5?fmt(t,1)+"%":"";
+            }
+          },
+          tooltip:{callbacks:{
+            label:c=>{
+              const t=c.chart.data.datasets.reduce((a,ds)=>a+(ds.data[c.dataIndex]||0),0);
+              const share=t>0?c.parsed.y/t*100:0;
+              return c.dataset.label+": "+fmt(c.parsed.y,1)+"% del total · "+fmt(share,0)+"% del tramo";
+            }
+          }}
+        },
+        scales:{
+          x:{stacked:true,ticks:{font:{size:11}},grid:{display:false}},
+          y:{stacked:true,display:false,max:maxT*1.3}
+        }
+      }
+    });
+    return;
+  }
+
+  if(!d.distancia||!d.distancia.length)return;
   const maxV=Math.max(...d.distancia.map(t=>t.pct||0));
   CH["c-distancia"]=new Chart(ctx,{
     type:"bar",
@@ -455,7 +557,8 @@ function renderDistancia(d){
       datasets:[{
         data:d.distancia.map(t=>t.pct),
         backgroundColor:d.distancia.map(t=>TRAMO_PAL[t.tramo]||"#41ab5d"),
-        borderWidth:0,borderRadius:3,
+        borderColor:sep,borderWidth:1,borderSkipped:false,
+        barPercentage:1,categoryPercentage:1
       }]
     },
     options:{
@@ -464,7 +567,7 @@ function renderDistancia(d){
         legend:{display:false},
         datalabels:{
           display:true,anchor:"end",align:"end",clamp:true,
-          color:isDark()?"#8b949e":"#64748b",
+          color:lblColor,
           font:{size:10,weight:"700"},
           formatter:v=>v>0.5?fmt(v,1)+"%":""
         },
@@ -564,22 +667,50 @@ function renderIngreso(d){
 const MAP_DESC={
   gen:"Viajes <b>generados</b> por zona (salidas desde el origen). Círculos anaranjados proporcionales al volumen.",
   atr:"Viajes <b>atraídos</b> por zona (llegadas al destino). Círculos azules proporcionales al volumen.",
-  od :"Top 150 pares OD por volumen. Líneas de deseo entre origen y destino; grosor proporcional al flujo."
+  od :"Pares OD principales por volumen. Líneas de deseo entre origen y destino; grosor proporcional al flujo. Ajusta cuántos pares ver con el control «Pares OD»."
 };
 const MAP_NOTE={
   gen:"Fuente: EOD procesada. Círculos proporcionales al volumen de viajes generado (factor de expansión).",
   atr:"Fuente: EOD procesada. Círculos proporcionales al volumen de viajes atraído (factor de expansión).",
-  od :"Top 150 pares OD por volumen de viajes expandidos. Las líneas son de deseo — no representan rutas reales."
+  od :"Pares OD por volumen de viajes expandidos. Las líneas son de deseo — no representan rutas reales."
 };
 
 document.querySelectorAll(".ctrl button[data-view]").forEach(b=>
   b.onclick=()=>setMapView(b.dataset.view));
 
+document.querySelectorAll("#per-ctrl button").forEach(b=>
+  b.onclick=()=>{
+    odPer=b.dataset.per;
+    document.querySelectorAll("#per-ctrl button").forEach(x=>x.classList.toggle("on",x===b));
+    updateMapNote();
+    if(S.sel)drawMapView(S.sel);
+  });
+
+(function(){
+  const r=document.getElementById("od-n");if(!r)return;
+  r.addEventListener("input",()=>{
+    odTopN=+r.value;
+    const v=document.getElementById("od-n-val");if(v)v.textContent=odTopN;
+    updateMapNote();
+    if(S.sel&&mapView==="od")drawMapView(S.sel);
+  });
+})();
+
+function updateMapNote(){
+  const note=document.getElementById("map-note");if(!note)return;
+  const per=odPer==="all"?"":" · "+PER_LBL[odPer];
+  note.textContent=mapView==="od"
+    ?`Top ${odTopN} pares OD por volumen de viajes expandidos${per}. Grosor proporcional al flujo — las líneas son de deseo, no rutas reales.`
+    :MAP_NOTE[mapView]+(per?" Período:"+per.slice(2)+".":"");
+}
+
 function setMapView(v){
   mapView=v;
   document.querySelectorAll(".ctrl button[data-view]").forEach(b=>b.classList.toggle("on",b.dataset.view===v));
   document.getElementById("map-desc").innerHTML=MAP_DESC[v];
-  document.getElementById("map-note").textContent=MAP_NOTE[v];
+  const nw=document.getElementById("odn-wrap");
+  if(nw)nw.style.display=v==="od"?"":"none";
+  updateMapNote();
   if(S.sel)drawMapView(S.sel);
 }
 
@@ -607,13 +738,19 @@ function drawMapView(d){
 function drawCircles(d,view){
   const zones=d.zonas;
   if(!zones||!zones.length){odInfo.update("Sin datos de zonas.");return;}
-  const vals=zones.map(z=>view==="gen"?z.gen:z.atr);
-  const maxVal=Math.max(...vals)||1;
+  const getV=z=>{
+    if(odPer==="all")return view==="gen"?z.gen:z.atr;
+    const p=z.per&&z.per[odPer];
+    return p?(view==="gen"?p[0]:p[1]):0;
+  };
+  const maxVal=Math.max(...zones.map(getV));
   const color=view==="gen"?OR:NAVY;
   const lbl=view==="gen"?"Generación":"Atracción";
+  const perTxt=odPer==="all"?"":"<br><small>"+PER_LBL[odPer]+"</small>";
+  if(!maxVal){odInfo.update("Sin datos para este período.");odLegend._d.innerHTML="";return;}
   const lyr=L.layerGroup();
   zones.forEach(z=>{
-    const val=view==="gen"?z.gen:z.atr;if(!val)return;
+    const val=getV(z);if(!val)return;
     const r=4+Math.sqrt(val/maxVal)*22;
     const m=L.circleMarker([z.lat,z.lng],{
       radius:r,color:"rgba(255,255,255,.55)",weight:1,
@@ -621,10 +758,10 @@ function drawCircles(d,view){
     });
     m.on("mouseover",()=>{
       m.setStyle({fillOpacity:.92,weight:2});
-      odInfo.update(`<b>Zona ${z.zona}</b><br>${lbl}:<br><b>${val.toLocaleString("es-CL")} viajes</b><br><small>Gen: ${z.gen.toLocaleString("es-CL")} · Atr: ${z.atr.toLocaleString("es-CL")}</small>`);
+      odInfo.update(`<b>Zona ${z.zona}</b>${perTxt}<br>${lbl}:<br><b>${val.toLocaleString("es-CL")} viajes</b>`);
     });
     m.on("mouseout",()=>{m.setStyle({fillOpacity:.72,weight:1});odInfo.update(null);});
-    m.bindPopup(`<b>Zona ${z.zona}</b><br>${lbl}: <b>${val.toLocaleString("es-CL")} viajes</b>`);
+    m.bindPopup(`<b>Zona ${z.zona}</b>${perTxt}<br>${lbl}: <b>${val.toLocaleString("es-CL")} viajes</b>`);
     lyr.addLayer(m);
   });
   lyr.addTo(odMap);odLyr=lyr;
@@ -633,25 +770,30 @@ function drawCircles(d,view){
       `<div style="display:flex;align-items:center;gap:7px;margin:3px 0">
         <span style="display:inline-block;width:${sz}px;height:${sz}px;border-radius:50%;background:${color};opacity:${op}"></span>${lab}
       </div>`).join("");
-  const pts=zones.filter(z=>(view==="gen"?z.gen:z.atr)>0).map(z=>[z.lat,z.lng]);
+  const pts=zones.filter(z=>getV(z)>0).map(z=>[z.lat,z.lng]);
   if(pts.length)odMap.fitBounds(L.latLngBounds(pts).pad(0.1));
 }
 
 function drawODLines(d){
-  const flows=d.od_top;
-  if(!flows||!flows.length){odInfo.update("Sin datos de flujos OD.");return;}
+  let flows=odPer==="all"?d.od_top:(d.od_per&&d.od_per[odPer])||[];
+  if(!flows||!flows.length){
+    odInfo.update(odPer==="all"?"Sin datos de flujos OD.":"Sin flujos para este período.");
+    odLegend._d.innerHTML="";return;
+  }
+  flows=flows.slice(0,odTopN);
+  const perTxt=odPer==="all"?"":"<br><small>"+PER_LBL[odPer]+"</small>";
   const maxN=Math.max(...flows.map(f=>f.n))||1;
   const lyr=L.layerGroup();
   flows.forEach(f=>{
-    const w=0.8+Math.sqrt(f.n/maxN)*5.5;
-    const op=0.18+(f.n/maxN)*0.68;
+    const w=0.7+(f.n/maxN)*7;
+    const op=0.2+(f.n/maxN)*0.65;
     const line=L.polyline([[f.olat,f.olng],[f.dlat,f.dlng]],{color:NAVY2,weight:w,opacity:op});
     line.on("mouseover",()=>{
       line.setStyle({color:OR,opacity:Math.min(op+0.3,1),weight:w+1.5});
-      odInfo.update(`<b>Zona ${f.o} → ${f.d}</b><br>Flujo: <b>${f.n.toLocaleString("es-CL")} viajes</b>`);
+      odInfo.update(`<b>Zona ${f.o} → ${f.d}</b>${perTxt}<br>Flujo: <b>${f.n.toLocaleString("es-CL")} viajes</b>`);
     });
     line.on("mouseout",()=>{line.setStyle({color:NAVY2,opacity:op,weight:w});odInfo.update(null);});
-    line.bindPopup(`<b>${f.o} → ${f.d}</b><br>${f.n.toLocaleString("es-CL")} viajes`);
+    line.bindPopup(`<b>${f.o} → ${f.d}</b>${perTxt}<br>${f.n.toLocaleString("es-CL")} viajes`);
     lyr.addLayer(line);
   });
   lyr.addTo(odMap);odLyr=lyr;
@@ -677,9 +819,8 @@ function renderNacional(){
       b.onclick=()=>{
         document.querySelectorAll("#nac-subtabs button").forEach(x=>x.classList.toggle("on",x===b));
         document.querySelectorAll("#p-nacional .sub-panel").forEach(p=>p.classList.toggle("on",p.id==="sp-"+b.dataset.sub));
-        if(b.dataset.sub==="panorama")  renderPanorama();
-        if(b.dataset.sub==="comparador")renderComparador();
-        if(b.dataset.sub==="ranking")   renderRanking();
+        if(b.dataset.sub==="panorama")renderPanorama();
+        if(b.dataset.sub==="ranking") renderRanking();
       };
     });
   }
@@ -775,15 +916,16 @@ function renderNacModal(){
   if(!S.index.length)return;
   const ctx=document.getElementById("c-nac-modal");if(!ctx)return;
   const avg=f=>{const l=S.index.filter(c=>c[f]!=null);return l.length?l.reduce((a,c)=>a+c[f],0)/l.length:0;};
-  const pub=avg("pct_publico"),priv=avg("pct_privado"),nom=avg("pct_no_motorizado");
+  const pub=avg("pct_publico"),priv=avg("pct_privado"),
+        cam=avg("pct_caminata"),bic=avg("pct_bicicleta");
   if(CH["c-nac-modal"])CH["c-nac-modal"].destroy();
   CH["c-nac-modal"]=new Chart(ctx,{
     type:"doughnut",
     data:{
-      labels:["Público","Privado","No motorizado"],
+      labels:["Público","Privado","Caminata","Bicicleta"],
       datasets:[{
-        data:[pub,priv,nom].map(v=>Math.round(v*10)/10),
-        backgroundColor:[NAVY,RED,GREEN],
+        data:[pub,priv,cam,bic].map(v=>Math.round(v*10)/10),
+        backgroundColor:[NAVY,RED,GREEN,LIME],
         borderWidth:0,hoverOffset:8
       }]
     },
@@ -869,7 +1011,7 @@ async function renderComparadorChart(){
     "Comparativa de "+(CMP_IND[cmpIndSel]||{label:""}).label.toLowerCase()+" entre ciudades";
   if(cmpVar==="indicadores"){renderComparadorSimple(cities);return;}
   const isModal=cmpVar==="modal";
-  const keys=isModal?["Público","Privado","No motorizado","Combinado","Otro"]:["Trabajo","Estudio","Otro"];
+  const keys=isModal?["Público","Privado","Caminata","Bicicleta","Combinado","Otro"]:["Trabajo","Estudio","Otro"];
   const cols=isModal?MODO_COL:PROP_COL;
   renderComparadorStacked(
     cities.map(d=>d.ciudad),
@@ -885,6 +1027,8 @@ async function renderComparadorChart(){
 
 const CMP_IND={
   pct_publico:{label:"% Público",fmt:v=>fmt(v,1)+"%",color:NAVY},
+  pct_caminata:{label:"% Caminata",fmt:v=>fmt(v,1)+"%",color:GREEN},
+  pct_bicicleta:{label:"% Bicicleta",fmt:v=>fmt(v,1)+"%",color:LIME},
   pct_no_motorizado:{label:"% No motorizado",fmt:v=>fmt(v,1)+"%",color:GREEN},
   viajes_persona:{label:"Viajes por persona",fmt:v=>fmt(v,2),color:TEAL},
   dist_mediana:{label:"Dist. mediana (km)",fmt:v=>fmt(v,1)+" km",color:OR},
@@ -1019,6 +1163,8 @@ function renderComparadorRadar(cities){
 const RANK_IND={
   pct_publico:{label:"% Transporte público",fmt:v=>fmt(v,1)+"%",color:NAVY},
   pct_no_motorizado:{label:"% No motorizado",fmt:v=>fmt(v,1)+"%",color:GREEN},
+  pct_caminata:{label:"% Caminata",fmt:v=>fmt(v,1)+"%",color:GREEN},
+  pct_bicicleta:{label:"% Bicicleta",fmt:v=>fmt(v,1)+"%",color:LIME},
   pct_privado:{label:"% Transporte privado",fmt:v=>fmt(v,1)+"%",color:RED},
   viajes_persona:{label:"Viajes por persona",fmt:v=>fmt(v,2),color:TEAL},
   dist_mediana:{label:"Distancia mediana (km)",fmt:v=>fmt(v,1)+" km",color:OR},
