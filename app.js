@@ -729,13 +729,13 @@ function renderIngreso(d){
 
 // ── TAB 5: MAPAS OD ──────────────────────────────────────────────────────────
 const MAP_DESC={
-  gen:"Viajes <b>generados</b> por zona (salidas desde el origen). Círculos anaranjados proporcionales al volumen.",
-  atr:"Viajes <b>atraídos</b> por zona (llegadas al destino). Círculos azules proporcionales al volumen.",
+  gen:"Viajes <b>generados</b> por zona (salidas desde el origen). Mapa coroplético: a mayor intensidad de naranjo, más viajes.",
+  atr:"Viajes <b>atraídos</b> por zona (llegadas al destino). Mapa coroplético: a mayor intensidad de azul, más viajes.",
   od :"Cada arco une dos zonas: el <b>grosor</b> indica cuántos viajes se realizan entre ellas y la <b>flecha</b> marca el <b>sentido dominante</b>. Haz clic en un arco para el detalle por sentido."
 };
 const MAP_NOTE={
-  gen:"Fuente: EOD procesada. Círculos proporcionales al volumen de viajes generado (factor de expansión).",
-  atr:"Fuente: EOD procesada. Círculos proporcionales al volumen de viajes atraído (factor de expansión).",
+  gen:"Fuente: EOD procesada. Color de cada zona proporcional al volumen de viajes generado (factor de expansión).",
+  atr:"Fuente: EOD procesada. Color de cada zona proporcional al volumen de viajes atraído (factor de expansión).",
   od :"Pares OD por volumen de viajes expandidos. Las líneas son de deseo — no representan rutas reales."
 };
 
@@ -804,7 +804,7 @@ function drawMapView(d){
   ensureOdMap();
   if(odLyr){odMap.removeLayer(odLyr);odLyr=null;}
   odInfo.update(null);
-  if(mapView==="gen"||mapView==="atr")drawCircles(d,mapView);
+  if(mapView==="gen"||mapView==="atr")drawChoropleth(d,mapView);
   else drawODLines(d);
 }
 
@@ -845,6 +845,67 @@ function drawCircles(d,view){
       </div>`).join("");
   const pts=zones.filter(z=>getV(z)>0).map(z=>[z.lat,z.lng]);
   if(pts.length)odMap.fitBounds(L.latLngBounds(pts).pad(0.1));
+}
+
+// ── Mapa COROPLÉTICO de generación / atracción (polígonos de zona coloreados) ──
+const GEOCACHE={};
+const nz=z=>String(z).replace(/\.0$/,"").trim();
+function hexMix(a,b,t){
+  const pa=[1,3,5].map(i=>parseInt(a.slice(i,i+2),16)), pb=[1,3,5].map(i=>parseInt(b.slice(i,i+2),16));
+  return "#"+pa.map((v,i)=>Math.round(v+(pb[i]-v)*t).toString(16).padStart(2,"0")).join("");
+}
+function drawChoropleth(d,view){
+  const zones=d.zonas;
+  if(!zones||!zones.length){odInfo.update("Sin datos de zonas.");return;}
+  const getV=z=>{
+    if(odPer==="all")return view==="gen"?z.gen:z.atr;
+    const p=z.per&&z.per[odPer];
+    return p?(view==="gen"?p[0]:p[1]):0;
+  };
+  const base=view==="gen"?OR:NAVY;
+  const light=view==="gen"?"#fbe8cf":"#dbe7f5";
+  const lbl=view==="gen"?"Generación":"Atracción";
+  const perTxt=odPer==="all"?"":"<br><small>"+PER_LBL[odPer]+"</small>";
+  const valBy={}; zones.forEach(z=>{valBy[nz(z.zona)]=getV(z);});
+  const pos=zones.map(getV).filter(v=>v>0).sort((a,b)=>a-b);
+  if(!pos.length){odInfo.update("Sin datos para este período.");odLegend._d.innerHTML="";return;}
+  const q=p=>pos[Math.min(pos.length-1,Math.floor(p*pos.length))];
+  const brks=[q(.2),q(.4),q(.6),q(.8)];
+  const ramp=[0,1,2,3,4].map(i=>hexMix(light,base,0.18+0.82*i/4));
+  const binOf=v=>{let b=0;for(const t of brks)if(v>t)b++;return b;};
+  const render=geo=>{
+    if(odLyr){odMap.removeLayer(odLyr);odLyr=null;}
+    let matched=0;
+    const lyr=L.geoJSON(geo,{
+      style:f=>{
+        const v=valBy[nz(f.properties.zona)]||0; if(v>0)matched++;
+        return {fillColor:v>0?ramp[binOf(v)]:(isDark()?"#1a2230":"#e8eaee"),
+          fillOpacity:v>0?0.82:0.18, color:isDark()?"#0b1220":"#ffffff", weight:0.5};
+      },
+      onEachFeature:(f,layer)=>{
+        const z=nz(f.properties.zona),v=valBy[z]||0;
+        layer.on("mouseover",()=>{layer.setStyle({weight:2.2,color:base,fillOpacity:.95});layer.bringToFront();
+          odInfo.update(`<b>Zona ${z}</b>${perTxt}<br>${lbl}:<br><b>${v.toLocaleString("es-CL")} viajes</b>`);});
+        layer.on("mouseout",()=>{lyr.resetStyle(layer);odInfo.update(null);});
+        layer.bindPopup(`<b>Zona ${z}</b>${perTxt}<br>${lbl}: <b>${v.toLocaleString("es-CL")} viajes</b>`);
+      }
+    });
+    if(!matched){drawCircles(d,view);return;}   // sin coincidencias -> respaldo a círculos
+    lyr.addTo(odMap);odLyr=lyr;
+    const fmt=n=>Math.round(n).toLocaleString("es-CL");
+    const rows=[[0,"< "+fmt(brks[0])],[1,fmt(brks[0])+"–"+fmt(brks[1])],[2,fmt(brks[1])+"–"+fmt(brks[2])],
+                [3,fmt(brks[2])+"–"+fmt(brks[3])],[4,"> "+fmt(brks[3])]];
+    odLegend._d.innerHTML='<b>'+lbl+'</b><br><small>viajes por zona</small>'+rows.map(([i,lab])=>
+      `<div style="display:flex;align-items:center;gap:7px;margin:3px 0">
+        <span style="display:inline-block;width:16px;height:12px;background:${ramp[i]};border:1px solid rgba(0,0,0,.18)"></span>${lab}</div>`).join("");
+    try{odMap.fitBounds(lyr.getBounds().pad(0.05));}catch(e){}
+  };
+  if(GEOCACHE[d.ciudad]){render(GEOCACHE[d.ciudad]);return;}
+  odInfo.update("Cargando zonas…");
+  getJSON("data/geojson/"+encodeURIComponent(d.ciudad)+".geojson").then(geo=>{
+    GEOCACHE[d.ciudad]=geo;
+    if(S.sel&&S.sel.ciudad===d.ciudad&&(mapView==="gen"||mapView==="atr"))render(geo);
+  }).catch(e=>{console.warn("geojson no disponible para",d.ciudad,"- respaldo a círculos",e);drawCircles(d,view);});
 }
 
 // Arco cuadrático de Bézier entre dos puntos lat/lng (curvatura perpendicular)
