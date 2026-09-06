@@ -15,7 +15,7 @@
       "pct_bicicleta": 2.1,
       "pct_trabajo": 23.6,
       "pct_estudio": 21.1,
-      "tiempo_medio_min": null
+      "tiempo_medio_min": 18.2
     },
     {
       "ciudad": "Iquique - Alto Hospicio",
@@ -32,7 +32,7 @@
       "pct_bicicleta": 0.4,
       "pct_trabajo": 29.6,
       "pct_estudio": 25.5,
-      "tiempo_medio_min": null
+      "tiempo_medio_min": 21.0
     },
     {
       "ciudad": "Copiapó",
@@ -49,7 +49,7 @@
       "pct_bicicleta": 1.3,
       "pct_trabajo": 27.0,
       "pct_estudio": 22.0,
-      "tiempo_medio_min": null
+      "tiempo_medio_min": 21.2
     },
     {
       "ciudad": "Coquimbo - La Serena",
@@ -66,7 +66,7 @@
       "pct_bicicleta": 1.1,
       "pct_trabajo": 25.6,
       "pct_estudio": 25.6,
-      "tiempo_medio_min": null
+      "tiempo_medio_min": 24.5
     },
     {
       "ciudad": "Gran Valparaíso",
@@ -83,7 +83,7 @@
       "pct_bicicleta": 0.0,
       "pct_trabajo": 28.0,
       "pct_estudio": 23.4,
-      "tiempo_medio_min": null
+      "tiempo_medio_min": 28.5
     },
     {
       "ciudad": "San Antonio",
@@ -100,7 +100,7 @@
       "pct_bicicleta": 0.0,
       "pct_trabajo": 30.5,
       "pct_estudio": 17.4,
-      "tiempo_medio_min": 22.6
+      "tiempo_medio_min": 22.9
     },
     {
       "ciudad": "Gran Santiago",
@@ -117,7 +117,7 @@
       "pct_bicicleta": 3.6,
       "pct_trabajo": 34.2,
       "pct_estudio": 20.9,
-      "tiempo_medio_min": 35.3
+      "tiempo_medio_min": 35.7
     },
     {
       "ciudad": "Rancagua - Machalí",
@@ -134,7 +134,7 @@
       "pct_bicicleta": 2.3,
       "pct_trabajo": 23.6,
       "pct_estudio": 14.1,
-      "tiempo_medio_min": 26.4
+      "tiempo_medio_min": 26.9
     },
     {
       "ciudad": "Curicó",
@@ -151,7 +151,7 @@
       "pct_bicicleta": 0.0,
       "pct_trabajo": 30.1,
       "pct_estudio": 16.0,
-      "tiempo_medio_min": null
+      "tiempo_medio_min": 19.8
     },
     {
       "ciudad": "Talca",
@@ -215,8 +215,8 @@
       "viajes_persona": 1.96,
       "pct_privado": 32.5,
       "pct_no_motorizado": 25.3,
-      "pct_caminata": 25.3,
-      "pct_bicicleta": 0.0,
+      "pct_caminata": 23.4,
+      "pct_bicicleta": 1.9,
       "pct_trabajo": 16.6,
       "pct_estudio": 14.2,
       "tiempo_medio_min": 32.0
@@ -236,7 +236,7 @@
       "pct_bicicleta": 1.9,
       "pct_trabajo": 28.7,
       "pct_estudio": 20.6,
-      "tiempo_medio_min": null
+      "tiempo_medio_min": 24.5
     },
     {
       "ciudad": "Valdivia",
@@ -253,7 +253,7 @@
       "pct_bicicleta": 1.9,
       "pct_trabajo": 28.7,
       "pct_estudio": 22.0,
-      "tiempo_medio_min": null
+      "tiempo_medio_min": 20.5
     },
     {
       "ciudad": "Osorno",
@@ -270,7 +270,7 @@
       "pct_bicicleta": 1.1,
       "pct_trabajo": 30.7,
       "pct_estudio": 18.9,
-      "tiempo_medio_min": null
+      "tiempo_medio_min": 23.2
     },
     {
       "ciudad": "Puerto Montt",
@@ -287,7 +287,7 @@
       "pct_bicicleta": 0.2,
       "pct_trabajo": 31.5,
       "pct_estudio": 20.9,
-      "tiempo_medio_min": null
+      "tiempo_medio_min": 28.6
     },
     {
       "ciudad": "Punta Arenas",
@@ -304,7 +304,7 @@
       "pct_bicicleta": 0.5,
       "pct_trabajo": 26.5,
       "pct_estudio": 13.5,
-      "tiempo_medio_min": 21.0
+      "tiempo_medio_min": 21.2
     }
   ]
 }
