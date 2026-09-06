@@ -305,6 +305,23 @@
       "pct_trabajo": 26.5,
       "pct_estudio": 13.5,
       "tiempo_medio_min": 21.2
+    },
+    {
+      "ciudad": "Los Ángeles",
+      "slug": "los_angeles",
+      "anio": 2022,
+      "n_zonas": 117,
+      "viajes": 550321,
+      "pct_publico": 13.6,
+      "dist_mediana": 2.3,
+      "viajes_persona": 3.29,
+      "pct_privado": 50.3,
+      "pct_no_motorizado": 25.5,
+      "pct_caminata": 23.1,
+      "pct_bicicleta": 2.4,
+      "pct_trabajo": 27.0,
+      "pct_estudio": 15.3,
+      "tiempo_medio_min": 23.9
     }
   ]
 }
