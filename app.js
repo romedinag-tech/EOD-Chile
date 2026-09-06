@@ -1,6 +1,6 @@
 /* ===================================================================
    EOD Chile · Movilidad Urbana
-   Encuestas Origen-Destino · 18 ciudades homologadas y expandidas
+   Encuestas Origen-Destino · 19 ciudades homologadas y expandidas
    By Rodrigo Medina González · Universidad de Concepción
    =================================================================== */
 
@@ -1049,7 +1049,7 @@ function renderPanorama(){
   const nacKpis=document.getElementById("nac-kpis");
   if(nacKpis)nacKpis.innerHTML=`
     <div class="kpi" style="--kpi-c:var(--navy)"><div class="v">${S.index.length}</div><div class="l">Ciudades cubiertas</div><div class="s">EOD homologadas</div></div>
-    <div class="kpi" style="--kpi-c:var(--teal)"><div class="v c-teal">${fmtM(totalV)}</div><div class="l">Viajes expandidos</div><div class="s">suma 18 ciudades día laboral</div></div>
+    <div class="kpi" style="--kpi-c:var(--teal)"><div class="v c-teal">${fmtM(totalV)}</div><div class="l">Viajes expandidos</div><div class="s">suma 19 ciudades día laboral</div></div>
     <div class="kpi" style="--kpi-c:var(--navy2)"><div class="v c-navy">${avgPub!=null?fmt(avgPub,1)+"%":"s/d"}</div><div class="l">% Público promedio</div><div class="s">promedio simple entre ciudades</div></div>
     <div class="kpi" style="--kpi-c:var(--or)"><div class="v or">${avgDm!=null?fmt(avgDm,1)+" km":"s/d"}</div><div class="l">Dist. mediana promedio</div><div class="s">centroide a centroide</div></div>`;
   // Map + donut (delayed so container is laid out)
@@ -1207,7 +1207,7 @@ async function renderComparadorChart(){
     wrap.innerHTML='<canvas id="c-comparador"></canvas>';
   if(cmpVar==="multidim"){
     document.getElementById("cmp-title").textContent="Perfil multidimensional por ciudad";
-    document.getElementById("cmp-lead").textContent="6 dimensiones normalizadas — 0 = mínimo, 100 = máximo entre las 18 ciudades";
+    document.getElementById("cmp-lead").textContent="6 dimensiones normalizadas — 0 = mínimo, 100 = máximo entre las 19 ciudades";
     wrap.style.height="460px";
     renderComparadorRadar(S.index.filter(c=>slugs.includes(c.slug)));
     return;
@@ -1405,7 +1405,7 @@ function _updateRankTitle(){
   if(p){
     const vals=S.index.map(c=>c[rankInd]).filter(v=>v!=null);
     const prom=vals.length?vals.reduce((a,v)=>a+v,0)/vals.length:null;
-    p.textContent="18 ciudades ordenadas de "+(rankAsc?"menor a mayor":"mayor a menor")
+    p.textContent="19 ciudades ordenadas de "+(rankAsc?"menor a mayor":"mayor a menor")
       +(prom!=null&&meta.fmt?" · promedio nacional: "+meta.fmt(prom):"")+".";
   }
 }
