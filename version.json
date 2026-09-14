@@ -1,5 +1,6 @@
 {
-  "version": "20260914",
+  "version": "20260914b",
   "datos": "Expansión pura de la encuesta (factor_expansion), día laboral, sin subreporte. Validación en EODs/EOD_PARQUET/validacion_expansion_oficial y validacion_poblacion_oficial.",
-  "cambio": "Recalculados Temuco, Valdivia, Osorno, Puerto Montt, Los Ángeles (factor venía calibrado), Rancagua y Punta Arenas (factor global de hogar), Curicó y Linares (laboral + fin de semana mezclados; Linares también hogares y personas). tiempo_medio_min actualizado en todas."
+  "cambio": "Recalculados Temuco, Valdivia, Osorno, Puerto Montt, Los Ángeles (factor venía calibrado), Rancagua y Punta Arenas (factor global de hogar), Curicó y Linares (laboral + fin de semana mezclados; Linares también hogares y personas). tiempo_medio_min actualizado en todas.",
+  "validacion": "estado_validacion por ciudad en EODs/EOD_PARQUET/validacion_expansion_oficial (v3): laboral validado con fuente primaria en Gran Santiago, Curicó, Linares, Los Ángeles, Punta Arenas, Rancagua, San Antonio y Talca; corroborado con fuente secundaria en Gran Concepción, Gran Valparaíso, Coquimbo y Valdivia; resto abierto."
 }
