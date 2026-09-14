@@ -66,8 +66,9 @@ let odPer="all", odTopN=50, odEsc="auto";
 const PER_LBL={all:"Día completo",pm:"Punta mañana",pmd:"Punta mediodía",pt:"Punta tarde",fp:"Fuera de punta"};
 
 // ── Utilidades ───────────────────────────────────────────────────────────────
+const DATA_V="20260914";  // bump al regenerar data/eod (cache-bust)
 function getJSON(url){
-  return fetch(url).then(r=>r.text())
+  return fetch(url+(url.includes("?")?"&":"?")+"v="+DATA_V).then(r=>r.text())
     .then(t=>JSON.parse(t.replace(/\bNaN\b/g,"null").replace(/-?\bInfinity\b/g,"null")));
 }
 
