@@ -1241,10 +1241,10 @@ async function renderComparadorChart(){
 }
 
 const CMP_IND={
-  pct_publico:{label:"% Público",fmt:v=>fmt(v,1)+"%",color:NAVY},
-  pct_caminata:{label:"% Caminata",fmt:v=>fmt(v,1)+"%",color:GREEN},
-  pct_bicicleta:{label:"% Bicicleta",fmt:v=>fmt(v,1)+"%",color:LIME},
-  pct_no_motorizado:{label:"% No motorizado",fmt:v=>fmt(v,1)+"%",color:GREEN},
+  pct_publico:{label:"% Público",fmt:v=>pct(v),color:NAVY},
+  pct_caminata:{label:"% Caminata",fmt:v=>pct(v),color:GREEN},
+  pct_bicicleta:{label:"% Bicicleta",fmt:v=>pct(v),color:LIME},
+  pct_no_motorizado:{label:"% No motorizado",fmt:v=>pct(v),color:GREEN},
   viajes_persona:{label:"Viajes por persona",fmt:v=>fmt(v,2),color:TEAL},
   dist_mediana:{label:"Dist. mediana (km)",fmt:v=>fmt(v,1)+" km",color:OR},
 };
@@ -1310,12 +1310,12 @@ function renderComparadorSimple(cities){
 }
 
 const RADAR_DIMS=[
-  {key:"pct_publico",      label:"% Público",    hi:true,  fmt:v=>fmt(v,1)+"%"},
-  {key:"pct_no_motorizado",label:"% No motor.",  hi:true,  fmt:v=>fmt(v,1)+"%"},
+  {key:"pct_publico",      label:"% Público",    hi:true,  fmt:v=>pct(v)},
+  {key:"pct_no_motorizado",label:"% No motor.",  hi:true,  fmt:v=>pct(v)},
   {key:"viajes_persona",   label:"V/persona",    hi:true,  fmt:v=>fmt(v,2)},
   {key:"dist_mediana",     label:"Compacidad",   hi:false, fmt:v=>fmt(v,1)+" km"},
   {key:"tiempo_medio_min", label:"Rapidez",      hi:false, fmt:v=>fmt(v,0)+" min"},
-  {key:"pct_trabajo",      label:"% Trabajo",    hi:true,  fmt:v=>fmt(v,1)+"%"},
+  {key:"pct_trabajo",      label:"% Trabajo",    hi:true,  fmt:v=>pct(v)},
 ];
 
 function renderComparadorRadar(cities){
@@ -1376,11 +1376,11 @@ function renderComparadorRadar(cities){
 
 // ── Ranking ───────────────────────────────────────────────────────────────────
 const RANK_IND={
-  pct_publico:{label:"% Transporte público",fmt:v=>fmt(v,1)+"%",color:NAVY},
-  pct_no_motorizado:{label:"% No motorizado",fmt:v=>fmt(v,1)+"%",color:GREEN},
-  pct_caminata:{label:"% Caminata",fmt:v=>fmt(v,1)+"%",color:GREEN},
-  pct_bicicleta:{label:"% Bicicleta",fmt:v=>fmt(v,1)+"%",color:LIME},
-  pct_privado:{label:"% Transporte privado",fmt:v=>fmt(v,1)+"%",color:RED},
+  pct_publico:{label:"% Transporte público",fmt:v=>pct(v),color:NAVY},
+  pct_no_motorizado:{label:"% No motorizado",fmt:v=>pct(v),color:GREEN},
+  pct_caminata:{label:"% Caminata",fmt:v=>pct(v),color:GREEN},
+  pct_bicicleta:{label:"% Bicicleta",fmt:v=>pct(v),color:LIME},
+  pct_privado:{label:"% Transporte privado",fmt:v=>pct(v),color:RED},
   viajes_persona:{label:"Viajes por persona",fmt:v=>fmt(v,2),color:TEAL},
   dist_mediana:{label:"Distancia mediana (km)",fmt:v=>fmt(v,1)+" km",color:OR},
   viajes:{label:"Viajes/día (total)",fmt:v=>fmtM(v),color:NAVY2},
