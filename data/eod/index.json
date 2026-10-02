@@ -95,9 +95,9 @@
       "dist_mediana": 1.3,
       "viajes_persona": 2.4,
       "pct_privado": 41.3,
-      "pct_no_motorizado": null,
-      "pct_caminata": null,
-      "pct_bicicleta": null,
+      "pct_no_motorizado": 24.4,
+      "pct_caminata": 23.9,
+      "pct_bicicleta": 0.5,
       "pct_trabajo": 30.5,
       "pct_estudio": 17.4,
       "tiempo_medio_min": 22.9
