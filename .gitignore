@@ -1,6 +1,4 @@
 __pycache__/
 *.pyc
 .venv/
-.streamlit/secrets.toml
 .DS_Store
-_st.log

@@ -1,61 +1,61 @@
-# 🚍 EOD Chile — Dashboard de Encuestas Origen-Destino
+# 🚍 EOD Chile — Movilidad Urbana en Chile
 
-Dashboard interactivo (Streamlit) para explorar y comparar las **Encuestas
-Origen-Destino (EOD)** de las ciudades de Chile, homologadas a un esquema común y
-expandidas con sus factores de expansión corregidos por sesgo.
+Sitio web que explora y compara las **Encuestas Origen-Destino (EOD)** del MTT/SECTRA de las ciudades
+de Chile, homologadas a un esquema común y expandidas con el factor de expansión de cada encuesta.
+
+Es un **sitio estático**: HTML + JavaScript vanilla, sin backend ni dependencias que instalar. Los
+indicadores vienen precalculados en JSON desde el repositorio de análisis.
 
 ## Qué incluye
 
-- **Menú lateral**: selección de región / ciudad / año de la encuesta.
-- **Menú superior** (herramientas):
-  - **Resumen** — panorama nacional: KPIs país, mapa de ciudades (tamaño ∝ viajes,
-    color ∝ % público), partición modal promedio y tabla comparada por ciudad.
-  - **Ciudad** — comportamiento de viajes de una ciudad, en pestañas:
-    *Resumen · Modos y propósitos · Distancia · Demografía · Ingreso · Mapas*.
-    Incluye partición modal, propósito, distribución horaria, **histograma por distancia**
-    (tramos 0-1…6+ km), tendencias por grupo etario y tipo de usuario, **segmentación por
-    quintil de ingreso**, y mapas de **generación/atracción**, **líneas de deseo** y
-    **matriz O/D interactiva** (zona origen → destinos). Filtros de segmentación globales.
-  - **Comparador** — partición modal/propósito, indicadores y dispersión entre ciudades.
-  - **Ranking** — ordena las ciudades por indicador (viajes por persona, % público, etc.).
+Selector de ciudad (19 con microdato de viajes) y siete vistas:
+
+- **Resumen** — KPIs de la ciudad: viajes diarios expandidos, viajes por persona, partición modal.
+- **Movilidad** — partición modal, propósito del viaje, distribución horaria y distancia por tramos.
+- **Demografía** — comportamiento por grupo etario, sexo y tipo de usuario.
+- **Ingreso** — segmentación por quintil del hogar (sólo las ciudades que publican el dato).
+- **Mapas** — generación y atracción por zona, líneas de deseo y matriz O-D interactiva (20 capas de
+  zonificación, EPSG:4326).
+- **Nacional** — panorama país: mapa de ciudades y comparación de indicadores.
+- **Comparador** — partición modal, propósito e indicadores entre ciudades.
 
 ## Datos
 
-18 ciudades con viajes validados (factor de expansión ≈ catálogo oficial), homologadas
-desde bases Access/xlsx del MTT. Columnas canónicas de modo (`modo_pp`), propósito
-(`proposito_agregado_h`), grupo etario, tipo de usuario y hora del día.
+19 ciudades con microdato de viajes homologado desde las bases Access del MTT (Calama no publica
+microdato; Antofagasta tiene la base corrupta). Los totales están **expandidos con el factor de
+expansión de la encuesta**, día laboral, **sin factor de subreporte** — la expansión es de la encuesta;
+el subreporte es calibración del modelo y va aparte.
 
-Los datos viven en `data/` (Parquet). Detalle metodológico de la homologación y la
-depuración en el repositorio de análisis.
+Cada ciudad declara contra qué cifra oficial se validó. En tres de ellas la partición modal está
+contrastada **al entero contra el cuadro del informe de su propio estudio**: Linares (Cuadro N° 11-23),
+San Antonio y Gran Valparaíso (Cuadro N° 17.26 de cada estudio), las tres con diferencia 0,00 pp. Donde
+una encuesta no separa caminata de bicicleta y no hay cuadro oficial leído, el indicador se publica
+como **s/d**, nunca como 0,0.
 
-## Ejecutar localmente
-
-```bash
-pip install -r requirements.txt
-streamlit run app.py
-```
-
-## Desplegar en Streamlit Community Cloud
-
-1. Entra a https://share.streamlit.io y conecta tu cuenta de GitHub.
-2. "New app" → repo `romedinag-tech/EOD-Chile`, branch `main`, archivo `app.py`.
-3. Deploy. (Los Parquet ya están en el repo, no requiere configuración extra.)
+**Cada cifra es de un año distinto**: una EOD por ciudad, entre 2010 y 2023. Es un corte transversal,
+no una serie temporal — no encadenar ciudades como si fueran años.
 
 ## Estructura
 
 ```
-app.py                # entrypoint: sidebar + menú superior
-views/                # Ciudad, Comparador, Ranking
-eodlib/               # data (carga), metrics (ponderadas), viz (Plotly)
-data/                 # viajes_analiticos / hogar / persona (Parquet) + índice
+index.html            # el sitio
+app.js                # lógica, gráficos y mapas (Leaflet)
+theme.css             # tema
+version.json          # versión publicada, qué cambió y cómo se validó
+data/eod/             # index.json + un JSON de KPIs por ciudad
+data/geojson/         # 20 capas de zonificación EOD (EPSG:4326)
 ```
 
-## Roadmap
+## Ver en local
 
-- [x] Distancias de viaje + histograma por tramos (0-1, 1-2, … 6+ km), segmentable.
-- [x] Mapas: generación / atracción por zona y **líneas de deseo** (20 ciudades).
-- [x] Matriz O/D interactiva (seleccionar zona origen → destinos).
-- [x] Segmentación por ingreso del hogar (quintiles, 10 ciudades con dato).
-- [x] Resumen nacional + rediseño profesional (tema, KPIs, pestañas).
-- [ ] Ingreso del hogar para EOD 2010-13 (derivar desde ingreso de personas).
-- [ ] Exportar gráficos/tablas y descargar datos filtrados.
+Servirlo por HTTP; con `file://` los mapas de Leaflet renderizan a 0 px:
+
+```bash
+python -X utf8 -m http.server 8000      # y abrir http://localhost:8000
+```
+
+## Fuente
+
+Encuestas Origen-Destino de la Subsecretaría de Transportes / SECTRA, Ministerio de Transportes y
+Telecomunicaciones de Chile. La homologación, la expansión y la validación contra las cifras oficiales
+de cada estudio se hacen en el repositorio de análisis; acá sólo se muestran.
