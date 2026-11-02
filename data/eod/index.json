@@ -183,8 +183,8 @@
       "pct_no_motorizado": 29.4,
       "pct_caminata": 22.5,
       "pct_bicicleta": 6.9,
-      "pct_trabajo": 17.4,
-      "pct_estudio": 9.6,
+      "pct_trabajo": 32.3,
+      "pct_estudio": 18.8,
       "tiempo_medio_min": 20.7
     },
     {
@@ -217,8 +217,8 @@
       "pct_no_motorizado": 25.3,
       "pct_caminata": 23.4,
       "pct_bicicleta": 1.9,
-      "pct_trabajo": 16.6,
-      "pct_estudio": 14.2,
+      "pct_trabajo": 30.2,
+      "pct_estudio": 27.3,
       "tiempo_medio_min": 32.0
     },
     {
@@ -296,7 +296,7 @@
       "n_zonas": 112,
       "viajes": 388976,
       "pct_publico": 20.3,
-      "dist_mediana": 4.1,
+      "dist_mediana": 2.3,
       "viajes_persona": 2.92,
       "pct_privado": 62.1,
       "pct_no_motorizado": 12.7,
@@ -310,10 +310,10 @@
       "ciudad": "Los Ángeles",
       "slug": "los_angeles",
       "anio": 2022,
-      "n_zonas": 117,
+      "n_zonas": 139,
       "viajes": 436242,
       "pct_publico": 17.5,
-      "dist_mediana": 2.3,
+      "dist_mediana": 1.7,
       "viajes_persona": 2.63,
       "pct_privado": 45.5,
       "pct_no_motorizado": 26.1,
