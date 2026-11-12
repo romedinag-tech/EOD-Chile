@@ -2,3 +2,8 @@ __pycache__/
 *.pyc
 .venv/
 .DS_Store
+
+# Notas internas del motor: no se publican
+CLAUDE.md
+CRUCE_CENSO_MOVILIDAD_PROMPT.md
+SALIDAS.md
