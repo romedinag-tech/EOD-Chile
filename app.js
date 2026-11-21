@@ -66,7 +66,7 @@ let odPer="all", odTopN=50, odEsc="auto";
 const PER_LBL={all:"Día completo",pm:"Punta mañana",pmd:"Punta mediodía",pt:"Punta tarde",fp:"Fuera de punta"};
 
 // ── Utilidades ───────────────────────────────────────────────────────────────
-const DATA_V="20261121a";  // bump al regenerar data/eod (cache-bust)
+const DATA_V="20261121b";  // bump al regenerar data/eod (cache-bust)
 function getJSON(url){
   return fetch(url+(url.includes("?")?"&":"?")+"v="+DATA_V).then(r=>r.text())
     .then(t=>JSON.parse(t.replace(/\bNaN\b/g,"null").replace(/-?\bInfinity\b/g,"null")));
@@ -485,9 +485,9 @@ function hBarChart(id,labels,data,colors,unit){
 
 // ── Barras apiladas horizontales (cross-tabs) ────────────────────────────────
 function stackedBar(id,chartData){
-  if(!chartData)return;
   const ctx=document.getElementById(id);if(!ctx)return;
-  if(CH[id])CH[id].destroy();
+  if(CH[id]){CH[id].destroy();delete CH[id];}
+  if(!chartData)return;
   const{labels,datasets}=chartData;
   if(!labels||!datasets||!labels.length)return;
   CH[id]=new Chart(ctx,{
@@ -656,7 +656,8 @@ function renderEtario(d){
     d.etario.map((_,i)=>ETARIO_PAL[i]||NAVY),"%");
 }
 function renderQuintil(d){
-  if(!d.quintil||!d.quintil.length)return;
+  const nota=document.getElementById("quintil-nota");if(nota)nota.textContent=d.quintil_nota||"";
+  if(!d.quintil||!d.quintil.length){hBarChart("c-quintil",[],[],[],"%");return;}
   hBarChart("c-quintil",
     d.quintil.map(q=>"Q"+q.q+" · "+(["Bajo","Medio-bajo","Medio","Medio-alto","Alto"][q.q-1]||"")),
     d.quintil.map(q=>q.pct),QUINTIL_COL,"%");
